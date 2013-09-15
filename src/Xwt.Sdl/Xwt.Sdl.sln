@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xwt.Sdl", "Xwt.Sdl.csproj", "{D346ADC0-C748-451B-88B5-F5988B1FEB0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xwt", "..\..\ext\xwt\Xwt\Xwt.csproj", "{92494904-35FA-4DC9-BDE9-3A3E87AC49D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xwt.Sdl.Tests", "..\Xwt.Sdl.Tests\Xwt.Sdl.Tests.csproj", "{56A555E1-63A4-49C8-AF00-DE10EE604E68}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{56A555E1-63A4-49C8-AF00-DE10EE604E68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56A555E1-63A4-49C8-AF00-DE10EE604E68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56A555E1-63A4-49C8-AF00-DE10EE604E68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56A555E1-63A4-49C8-AF00-DE10EE604E68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92494904-35FA-4DC9-BDE9-3A3E87AC49D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92494904-35FA-4DC9-BDE9-3A3E87AC49D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92494904-35FA-4DC9-BDE9-3A3E87AC49D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92494904-35FA-4DC9-BDE9-3A3E87AC49D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D346ADC0-C748-451B-88B5-F5988B1FEB0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D346ADC0-C748-451B-88B5-F5988B1FEB0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D346ADC0-C748-451B-88B5-F5988B1FEB0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D346ADC0-C748-451B-88B5-F5988B1FEB0C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = ..\Xwt.Sdl.Tests\Xwt.Sdl.Tests.csproj
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,5 @@
+src/Xwt.Sdl.Tests/bin/*
+src/Xwt.Sdl.Tests/obj/*
+src/Xwt.Sdl/bin/
+src/Xwt.Sdl/obj/
+*.userprefs
