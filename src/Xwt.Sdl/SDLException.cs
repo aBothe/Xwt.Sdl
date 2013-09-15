@@ -1,5 +1,5 @@
 //
-// Program.cs
+// SDLException.cs
 //
 // Author:
 //       Alexander Bothe <info@alexanderbothe.com>
@@ -24,34 +24,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using Xwt;
+using SDL2;
 
-namespace Xwt.Sdl.Tests
+namespace Xwt.Sdl
 {
-	class MainClass
+	public class SdlException : Exception
 	{
-		public static void Main (string[] args)
+		public SdlException () : base(SDL.SDL_GetError())
 		{
-			Application.Initialize ("Xwt.Sdl.Backends.SdlEngine, Xwt.Sdl");
-
-			var mw = new Window();
-			mw.Size = new Size (600, 600);
-			mw.Title = "SDL2 Test!";
-			mw.CloseRequested+=
-				(sender, a) => Application.Exit();
-			mw.Show();
-
-			var mw2 = new Window ();
-			bool bb=true;
-			mw2.Size = new Size (500, 100);
-			mw2.Title = "Shallow";
-			mw2.CloseRequested += (sender, a) => {
-				a.Handled = bb;
-				bb = false;
-			};
-			mw2.Show ();
-
-			Application.Run ();
 		}
 	}
 }
+

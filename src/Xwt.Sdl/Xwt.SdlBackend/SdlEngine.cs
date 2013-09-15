@@ -33,10 +33,12 @@ namespace Xwt.Sdl.Backends
 	public class SdlEngine : ToolkitEngineBackend
 	{
 		ManualResetEvent pendingEvents = new ManualResetEvent(true);
+		bool run;
 
 		public override void InitializeApplication ()
 		{
-			SDL.SDL_Init(SDL.SDL_INIT_VIDEO);
+			if (SDL.SDL_Init (SDL.SDL_INIT_VIDEO) < 0)
+				throw new SdlException ();
 		}
 
 		public override void InitializeBackends ()
@@ -107,35 +109,51 @@ namespace Xwt.Sdl.Backends
 
 		public override void RunApplication ()
 		{
+			run = true;
 			SDL.SDL_Event ev;
-			while (true) {
+			while (run) {
 				pendingEvents.Reset ();
 				while (SDL.SDL_PollEvent (out ev) != 0) {
 					if (ev.type == SDL.SDL_EventType.SDL_QUIT) {
-						SDL.SDL_Quit ();
+						run = false;
 						return;
 					}
-
 					HandleEvent (ev);
 				}
 				pendingEvents.Set ();
-				System.Threading.Thread.Sleep (10);
+
+				if(!Draw())
+					Thread.Sleep (15);
 			}
 		}
 
-		void HandleEvent(SDL.SDL_Event ev)
+		bool HandleEvent(SDL.SDL_Event ev)
 		{
+			switch (ev.type) {
+				case SDL.SDL_EventType.SDL_WINDOWEVENT:
+					WeakReference wr;
+					if (WindowBackend.windowCache.TryGetValue (ev.window.windowID, out wr) && wr.IsAlive)
+						return (wr.Target as WindowBackend).HandleWindowEvent (ev);
+					break;
+			}
 
+			return false;
+		}
+
+		bool Draw()
+		{
+			return false;
 		}
 
 		public override void ExitApplication ()
 		{
+			run = false;
 			SDL.SDL_Quit ();
 		}
 
 		public override void InvokeAsync (Action action)
 		{
-			throw new NotImplementedException ();
+			ThreadPool.QueueUserWorkItem ((state) => action());
 		}
 
 		public override object TimerInvoke (Func<bool> action, TimeSpan timeSpan)

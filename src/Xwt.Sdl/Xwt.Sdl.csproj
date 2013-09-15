@@ -38,6 +38,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Xwt.SdlBackend\SdlEngine.cs" />
     <Compile Include="Xwt.SdlBackend\WindowBackend.cs" />
+    <Compile Include="SDL2Extensions.cs" />
+    <Compile Include="SDLException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

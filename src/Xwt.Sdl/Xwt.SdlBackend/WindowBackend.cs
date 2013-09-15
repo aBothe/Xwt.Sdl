@@ -26,12 +26,54 @@
 using System;
 using Xwt.Backends;
 using SDL2;
+using System.Collections.Generic;
 
 namespace Xwt.Sdl.Backends
 {
 	public class WindowBackend : IWindowBackend
 	{
+		#region Properties
+		internal static Dictionary<uint, WeakReference> windowCache = new Dictionary<uint, WeakReference>();
+		IntPtr window;
+		uint id;
+		public uint WindowId {get{return id;}}
+		public IWindowFrameEventSink eventSink;
 
+		Rectangle padding;
+		#endregion
+
+		#region Extension
+		internal bool HandleWindowEvent(SDL.SDL_Event ev)
+		{
+			if (eventSink != null) {
+				switch (ev.window.windowEvent) {
+					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_CLOSE:
+						if (!eventSink.OnCloseRequested ()) {
+							Dispose ();
+						}
+						break;
+					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_HIDDEN:
+						eventSink.OnHidden ();
+						break;
+					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_SHOWN:
+						eventSink.OnShown ();
+						break;
+					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MOVED:
+						int w, h;
+						SDL.SDL_GetWindowSize (window, out w, out h);
+						eventSink.OnBoundsChanged (new Rectangle ((double)ev.window.data1, (double)ev.window.data2, (double)w, (double)h));
+						break;
+					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED:
+						int x, y;
+						SDL.SDL_GetWindowPosition (window, out x, out y);
+						eventSink.OnBoundsChanged (new Rectangle ((double)x, (double)y, (double)ev.window.data1, (double)ev.window.data2));
+						break;
+				}
+			}
+			return false;
+		}
+
+		#endregion
 
 		#region IWindowBackend implementation
 
@@ -47,17 +89,18 @@ namespace Xwt.Sdl.Backends
 
 		public void SetPadding (double left, double top, double right, double bottom)
 		{
-			throw new NotImplementedException ();
+			padding = new Rectangle (left, top, right, bottom);
 		}
 
 		public void GetMetrics (out Size minSize, out Size decorationSize)
 		{
-			throw new NotImplementedException ();
+			minSize = new Size ();
+			decorationSize = new Size ();
 		}
 
 		public void SetMinSize (Size size)
 		{
-			throw new NotImplementedException ();
+			SDL_.SDL_SetWindowMinimumSize (window, (int)size.Width, (int)size.Height);
 		}
 
 		#endregion
@@ -75,22 +118,31 @@ namespace Xwt.Sdl.Backends
 
 		public void Initialize (IWindowFrameEventSink eventSink)
 		{
-			throw new NotImplementedException ();
+			this.eventSink = eventSink;
+			window = SDL.SDL_CreateWindow (string.Empty, 0, 0, 400, 300, SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
+
+			if (window == IntPtr.Zero)
+				throw new SdlException ();
+
+			id = SDL.SDL_GetWindowID (window);
+
+			windowCache.Add (id, new WeakReference (this));
 		}
 
-		public void Dispose ()
+		public virtual void Dispose ()
 		{
-			throw new NotImplementedException ();
+			SDL.SDL_DestroyWindow (window);
+			windowCache.Remove (id);
 		}
 
 		public void Move (double x, double y)
 		{
-			throw new NotImplementedException ();
+			SDL.SDL_SetWindowPosition (window, (int)x, (int)y);
 		}
 
 		public void SetSize (double width, double height)
 		{
-			throw new NotImplementedException ();
+			SDL.SDL_SetWindowSize (window, (int)width, (int)height);
 		}
 
 		public void SetTransientFor (IWindowFrameBackend window)
@@ -105,41 +157,54 @@ namespace Xwt.Sdl.Backends
 
 		public void Present ()
 		{
-			throw new NotImplementedException ();
+			SDL.SDL_ShowWindow (window);
 		}
 
 		public Rectangle Bounds {
 			get {
-				throw new NotImplementedException ();
+				int x, y, w, h;
+				SDL.SDL_GetWindowPosition (window, out x, out y);
+				SDL.SDL_GetWindowSize (window, out w, out h);
+				return new Rectangle ((double)x, (double)y, (double)w, (double)h);
 			}
 			set {
-				throw new NotImplementedException ();
+				Move (value.X, value.Y);
+				SetSize (value.Width, value.Height);
 			}
 		}
 
 		public bool Visible {
 			get {
-				throw new NotImplementedException ();
+				return (SDL.SDL_GetWindowFlags (window) & (uint)SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN) != 0;
 			}
 			set {
-				throw new NotImplementedException ();
+				if (value)
+					SDL.SDL_ShowWindow (window);
+				else
+					SDL.SDL_HideWindow (window);
 			}
 		}
 
 		public string Title {
 			get {
-				throw new NotImplementedException ();
+				return SDL.SDL_GetWindowTitle (window);
 			}
 			set {
-				throw new NotImplementedException ();
+				SDL.SDL_SetWindowTitle (window, value);
 			}
 		}
 
 		public bool Decorated {
 			get {
-				throw new NotImplementedException ();
+				return (SDL.SDL_GetWindowFlags (window) & (uint)SDL.SDL_WindowFlags.SDL_WINDOW_BORDERLESS) != 0;
 			}
 			set {
+				if (Decorated != value) {
+					/*
+					 * Perhaps destroy old window, reallocate it with(out) the DECORATED flag?
+					 * What about restoring drawing contexts?
+					 */
+				}
 				throw new NotImplementedException ();
 			}
 		}
@@ -155,9 +220,10 @@ namespace Xwt.Sdl.Backends
 
 		public bool Resizable {
 			get {
-				throw new NotImplementedException ();
+				return (SDL.SDL_GetWindowFlags (window) & (uint)SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE) != 0;
 			}
 			set {
+				// See Decorated
 				throw new NotImplementedException ();
 			}
 		}
@@ -173,10 +239,11 @@ namespace Xwt.Sdl.Backends
 
 		public bool FullScreen {
 			get {
-				throw new NotImplementedException ();
+				return (SDL.SDL_GetWindowFlags (window) & (uint)SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN) != 0;
 			}
 			set {
-				throw new NotImplementedException ();
+				if (SDL.SDL_SetWindowFullscreen (window, value ? (uint)SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP : 0u) != 0)
+					throw new SdlException();
 			}
 		}
 
@@ -192,17 +259,17 @@ namespace Xwt.Sdl.Backends
 
 		public void InitializeBackend (object frontend, ApplicationContext context)
 		{
-			throw new NotImplementedException ();
+			
 		}
 
 		public void EnableEvent (object eventId)
 		{
-			throw new NotImplementedException ();
+
 		}
 
 		public void DisableEvent (object eventId)
 		{
-			throw new NotImplementedException ();
+
 		}
 
 		#endregion

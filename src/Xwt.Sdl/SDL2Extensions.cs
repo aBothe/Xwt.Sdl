@@ -1,5 +1,5 @@
 //
-// Program.cs
+// SDL2Extensions.cs
 //
 // Author:
 //       Alexander Bothe <info@alexanderbothe.com>
@@ -24,34 +24,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using Xwt;
+using System.Runtime.InteropServices;
 
-namespace Xwt.Sdl.Tests
+namespace SDL2
 {
-	class MainClass
+	public static class SDL_
 	{
-		public static void Main (string[] args)
-		{
-			Application.Initialize ("Xwt.Sdl.Backends.SdlEngine, Xwt.Sdl");
+		private const string nativeLibName = "SDL2.dll";
 
-			var mw = new Window();
-			mw.Size = new Size (600, 600);
-			mw.Title = "SDL2 Test!";
-			mw.CloseRequested+=
-				(sender, a) => Application.Exit();
-			mw.Show();
-
-			var mw2 = new Window ();
-			bool bb=true;
-			mw2.Size = new Size (500, 100);
-			mw2.Title = "Shallow";
-			mw2.CloseRequested += (sender, a) => {
-				a.Handled = bb;
-				bb = false;
-			};
-			mw2.Show ();
-
-			Application.Run ();
-		}
+		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+		public static extern void SDL_SetWindowMinimumSize(IntPtr window,int         min_w,int         min_h);
 	}
 }
+
