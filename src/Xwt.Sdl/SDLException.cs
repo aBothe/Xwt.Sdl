@@ -33,6 +33,8 @@ namespace Xwt.Sdl
 		public SdlException () : base(SDL.SDL_GetError())
 		{
 		}
+
+		public SdlException(string msg) : base(msg) {}
 	}
 }
 

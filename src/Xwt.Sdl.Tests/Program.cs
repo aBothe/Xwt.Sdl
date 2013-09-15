@@ -40,17 +40,13 @@ namespace Xwt.Sdl.Tests
 			mw.CloseRequested+=
 				(sender, a) => Application.Exit();
 			mw.Show();
-
+			/*
 			var mw2 = new Window ();
 			bool bb=true;
 			mw2.Size = new Size (500, 100);
 			mw2.Title = "Shallow";
-			mw2.CloseRequested += (sender, a) => {
-				a.Handled = bb;
-				bb = false;
-			};
 			mw2.Show ();
-
+			*/
 			Application.Run ();
 		}
 	}

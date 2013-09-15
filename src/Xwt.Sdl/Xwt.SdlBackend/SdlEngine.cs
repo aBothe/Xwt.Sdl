@@ -37,6 +37,7 @@ namespace Xwt.Sdl.Backends
 
 		public override void InitializeApplication ()
 		{
+			OpenTK.Graphics.OpenGL.GL.LoadAll ();
 			if (SDL.SDL_Init (SDL.SDL_INIT_VIDEO) < 0)
 				throw new SdlException ();
 		}
@@ -142,7 +143,16 @@ namespace Xwt.Sdl.Backends
 
 		bool Draw()
 		{
-			return false;
+			bool d=false;
+			WindowBackend w;
+
+			foreach (var kv in WindowBackend.windowCache) {
+				w = kv.Value.Target as WindowBackend;
+				if (w != null && w.Draw ())
+					d = true;
+			}
+
+			return d;
 		}
 
 		public override void ExitApplication ()

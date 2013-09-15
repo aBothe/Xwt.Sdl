@@ -26,6 +26,8 @@
 using System;
 using Xwt.Backends;
 using SDL2;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
 
 namespace Xwt.Sdl.Backends
@@ -35,6 +37,7 @@ namespace Xwt.Sdl.Backends
 		#region Properties
 		internal static Dictionary<uint, WeakReference> windowCache = new Dictionary<uint, WeakReference>();
 		IntPtr window;
+		IntPtr ctxt;
 		uint id;
 		public uint WindowId {get{return id;}}
 		public IWindowFrameEventSink eventSink;
@@ -73,6 +76,36 @@ namespace Xwt.Sdl.Backends
 			return false;
 		}
 
+		internal bool Draw()
+		{
+			if (SDL.SDL_GL_MakeCurrent (window, ctxt) != 0)
+				throw new SdlException ();
+
+			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			/*
+			SDL.SDL_SetRenderDrawColor (renderer, 0, 0, 0, 0);
+
+			SDL.SDL_RenderClear (renderer);
+			*/
+			GL.Begin (BeginMode.Triangles);
+			GL.Vertex2 (0, 0);
+			GL.Vertex2 (50, 50);
+			GL.Vertex2 (200, -200);
+			GL.End ();
+			/*
+			var rect = new SDL2.SDL.SDL_Rect();
+			rect.x = 100;
+			rect.y = 100;
+			rect.w = 50;
+			rect.h = 100;
+			SDL.SDL_RenderFillRect (renderer, ref rect);
+			*/
+
+			SDL.SDL_GL_SwapWindow (window);
+
+			return false;
+			return true;
+		}
 		#endregion
 
 		#region IWindowBackend implementation
@@ -119,10 +152,17 @@ namespace Xwt.Sdl.Backends
 		public void Initialize (IWindowFrameEventSink eventSink)
 		{
 			this.eventSink = eventSink;
-			window = SDL.SDL_CreateWindow (string.Empty, 0, 0, 400, 300, SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
 
-			if (window == IntPtr.Zero)
+			window = SDL.SDL_CreateWindow (null, 0, 0, 400, 300, SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE | SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL);
+
+			if(window == IntPtr.Zero)
 				throw new SdlException ();
+
+			ctxt = SDL.SDL_GL_CreateContext (window);
+			if (ctxt == IntPtr.Zero)
+				throw new SdlException ();
+
+			SDL.SDL_GL_SetAttribute (SDL.SDL_GLattr.SDL_GL_DOUBLEBUFFER, 1);
 
 			id = SDL.SDL_GetWindowID (window);
 
@@ -131,6 +171,7 @@ namespace Xwt.Sdl.Backends
 
 		public virtual void Dispose ()
 		{
+			SDL.SDL_GL_DeleteContext (ctxt);
 			SDL.SDL_DestroyWindow (window);
 			windowCache.Remove (id);
 		}
@@ -259,7 +300,7 @@ namespace Xwt.Sdl.Backends
 
 		public void InitializeBackend (object frontend, ApplicationContext context)
 		{
-			
+
 		}
 
 		public void EnableEvent (object eventId)
