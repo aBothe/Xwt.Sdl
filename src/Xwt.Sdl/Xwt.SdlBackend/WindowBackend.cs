@@ -41,11 +41,19 @@ namespace Xwt.Sdl.Backends
 		uint id;
 		public uint WindowId {get{return id;}}
 		public IWindowFrameEventSink eventSink;
-
+		int oldWidth;
+		int oldHeight;
+		bool redraw = true;
 		Rectangle padding;
 		#endregion
 
 		#region Extension
+		static WindowBackend()
+		{
+			// Workaround, so that this "No current gl context" exception won't become thrown.
+			GraphicsContext.CurrentContext = new IntPtr (1);
+		}
+
 		internal bool HandleWindowEvent(SDL.SDL_Event ev)
 		{
 			if (eventSink != null) {
@@ -69,7 +77,17 @@ namespace Xwt.Sdl.Backends
 					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED:
 						int x, y;
 						SDL.SDL_GetWindowPosition (window, out x, out y);
+
+						SDL.SDL_GL_MakeCurrent (window, ctxt);
+						GL.Viewport (0, 0, ev.window.data1, ev.window.data2);
+						GL.MatrixMode (MatrixMode.Modelview);
+						GL.LoadIdentity ();
+						GL.Ortho (0.0, (double)ev.window.data1, 0.0, (double)ev.window.data2, -1, 1);
+
+						redraw = true;
 						eventSink.OnBoundsChanged (new Rectangle ((double)x, (double)y, (double)ev.window.data1, (double)ev.window.data2));
+						oldWidth = ev.window.data1;
+						oldHeight = ev.window.data2;
 						break;
 				}
 			}
@@ -78,32 +96,25 @@ namespace Xwt.Sdl.Backends
 
 		internal bool Draw()
 		{
-			if (SDL.SDL_GL_MakeCurrent (window, ctxt) != 0)
-				throw new SdlException ();
+			if (!redraw)
+				return false;
+			redraw = false;
 
-			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-			/*
-			SDL.SDL_SetRenderDrawColor (renderer, 0, 0, 0, 0);
+			SDL.SDL_GL_MakeCurrent (window, ctxt);
 
-			SDL.SDL_RenderClear (renderer);
-			*/
+			//GL.ClearColor (1f, 1f, 1f, 1f);
+			GL.Clear(ClearBufferMask.ColorBufferBit);
+
+			GL.Color3 (1f, 0, 0);
 			GL.Begin (BeginMode.Triangles);
 			GL.Vertex2 (0, 0);
-			GL.Vertex2 (50, 50);
-			GL.Vertex2 (200, -200);
+			GL.Vertex2 (oldWidth, oldHeight/2);
+			GL.Vertex2 (0, oldHeight);
 			GL.End ();
-			/*
-			var rect = new SDL2.SDL.SDL_Rect();
-			rect.x = 100;
-			rect.y = 100;
-			rect.w = 50;
-			rect.h = 100;
-			SDL.SDL_RenderFillRect (renderer, ref rect);
-			*/
 
+			GL.Flush ();
 			SDL.SDL_GL_SwapWindow (window);
 
-			return false;
 			return true;
 		}
 		#endregion
@@ -158,11 +169,13 @@ namespace Xwt.Sdl.Backends
 			if(window == IntPtr.Zero)
 				throw new SdlException ();
 
+			SDL.SDL_GL_SetAttribute (SDL.SDL_GLattr.SDL_GL_DOUBLEBUFFER, 1);
+			SDL.SDL_GL_SetAttribute (SDL.SDL_GLattr.SDL_GL_ACCELERATED_VISUAL, 1);
+
 			ctxt = SDL.SDL_GL_CreateContext (window);
 			if (ctxt == IntPtr.Zero)
 				throw new SdlException ();
 
-			SDL.SDL_GL_SetAttribute (SDL.SDL_GLattr.SDL_GL_DOUBLEBUFFER, 1);
 
 			id = SDL.SDL_GetWindowID (window);
 
