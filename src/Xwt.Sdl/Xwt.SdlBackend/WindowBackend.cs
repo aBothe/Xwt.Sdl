@@ -240,13 +240,7 @@ namespace Xwt.Sdl.Backends
 				return (SDL.SDL_GetWindowFlags (window) & (uint)SDL.SDL_WindowFlags.SDL_WINDOW_BORDERLESS) != 0;
 			}
 			set {
-				if (Decorated != value) {
-					/*
-					 * Perhaps destroy old window, reallocate it with(out) the DECORATED flag?
-					 * What about restoring drawing contexts?
-					 */
-				}
-				throw new NotImplementedException ();
+				SDL.SDL_SetWindowBordered (window, value ? SDL.SDL_bool.SDL_TRUE : SDL.SDL_bool.SDL_FALSE);
 			}
 		}
 
@@ -264,7 +258,10 @@ namespace Xwt.Sdl.Backends
 				return (SDL.SDL_GetWindowFlags (window) & (uint)SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE) != 0;
 			}
 			set {
-				// See Decorated
+				/*
+				 * Perhaps destroy old window, reallocate it with(out) the DECORATED flag?
+				 * What about restoring drawing contexts?
+				 */
 				throw new NotImplementedException ();
 			}
 		}
