@@ -1,5 +1,5 @@
 //
-// Program.cs
+// MenuBackend.cs
 //
 // Author:
 //       Alexander Bothe <info@alexanderbothe.com>
@@ -24,33 +24,72 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using Xwt;
+using Xwt.Backends;
+using OpenTK.Graphics.OpenGL;
 
-namespace Xwt.Sdl.Tests
+namespace Xwt.Sdl
 {
-	class MainClass
+	public class MenuBackend : IMenuBackend
 	{
-		public static void Main (string[] args)
+		public MenuBackend ()
 		{
-			Application.Initialize ("Xwt.Sdl.Backends.SdlEngine, Xwt.Sdl");
-
-			var mw = new Window();
-			mw.Size = new Size (600, 600);
-
-			mw.MainMenu = new Menu ();
-
-			mw.Title = "SDL2 Test!";
-			mw.CloseRequested+=
-				(sender, a) => Application.Exit();
-			mw.Show();
-			/*
-			var mw2 = new Window ();
-			bool bb=true;
-			mw2.Size = new Size (500, 100);
-			mw2.Title = "Shallow";
-			mw2.Show ();
-			*/
-			Application.Run ();
 		}
+
+		public int Height
+		{
+			get{
+				return 25;
+			}
+		}
+
+		public void Draw(int width)
+		{
+			GL.Color3 (1f, 0f, 0f);
+			GL.Rect (0, 0, width, 25);
+		}
+
+		#region IMenuBackend implementation
+
+		public void InsertItem (int index, IMenuItemBackend menuItem)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void RemoveItem (IMenuItemBackend menuItem)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void Popup ()
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void Popup (IWidgetBackend widget, double x, double y)
+		{
+			throw new NotImplementedException ();
+		}
+
+		#endregion
+
+		#region IBackend implementation
+
+		public void InitializeBackend (object frontend, ApplicationContext context)
+		{
+
+		}
+
+		public void EnableEvent (object eventId)
+		{
+
+		}
+
+		public void DisableEvent (object eventId)
+		{
+
+		}
+
+		#endregion
 	}
 }
+

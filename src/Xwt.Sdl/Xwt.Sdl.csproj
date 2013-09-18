@@ -42,6 +42,8 @@
     <Compile Include="Xwt.SdlBackend\WindowBackend.cs" />
     <Compile Include="SDL2Extensions.cs" />
     <Compile Include="SDLException.cs" />
+    <Compile Include="Xwt.SdlBackend\MenuBackend.cs" />
+    <Compile Include="Xwt.SdlBackend\WidgetBackend.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

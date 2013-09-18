@@ -41,10 +41,22 @@ namespace Xwt.Sdl.Backends
 		uint id;
 		public uint WindowId {get{return id;}}
 		public IWindowFrameEventSink eventSink;
+
 		int oldWidth;
 		int oldHeight;
-		bool redraw = true;
+		int Width;
+		int Height;
+		Rectangle invalidatedRegion;
+		bool redraw;
+
 		Rectangle padding;
+		WidgetBackend child;
+		MenuBackend menu;
+
+		/// <summary>
+		/// Focused widget to which keyboard & mouse events are redirected.
+		/// </summary>
+		int focusedWidget;
 		#endregion
 
 		#region Extension
@@ -52,6 +64,16 @@ namespace Xwt.Sdl.Backends
 		{
 			// Workaround, so that this "No current gl context" exception won't become thrown.
 			GraphicsContext.CurrentContext = new IntPtr (1);
+		}
+
+		void UpdateViewPort()
+		{
+			SDL.SDL_GL_MakeCurrent (window, ctxt);
+			GL.Viewport (0, 0, Width, Height);
+			GL.MatrixMode (MatrixMode.Projection);
+			GL.LoadIdentity ();
+			GL.Ortho (0.0, (double)Width, (double)Height, 0.0, -1, 1);
+			GL.MatrixMode (MatrixMode.Modelview);
 		}
 
 		internal bool HandleWindowEvent(SDL.SDL_Event ev)
@@ -67,6 +89,9 @@ namespace Xwt.Sdl.Backends
 						eventSink.OnHidden ();
 						break;
 					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_SHOWN:
+						SDL.SDL_GetWindowSize (window, out Width, out Height);
+						UpdateViewPort ();
+						Invalidate ();
 						eventSink.OnShown ();
 						break;
 					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MOVED:
@@ -78,20 +103,31 @@ namespace Xwt.Sdl.Backends
 						int x, y;
 						SDL.SDL_GetWindowPosition (window, out x, out y);
 
-						SDL.SDL_GL_MakeCurrent (window, ctxt);
-						GL.Viewport (0, 0, ev.window.data1, ev.window.data2);
-						GL.MatrixMode (MatrixMode.Modelview);
-						GL.LoadIdentity ();
-						GL.Ortho (0.0, (double)ev.window.data1, 0.0, (double)ev.window.data2, -1, 1);
+						Width = ev.window.data1;
+						Height = ev.window.data2;
 
-						redraw = true;
+						UpdateViewPort ();
+						Invalidate ();
+
 						eventSink.OnBoundsChanged (new Rectangle ((double)x, (double)y, (double)ev.window.data1, (double)ev.window.data2));
+
 						oldWidth = ev.window.data1;
 						oldHeight = ev.window.data2;
 						break;
 				}
 			}
 			return false;
+		}
+
+		public void Invalidate()
+		{
+			Invalidate (Bounds);
+		}
+
+		public void Invalidate(Rectangle region)
+		{
+			invalidatedRegion = region;
+			redraw = true;
 		}
 
 		internal bool Draw()
@@ -102,20 +138,34 @@ namespace Xwt.Sdl.Backends
 
 			SDL.SDL_GL_MakeCurrent (window, ctxt);
 
-			//GL.ClearColor (1f, 1f, 1f, 1f);
+			GL.ClearColor (1f, 1f, 1f, 1f);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 
-			GL.Color3 (1f, 0, 0);
-			GL.Begin (BeginMode.Triangles);
-			GL.Vertex2 (0, 0);
-			GL.Vertex2 (oldWidth, oldHeight/2);
-			GL.Vertex2 (0, oldHeight);
-			GL.End ();
+			GL.LoadIdentity ();
 
-			GL.Flush ();
+			if (menu != null) {
+				menu.Draw (Width);
+				GL.Translate (0.0, (float)menu.Height, 0.0);
+			}
+
+			if (child != null)
+				child.Draw ();
+
 			SDL.SDL_GL_SwapWindow (window);
 
 			return true;
+		}
+
+		public void SetFocusedWidget(int Id)
+		{
+			var w = WidgetBackend.GetById (focusedWidget);
+			if (w != null) {
+				w.FireLostFocus ();
+			}
+			focusedWidget = Id;
+			w = WidgetBackend.GetById (Id);
+			if(w!= null)
+				w.
 		}
 		#endregion
 
@@ -123,12 +173,14 @@ namespace Xwt.Sdl.Backends
 
 		public void SetChild (IWidgetBackend child)
 		{
-			throw new NotImplementedException ();
+			this.child = child as WidgetBackend;
+			Invalidate ();
 		}
 
 		public void SetMainMenu (IMenuBackend menu)
 		{
-			throw new NotImplementedException ();
+			this.menu = menu as MenuBackend;
+			Invalidate ();
 		}
 
 		public void SetPadding (double left, double top, double right, double bottom)
@@ -153,7 +205,8 @@ namespace Xwt.Sdl.Backends
 
 		public void UpdateChildPlacement (IWidgetBackend childBackend)
 		{
-			throw new NotImplementedException ();
+			child = childBackend as WidgetBackend;
+			Invalidate ();
 		}
 
 		#endregion
@@ -169,13 +222,13 @@ namespace Xwt.Sdl.Backends
 			if(window == IntPtr.Zero)
 				throw new SdlException ();
 
-			SDL.SDL_GL_SetAttribute (SDL.SDL_GLattr.SDL_GL_DOUBLEBUFFER, 1);
-			SDL.SDL_GL_SetAttribute (SDL.SDL_GLattr.SDL_GL_ACCELERATED_VISUAL, 1);
-
 			ctxt = SDL.SDL_GL_CreateContext (window);
 			if (ctxt == IntPtr.Zero)
 				throw new SdlException ();
 
+			SDL.SDL_GL_MakeCurrent (window, ctxt);
+			SDL.SDL_GL_SetAttribute (SDL.SDL_GLattr.SDL_GL_MULTISAMPLESAMPLES, 8);
+			SDL.SDL_GL_SetAttribute (SDL.SDL_GLattr.SDL_GL_DOUBLEBUFFER, 1);
 
 			id = SDL.SDL_GetWindowID (window);
 

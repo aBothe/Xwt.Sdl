@@ -60,9 +60,9 @@ namespace Xwt.Sdl.Backends
 			RegisterBackend<TextLayoutBackendHandler, GtkTextLayoutBackendHandler> ();
 			RegisterBackend<DrawingPathBackendHandler, CairoContextBackendHandler> ();
 			RegisterBackend<GradientBackendHandler, CairoGradientBackendHandler> ();
-			RegisterBackend<FontBackendHandler, GtkFontBackendHandler> ();
+			RegisterBackend<FontBackendHandler, GtkFontBackendHandler> ();*/
 			RegisterBackend<IMenuBackend, MenuBackend> ();
-			RegisterBackend<IMenuItemBackend, MenuItemBackend> ();
+			/*RegisterBackend<IMenuItemBackend, MenuItemBackend> ();
 			RegisterBackend<ICheckBoxMenuItemBackend, CheckBoxMenuItemBackend> ();
 			RegisterBackend<IRadioButtonMenuItemBackend, RadioButtonMenuItemBackend> ();
 			RegisterBackend<ISeparatorMenuItemBackend, SeparatorMenuItemBackend> ();
@@ -124,7 +124,7 @@ namespace Xwt.Sdl.Backends
 				pendingEvents.Set ();
 
 				if(!Draw())
-					Thread.Sleep (15);
+					SDL.SDL_Delay (15u);
 			}
 		}
 
