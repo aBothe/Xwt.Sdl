@@ -28,7 +28,7 @@ using Xwt.Backends;
 using Xwt.Drawing;
 using System.Collections.Generic;
 
-namespace Xwt.Sdl.Backends
+namespace Xwt.Sdl
 {
 	public abstract class WidgetBackend : IWidgetBackend
 	{
@@ -46,11 +46,85 @@ namespace Xwt.Sdl.Backends
 
 				return parentRef.Target as WindowBackend; 
 			}
+			set{ 
+				if (value != null)
+					parentRef = new WeakReference (value);
+				else
+					parentRef = null;
+			}
 		}
 
 		IWidgetEventSink eventSink;
 		bool focused;
+		bool visible;
+		bool sensitive;
 		double minWidth, minHeight;
+		double x,y, width, height;
+		/// <summary>
+		/// Horizontal distance to the parent widget's left border.
+		/// </summary>
+		public double X { 
+			get{return x;}
+			set{
+				x = value;
+				Invalidate ();
+			}
+		}
+		/// <summary>
+		/// Vertical distance to the parent widget's top border
+		/// </summary>
+		/// <value>The y.</value>
+		public double Y {
+			get{return y;}
+			set{ 
+ 				y = value;
+				Invalidate ();
+			}
+		}
+
+		public double Width {
+			get{return width;}
+			set{ 
+				width = value;
+				Invalidate ();
+			}
+		}
+		public double Height {
+			get{return height;}
+			set{ 
+				height = value;
+				Invalidate ();
+			}
+		}
+
+		/// <summary>
+		/// The location relative to the parent widget.
+		/// </summary>
+		public Point RelativeLocation
+		{
+			get{ 
+				return new Point (x, y);
+			}
+		}
+
+		/// <summary>
+		/// The location relative to the absolute parent window.
+		/// </summary>
+		public Point AbsoluteLocation
+		{
+			get{ 
+				double absX = x, absY = y;
+				WeakReference wref = parentRef;
+				WidgetBackend w;
+				while (wref != null && (w = wref.Target as WidgetBackend) != null) {
+					absX += w.x;
+					absY += w.y;
+					wref = w.parentRef;
+				}
+
+				return new Point (absX, absY);
+			}
+		}
 
 		#endregion
 
@@ -72,26 +146,47 @@ namespace Xwt.Sdl.Backends
 			return null;
 		}
 
-		internal void FireLostFocus()
+		internal virtual void FireLostFocus()
 		{
 			focused = false;
 			this.eventSink.OnLostFocus ();
 		}
 
-		internal void FireGainedFocus()
+		internal virtual void FireGainedFocus()
 		{
 			focused = true;
 			this.eventSink.OnGotFocus ();
 		}
 
-		public void Invalidate()
+		internal void ParentSizeChanged(double parentWidth, double parentHeight)
 		{
+			bool boundsChanged = width != parentWidth || height != parentHeight;
 
+			width = parentWidth;
+			height = parentHeight;
+			Invalidate ();
+
+			if(boundsChanged)
+				eventSink.OnBoundsChanged ();
 		}
 
-		public void Draw()
+		/// <summary>
+		/// Queues redrawing the widget.
+		/// </summary>
+		public void Invalidate()
 		{
+			ParentWindow.Invalidate (new Rectangle(x,y, width, height));
+		}
 
+		public void Invalidate(Rectangle rect)
+		{
+			ParentWindow.Invalidate (rect);
+		}
+
+		public virtual void Draw()
+		{
+			OpenTK.Graphics.OpenGL.GL.Color3 (0.0, 0.0, .3);
+			OpenTK.Graphics.OpenGL.GL.Rect (x, y, width, height);
 		}
 
 		#endregion
@@ -110,7 +205,8 @@ namespace Xwt.Sdl.Backends
 
 		public Point ConvertToScreenCoordinates (Point widgetCoordinates)
 		{
-			throw new NotImplementedException ();
+			//TODO: Add the client-windowframe offsets and the window coordinates
+			return AbsoluteLocation.Offset (widgetCoordinates);
 		}
 
 		public void SetMinSize (double width, double height)
@@ -121,12 +217,15 @@ namespace Xwt.Sdl.Backends
 
 		public void SetSizeRequest (double width, double height)
 		{
-			throw new NotImplementedException ();
+			this.width = width;
+			this.height = height;
+			Invalidate ();
 		}
 
 		public void SetFocus ()
 		{
-			ParentWindow.SetFocusedWidget (Id);
+			if(CanGetFocus)
+				ParentWindow.SetFocusedWidget (Id);
 		}
 
 		public void UpdateLayout ()
@@ -161,19 +260,21 @@ namespace Xwt.Sdl.Backends
 
 		public bool Visible {
 			get {
-				throw new NotImplementedException ();
+				return visible;
 			}
 			set {
-				throw new NotImplementedException ();
+				visible = value;
+				Invalidate ();
 			}
 		}
 
 		public bool Sensitive {
 			get {
-				throw new NotImplementedException ();
+				return sensitive;
 			}
 			set {
-				throw new NotImplementedException ();
+				sensitive = value;
+				Invalidate ();
 			}
 		}
 
@@ -203,7 +304,7 @@ namespace Xwt.Sdl.Backends
 
 		public Size Size {
 			get {
-				throw new NotImplementedException ();
+				return new Size (width, height);
 			}
 		}
 

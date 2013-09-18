@@ -1,5 +1,5 @@
 //
-// Program.cs
+// CanvasBackend.cs
 //
 // Author:
 //       Alexander Bothe <info@alexanderbothe.com>
@@ -24,34 +24,55 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using Xwt;
+using Xwt.Backends;
+using OpenTK.Graphics.OpenGL;
+using System.Collections.Generic;
 
-namespace Xwt.Sdl.Tests
+namespace Xwt.Sdl
 {
-	class MainClass
+	public class CanvasBackend : WidgetBackend, ICanvasBackend
 	{
-		public static void Main (string[] args)
+		List<Tuple<WidgetBackend, Rectangle>> children = new List<Tuple<WidgetBackend, Rectangle>>();
+
+		public CanvasBackend ()
 		{
-			Application.Initialize ("Xwt.Sdl.SdlEngine, Xwt.Sdl");
-
-			var mw = new Window();
-			mw.Size = new Size (600, 600);
-
-			mw.MainMenu = new Menu ();
-			mw.Content = new Canvas ();
-
-			mw.Title = "SDL2 Test!";
-			mw.CloseRequested+=
-				(sender, a) => Application.Exit();
-			mw.Show();
-			/*
-			var mw2 = new Window ();
-			bool bb=true;
-			mw2.Size = new Size (500, 100);
-			mw2.Title = "Shallow";
-			mw2.Show ();
-			*/
-			Application.Run ();
 		}
+
+		public override void Draw ()
+		{
+			// Draw actual content
+			base.Draw ();
+			// Draw child widgets
+		}
+
+		#region ICanvasBackend implementation
+
+		public void QueueDraw ()
+		{
+			Invalidate ();
+		}
+
+		public void QueueDraw (Rectangle rect)
+		{
+			Invalidate (rect);
+		}
+
+		public void AddChild (IWidgetBackend widget, Rectangle bounds)
+		{
+
+		}
+
+		public void SetChildBounds (IWidgetBackend widget, Rectangle bounds)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void RemoveChild (IWidgetBackend widget)
+		{
+			throw new NotImplementedException ();
+		}
+
+		#endregion
 	}
 }
+

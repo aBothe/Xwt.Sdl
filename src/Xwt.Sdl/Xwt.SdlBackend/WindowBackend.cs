@@ -30,7 +30,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
 
-namespace Xwt.Sdl.Backends
+namespace Xwt.Sdl
 {
 	public class WindowBackend : IWindowBackend
 	{
@@ -46,6 +46,9 @@ namespace Xwt.Sdl.Backends
 		int oldHeight;
 		int Width;
 		int Height;
+		/// <summary>
+		/// http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
+		/// </summary>
 		Rectangle invalidatedRegion;
 		bool redraw;
 
@@ -107,7 +110,11 @@ namespace Xwt.Sdl.Backends
 						Height = ev.window.data2;
 
 						UpdateViewPort ();
-						Invalidate ();
+
+						if (child != null)
+							child.ParentSizeChanged ((double)Width, (double)Height);
+						else if (menu != null) // Only redraw if necessary!
+							Invalidate ();
 
 						eventSink.OnBoundsChanged (new Rectangle ((double)x, (double)y, (double)ev.window.data1, (double)ev.window.data2));
 
@@ -138,6 +145,8 @@ namespace Xwt.Sdl.Backends
 
 			SDL.SDL_GL_MakeCurrent (window, ctxt);
 
+
+
 			GL.ClearColor (1f, 1f, 1f, 1f);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 
@@ -164,8 +173,8 @@ namespace Xwt.Sdl.Backends
 			}
 			focusedWidget = Id;
 			w = WidgetBackend.GetById (Id);
-			if(w!= null)
-				w.
+			if (w != null)
+				w.FireGainedFocus ();
 		}
 		#endregion
 
@@ -174,6 +183,7 @@ namespace Xwt.Sdl.Backends
 		public void SetChild (IWidgetBackend child)
 		{
 			this.child = child as WidgetBackend;
+			this.child.ParentWindow = this;
 			Invalidate ();
 		}
 
@@ -205,8 +215,8 @@ namespace Xwt.Sdl.Backends
 
 		public void UpdateChildPlacement (IWidgetBackend childBackend)
 		{
-			child = childBackend as WidgetBackend;
-			Invalidate ();
+			if(childBackend==child)
+				Invalidate ();
 		}
 
 		#endregion

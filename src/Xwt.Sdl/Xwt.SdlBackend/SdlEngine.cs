@@ -28,7 +28,7 @@ using SDL2;
 using Xwt.Backends;
 using System.Threading;
 
-namespace Xwt.Sdl.Backends
+namespace Xwt.Sdl
 {
 	public class SdlEngine : ToolkitEngineBackend
 	{
@@ -44,7 +44,7 @@ namespace Xwt.Sdl.Backends
 
 		public override void InitializeBackends ()
 		{
-			//RegisterBackend<ICustomWidgetBackend, CustomWidgetBackend> ();
+			RegisterBackend<ICustomWidgetBackend, CustomWidgetBackend> ();
 			RegisterBackend<IWindowBackend, WindowBackend> ();
 			/*RegisterBackend<ILabelBackend, LabelBackend> ();
 			RegisterBackend<IBoxBackend, BoxBackend> ();
@@ -53,14 +53,14 @@ namespace Xwt.Sdl.Backends
 			RegisterBackend<ITreeViewBackend, TreeViewBackend> ();
 			RegisterBackend<ITreeStoreBackend, TreeStoreBackend> ();
 			RegisterBackend<IListViewBackend, ListViewBackend> ();
-			RegisterBackend<IListStoreBackend, ListStoreBackend> ();
+			RegisterBackend<IListStoreBackend, ListStoreBackend> ();*/
 			RegisterBackend<ICanvasBackend, CanvasBackend> ();
 			RegisterBackend<ImageBackendHandler, ImageHandler> ();
-			RegisterBackend<Xwt.Backends.ContextBackendHandler, CairoContextBackendHandler> ();
-			RegisterBackend<TextLayoutBackendHandler, GtkTextLayoutBackendHandler> ();
-			RegisterBackend<DrawingPathBackendHandler, CairoContextBackendHandler> ();
-			RegisterBackend<GradientBackendHandler, CairoGradientBackendHandler> ();
-			RegisterBackend<FontBackendHandler, GtkFontBackendHandler> ();*/
+			RegisterBackend<Xwt.Backends.ContextBackendHandler, SdlContextBackendHandler> ();
+			RegisterBackend<TextLayoutBackendHandler, SdlTextLayoutBackendHandler> ();
+			RegisterBackend<DrawingPathBackendHandler, SdlContextBackendHandler> ();
+			RegisterBackend<GradientBackendHandler, SdlGradientBackendHandler> ();
+			RegisterBackend<FontBackendHandler, SdlFontBackendHandler> ();
 			RegisterBackend<IMenuBackend, MenuBackend> ();
 			/*RegisterBackend<IMenuItemBackend, MenuItemBackend> ();
 			RegisterBackend<ICheckBoxMenuItemBackend, CheckBoxMenuItemBackend> ();

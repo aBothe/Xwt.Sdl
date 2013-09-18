@@ -1,5 +1,5 @@
 //
-// Program.cs
+// SdlGradientBackendHandler.cs
 //
 // Author:
 //       Alexander Bothe <info@alexanderbothe.com>
@@ -24,34 +24,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using Xwt.Backends;
 using Xwt;
+using Xwt.Drawing;
 
-namespace Xwt.Sdl.Tests
+namespace Xwt.Sdl
 {
-	class MainClass
+	public class SdlGradientBackendHandler : GradientBackendHandler
 	{
-		public static void Main (string[] args)
+		public SdlGradientBackendHandler ()
 		{
-			Application.Initialize ("Xwt.Sdl.SdlEngine, Xwt.Sdl");
-
-			var mw = new Window();
-			mw.Size = new Size (600, 600);
-
-			mw.MainMenu = new Menu ();
-			mw.Content = new Canvas ();
-
-			mw.Title = "SDL2 Test!";
-			mw.CloseRequested+=
-				(sender, a) => Application.Exit();
-			mw.Show();
-			/*
-			var mw2 = new Window ();
-			bool bb=true;
-			mw2.Size = new Size (500, 100);
-			mw2.Title = "Shallow";
-			mw2.Show ();
-			*/
-			Application.Run ();
 		}
+
+		#region implemented abstract members of GradientBackendHandler
+
+		public override object CreateLinear (double x0, double y0, double x1, double y1)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override object CreateRadial (double cx0, double cy0, double radius0, double cx1, double cy1, double radius1)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override void AddColorStop (object backend, double position, Color color)
+		{
+			throw new NotImplementedException ();
+		}
+
+		#endregion
 	}
 }
+

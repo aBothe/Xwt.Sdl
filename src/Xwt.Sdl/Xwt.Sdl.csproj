@@ -44,6 +44,13 @@
     <Compile Include="SDLException.cs" />
     <Compile Include="Xwt.SdlBackend\MenuBackend.cs" />
     <Compile Include="Xwt.SdlBackend\WidgetBackend.cs" />
+    <Compile Include="Xwt.SdlBackend\CustomWidgetBackend.cs" />
+    <Compile Include="Xwt.SdlBackend\CanvasBackend.cs" />
+    <Compile Include="Xwt.SdlBackend\ImageHandler.cs" />
+    <Compile Include="Xwt.SdlBackend\SdlContextBackendHandler.cs" />
+    <Compile Include="Xwt.SdlBackend\SdlTextLayoutBackendHandler.cs" />
+    <Compile Include="Xwt.SdlBackend\SdlGradientBackendHandler.cs" />
+    <Compile Include="Xwt.SdlBackend\SdlFontBackendHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
