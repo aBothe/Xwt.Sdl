@@ -49,11 +49,11 @@ namespace Xwt.Sdl
 		{
 			throw new NotImplementedException ();
 		}
-		public override bool IsBitmap (object handle)
+		public override object ConvertToBitmap (object handle, double width, double height, double scaleFactor, ImageFormat format)
 		{
 			throw new NotImplementedException ();
 		}
-		public override object ConvertToBitmap (object handle, int pixelWidth, int pixelHeight, ImageFormat format)
+		public override bool IsBitmap (object handle)
 		{
 			throw new NotImplementedException ();
 		}
