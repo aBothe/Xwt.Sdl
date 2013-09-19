@@ -37,6 +37,14 @@ namespace Xwt.Sdl
 		public readonly int Id;
 		static Dictionary<int, WeakReference> widgetStore = new Dictionary<int, WeakReference>();
 
+		Widget frontend;
+		public Widget Frontend {get{return frontend;}}
+
+		public ApplicationContext ApplicationContext {
+			get;
+			private set;
+		}
+
 		WeakReference parentRef;
 		public WidgetBackend Parent { get { return parentRef.Target as WidgetBackend; }}
 		public WindowBackend ParentWindow {
@@ -55,12 +63,16 @@ namespace Xwt.Sdl
 		}
 
 		IWidgetEventSink eventSink;
+		public IWidgetEventSink EventSink {get{return eventSink;}}
 		bool focused;
 		bool visible;
 		bool sensitive;
+
 		double minWidth, minHeight;
 		double x,y, width, height;
-		/// <summary>
+		SizeConstraint currentWidthConstraint = SizeConstraint.Unconstrained;
+		SizeConstraint currentHeightConstraint = SizeConstraint.Unconstrained;
+/// <summary>
 		/// Horizontal distance to the parent widget's left border.
 		/// </summary>
 		public double X { 
@@ -158,6 +170,12 @@ namespace Xwt.Sdl
 			this.eventSink.OnGotFocus ();
 		}
 
+		internal virtual void OnWidgetResized()
+		{
+			this.eventSink.OnBoundsChanged ();
+			Invalidate ();
+		}
+
 		internal void ParentSizeChanged(double parentWidth, double parentHeight)
 		{
 			bool boundsChanged = width != parentWidth || height != parentHeight;
@@ -166,8 +184,8 @@ namespace Xwt.Sdl
 			height = parentHeight;
 			Invalidate ();
 
-			if(boundsChanged)
-				eventSink.OnBoundsChanged ();
+			if (boundsChanged)
+				OnWidgetResized ();
 		}
 
 		/// <summary>
@@ -196,7 +214,10 @@ namespace Xwt.Sdl
 		public void Initialize (IWidgetEventSink eventSink)
 		{
 			this.eventSink = eventSink;
+			Initialize ();
 		}
+
+		public virtual void Initialize() {}
 
 		public void Dispose ()
 		{
@@ -217,9 +238,9 @@ namespace Xwt.Sdl
 
 		public void SetSizeRequest (double width, double height)
 		{
-			this.width = width;
-			this.height = height;
-			Invalidate ();
+			this.width = minWidth > 0.0 && minWidth > width ? minWidth : width;
+			this.height = minHeight > 0.0 && minHeight > height ? minHeight : height;
+			OnWidgetResized ();
 		}
 
 		public void SetFocus ()
@@ -235,8 +256,12 @@ namespace Xwt.Sdl
 
 		public Size GetPreferredSize (SizeConstraint widthConstraint, SizeConstraint heightConstraint)
 		{
-			throw new NotImplementedException ();
+			currentWidthConstraint = widthConstraint;
+			currentHeightConstraint = heightConstraint;
+			return GetPreferredSize ();
 		}
+
+		public virtual Size GetPreferredSize() { return Size.Zero; }
 
 		public void DragStart (DragStartData data)
 		{
@@ -293,12 +318,14 @@ namespace Xwt.Sdl
 			}
 		}
 
+		double opacity = 1.0;
 		public double Opacity {
 			get {
-				throw new NotImplementedException ();
+				return opacity;
 			}
 			set {
-				throw new NotImplementedException ();
+				opacity = value;
+				Invalidate ();
 			}
 		}
 
@@ -314,12 +341,12 @@ namespace Xwt.Sdl
 			}
 		}
 
-		public object Font {
+		public virtual object Font {
 			get {
-				throw new NotImplementedException ();
+				return null;
 			}
 			set {
-				throw new NotImplementedException ();
+
 			}
 		}
 
@@ -344,7 +371,8 @@ namespace Xwt.Sdl
 
 		public void InitializeBackend (object frontend, ApplicationContext context)
 		{
-
+			this.frontend = frontend as Widget;
+			this.ApplicationContext = context;
 		}
 
 		public void EnableEvent (object eventId)
