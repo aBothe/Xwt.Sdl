@@ -33,19 +33,15 @@ namespace Xwt.Sdl
 	{
 		public MenuBackend ()
 		{
+			Height = 25.0;
 		}
 
-		public int Height
-		{
-			get{
-				return 25;
-			}
-		}
+		public readonly double Height;
 
 		public void Draw(int width)
 		{
 			GL.Color3 (1f, 0f, 0f);
-			GL.Rect (0, 0, width, 25);
+			GL.Rect (0.0, 0.0, (double)width, Height);
 		}
 
 		#region IMenuBackend implementation

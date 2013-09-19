@@ -124,21 +124,18 @@ namespace Xwt.Sdl
 				pendingEvents.Set ();
 
 				if(!Draw())
-					SDL.SDL_Delay (15u);
+					SDL.SDL_Delay (20u);
 			}
 		}
 
-		bool HandleEvent(SDL.SDL_Event ev)
+		void HandleEvent(SDL.SDL_Event ev)
 		{
-			switch (ev.type) {
-				case SDL.SDL_EventType.SDL_WINDOWEVENT:
-					WeakReference wr;
-					if (WindowBackend.windowCache.TryGetValue (ev.window.windowID, out wr) && wr.IsAlive)
-						return (wr.Target as WindowBackend).HandleWindowEvent (ev);
-					break;
-			}
-
-			return false;
+			WeakReference wr;
+			WindowBackend w;
+			if (WindowBackend.windowCache.TryGetValue (ev.window.windowID, out wr) && 
+				((w = wr.Target as WindowBackend) != null || 
+					(w = WindowBackend.WindowHoveredByMouse) != null))
+				w.HandleWindowEvent (ev);
 		}
 
 		bool Draw()

@@ -59,7 +59,11 @@ namespace Xwt.Sdl
 		/// <summary>
 		/// Focused widget to which keyboard & mouse events are redirected.
 		/// </summary>
-		int focusedWidget;
+		WidgetBackend focusedWidget;
+		WidgetBackend hoveredWidget;
+		internal static WindowBackend WindowHoveredByMouse;
+		bool focused;
+		public bool HasFocus {get{return focused;}}
 		#endregion
 
 		#region Extension
@@ -79,49 +83,132 @@ namespace Xwt.Sdl
 			GL.MatrixMode (MatrixMode.Modelview);
 		}
 
-		internal bool HandleWindowEvent(SDL.SDL_Event ev)
+		public WidgetBackend GetWidgetAt(double x, double y)
 		{
-			if (eventSink != null) {
-				switch (ev.window.windowEvent) {
-					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_CLOSE:
-						if (!eventSink.OnCloseRequested ()) {
-							Dispose ();
-						}
-						break;
-					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_HIDDEN:
-						eventSink.OnHidden ();
-						break;
-					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_SHOWN:
-						SDL.SDL_GetWindowSize (window, out Width, out Height);
-						UpdateViewPort ();
-						Invalidate ();
-						eventSink.OnShown ();
-						break;
-					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MOVED:
-						int w, h;
-						SDL.SDL_GetWindowSize (window, out w, out h);
-						eventSink.OnBoundsChanged (new Rectangle ((double)ev.window.data1, (double)ev.window.data2, (double)w, (double)h));
-						break;
-					case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED:
-						int x, y;
-						SDL.SDL_GetWindowPosition (window, out x, out y);
-
-						Width = ev.window.data1;
-						Height = ev.window.data2;
-
-						UpdateViewPort ();
-
-						UpdateChildBounds();
-						Invalidate ();
-
-						eventSink.OnBoundsChanged (new Rectangle ((double)x, (double)y, (double)ev.window.data1, (double)ev.window.data2));
-
-						oldWidth = ev.window.data1;
-						oldHeight = ev.window.data2;
-						break;
-				}
+			if (y > 400) {
+				Console.WriteLine ();
 			}
-			return false;
+			double off=0.0;
+			if (menu != null) {
+				if (y <= menu.Height) // Normalize y value
+					return null; // .. or return a widget wrapper
+				off = menu.Height;
+			}
+
+			if (child == null || 
+				y < padding.Top+off || x < padding.Left || 
+				y+padding.Height > Height || x + padding.Width > Width)
+				return null;
+
+			var w = child;
+			while (true) {
+				var ch = w.GetChildAt (x, y);
+				if (ch == null)
+					return w;
+				w = ch;
+			}
+		}
+
+		internal void HandleWindowEvent(SDL.SDL_Event ev)
+		{
+			if (eventSink == null)
+				return;
+
+			switch (ev.type) {
+				case SDL.SDL_EventType.SDL_KEYDOWN:
+					break;
+				case SDL.SDL_EventType.SDL_KEYUP:
+					break;
+
+				case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
+					return;
+				case SDL.SDL_EventType.SDL_MOUSEBUTTONUP:
+					return;
+				case SDL.SDL_EventType.SDL_MOUSEMOTION:
+					if (!focused)
+						return;
+
+					int x = ev.motion.x, y = ev.motion.y;
+
+					if (menu != null && y <= menu.Height) {
+						if (hoveredWidget != null) {
+							hoveredWidget.FireMouseLeave ();
+							hoveredWidget = null;
+						}
+
+						//TODO: Menu implementation
+						return;
+					}
+
+					var w = GetWidgetAt ((double)x, (double)y);
+					if (w != hoveredWidget) {
+						if(hoveredWidget != null)
+							hoveredWidget.FireMouseLeave ();
+						hoveredWidget = w;
+						if (hoveredWidget != null)
+							hoveredWidget.FireMouseEnter ();
+					}
+					return;
+				case SDL.SDL_EventType.SDL_MOUSEWHEEL:
+					return;
+
+				case SDL.SDL_EventType.SDL_WINDOWEVENT:
+					break;
+				default:
+					return;
+			}
+
+			switch (ev.window.windowEvent) {
+				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_CLOSE:
+					if (!eventSink.OnCloseRequested ()) {
+						Dispose ();
+					}
+					break;
+				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_HIDDEN:
+					eventSink.OnHidden ();
+					break;
+				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_SHOWN:
+					SDL.SDL_GetWindowSize (window, out Width, out Height);
+					UpdateViewPort ();
+					Invalidate ();
+					eventSink.OnShown ();
+					break;
+				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MOVED:
+					int w, h;
+					SDL.SDL_GetWindowSize (window, out w, out h);
+					eventSink.OnBoundsChanged (new Rectangle ((double)ev.window.data1, (double)ev.window.data2, (double)w, (double)h));
+					break;
+				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED:
+					int x, y;
+					SDL.SDL_GetWindowPosition (window, out x, out y);
+
+					Width = ev.window.data1;
+					Height = ev.window.data2;
+
+					UpdateViewPort ();
+
+					UpdateChildBounds();
+					Invalidate ();
+
+					eventSink.OnBoundsChanged (new Rectangle ((double)x, (double)y, (double)ev.window.data1, (double)ev.window.data2));
+
+					oldWidth = ev.window.data1;
+					oldHeight = ev.window.data2;
+					break;
+
+				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_ENTER:
+					WindowHoveredByMouse = this;
+					break;
+				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_LEAVE:
+					WindowHoveredByMouse = null;
+					break;
+				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_FOCUS_LOST:
+					focused = false;
+					break;
+				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_FOCUS_GAINED:
+					focused = true;
+					break;
+			}
 		}
 
 		public void Invalidate()
@@ -166,14 +253,12 @@ namespace Xwt.Sdl
 
 		public void SetFocusedWidget(int Id)
 		{
-			var w = WidgetBackend.GetById (focusedWidget);
-			if (w != null) {
-				w.FireLostFocus ();
+			if (focusedWidget != null) {
+				focusedWidget.FireLostFocus ();
 			}
-			focusedWidget = Id;
-			w = WidgetBackend.GetById (Id);
-			if (w != null)
-				w.FireGainedFocus ();
+			focusedWidget = WidgetBackend.GetById(Id);
+			if (focusedWidget != null)
+				focusedWidget.FireGainedFocus ();
 		}
 
 		void UpdateChildBounds()

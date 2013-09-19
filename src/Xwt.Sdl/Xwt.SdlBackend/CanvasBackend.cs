@@ -36,6 +36,7 @@ namespace Xwt.Sdl
 
 		public CanvasBackend ()
 		{
+
 		}
 
 		public override void Draw ()
@@ -43,6 +44,11 @@ namespace Xwt.Sdl
 			// Draw actual content
 			base.Draw ();
 			// Draw child widgets
+		}
+
+		public override WidgetBackend GetChildAt (double x, double y)
+		{
+			return null;
 		}
 
 		#region ICanvasBackend implementation

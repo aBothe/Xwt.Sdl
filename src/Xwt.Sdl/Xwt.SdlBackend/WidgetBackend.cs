@@ -158,22 +158,32 @@ namespace Xwt.Sdl
 			return null;
 		}
 
-		internal virtual void FireLostFocus()
+		internal void FireLostFocus()
 		{
 			focused = false;
 			this.eventSink.OnLostFocus ();
 		}
 
-		internal virtual void FireGainedFocus()
+		internal void FireGainedFocus()
 		{
 			focused = true;
 			this.eventSink.OnGotFocus ();
 		}
 
-		internal virtual void OnWidgetResized()
+		internal void OnWidgetResized()
 		{
 			this.eventSink.OnBoundsChanged ();
 			Invalidate ();
+		}
+
+		internal void FireMouseEnter()
+		{
+			eventSink.OnMouseEntered ();
+		}
+
+		internal void FireMouseLeave()
+		{
+			this.eventSink.OnMouseExited ();
 		}
 
 		internal void OnBoundsChanged(double x, double y, double width, double height)
@@ -184,6 +194,11 @@ namespace Xwt.Sdl
 			this.height = height;
 
 			OnWidgetResized ();
+		}
+
+		public virtual WidgetBackend GetChildAt(double x, double y)
+		{
+			return null;
 		}
 
 		/// <summary>

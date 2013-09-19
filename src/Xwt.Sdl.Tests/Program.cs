@@ -38,12 +38,15 @@ namespace Xwt.Sdl.Tests
 			mw.Size = new Size (600, 600);
 
 			mw.MainMenu = new Menu ();
-			mw.Content = new Canvas ();
-
+			var c = new Canvas ();
+			mw.Content = c;
+			c.MouseEntered += (sender, e) => mw.Title = "Canvas";
+			c.MouseExited += (sender, e) =>  mw.Title = "------";
 			mw.Title = "SDL2 Test!";
 			mw.CloseRequested+=
 				(sender, a) => Application.Exit();
 			mw.Show();
+
 			/*
 			var mw2 = new Window ();
 			bool bb=true;
