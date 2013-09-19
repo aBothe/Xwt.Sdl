@@ -85,9 +85,6 @@ namespace Xwt.Sdl
 
 		public WidgetBackend GetWidgetAt(double x, double y)
 		{
-			if (y > 400) {
-				Console.WriteLine ();
-			}
 			double off=0.0;
 			if (menu != null) {
 				if (y <= menu.Height) // Normalize y value
