@@ -111,10 +111,8 @@ namespace Xwt.Sdl
 
 						UpdateViewPort ();
 
-						if (child != null)
-							child.ParentSizeChanged ((double)Width, (double)Height);
-						else if (menu != null) // Only redraw if necessary!
-							Invalidate ();
+						UpdateChildBounds();
+						Invalidate ();
 
 						eventSink.OnBoundsChanged (new Rectangle ((double)x, (double)y, (double)ev.window.data1, (double)ev.window.data2));
 
@@ -145,10 +143,11 @@ namespace Xwt.Sdl
 
 			SDL.SDL_GL_MakeCurrent (window, ctxt);
 
-
-
-			GL.ClearColor (1f, 1f, 1f, 1f);
-			GL.Clear(ClearBufferMask.ColorBufferBit);
+			// Is clearing the background really needed?
+			if (!padding.IsEmpty) {
+				GL.ClearColor (1f, 1f, 1f, 1f);
+				GL.Clear (ClearBufferMask.ColorBufferBit);
+			}
 
 			GL.LoadIdentity ();
 
@@ -176,6 +175,18 @@ namespace Xwt.Sdl
 			if (w != null)
 				w.FireGainedFocus ();
 		}
+
+		void UpdateChildBounds()
+		{
+			if (child == null)
+				return;
+
+			// The padding does NOT affect the menu position - only the child position!
+			child.OnBoundsChanged (padding.Left, 
+				padding.Top, 
+				(double)Width-padding.Width, 
+				(double)(Height-(menu == null ? 0 : menu.Height)) - padding.Height);
+		}
 		#endregion
 
 		#region IWindowBackend implementation
@@ -184,18 +195,21 @@ namespace Xwt.Sdl
 		{
 			this.child = child as WidgetBackend;
 			this.child.ParentWindow = this;
+			UpdateChildBounds ();
 			Invalidate ();
 		}
 
 		public void SetMainMenu (IMenuBackend menu)
 		{
 			this.menu = menu as MenuBackend;
+			UpdateChildBounds ();
 			Invalidate ();
 		}
 
 		public void SetPadding (double left, double top, double right, double bottom)
 		{
 			padding = new Rectangle (left, top, right, bottom);
+			UpdateChildBounds ();
 		}
 
 		public void GetMetrics (out Size minSize, out Size decorationSize)

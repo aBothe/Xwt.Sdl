@@ -176,16 +176,14 @@ namespace Xwt.Sdl
 			Invalidate ();
 		}
 
-		internal void ParentSizeChanged(double parentWidth, double parentHeight)
+		internal void OnBoundsChanged(double x, double y, double width, double height)
 		{
-			bool boundsChanged = width != parentWidth || height != parentHeight;
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
 
-			width = parentWidth;
-			height = parentHeight;
-			Invalidate ();
-
-			if (boundsChanged)
-				OnWidgetResized ();
+			OnWidgetResized ();
 		}
 
 		/// <summary>
