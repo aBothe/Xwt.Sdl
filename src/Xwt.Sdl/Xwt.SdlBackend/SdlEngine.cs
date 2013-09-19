@@ -97,9 +97,9 @@ namespace Xwt.Sdl
 			RegisterBackend<ILinkLabelBackend, LinkLabelBackend> ();
 			RegisterBackend<ISpinnerBackend, SpinnerBackend> ();
 			RegisterBackend<IRichTextViewBackend, RichTextViewBackend> ();
-			RegisterBackend<IExpanderBackend, ExpanderBackend> ();
-			RegisterBackend<DesktopBackend, GtkDesktopBackend> ();
-			RegisterBackend<IEmbeddedWidgetBackend, EmbeddedWidgetBackend> ();
+			RegisterBackend<IExpanderBackend, ExpanderBackend> ();*/
+			RegisterBackend<DesktopBackend, SdlDesktopBackend> ();
+			/*RegisterBackend<IEmbeddedWidgetBackend, EmbeddedWidgetBackend> ();
 			RegisterBackend<ISegmentedButtonBackend, SegmentedButtonBackend> ();
 			RegisterBackend<ISliderBackend, SliderBackend> ();
 			RegisterBackend<IRadioButtonBackend, RadioButtonBackend> ();
