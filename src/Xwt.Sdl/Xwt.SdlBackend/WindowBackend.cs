@@ -113,6 +113,12 @@ namespace Xwt.Sdl
 
 			switch (ev.type) {
 				case SDL.SDL_EventType.SDL_KEYDOWN:
+					Key k;
+					ModifierKeys mods;
+
+					if (focusedWidget != null) {
+						focusedWidget.FireKeyDown (Key.N, ModifierKeys.None, ev.key.repeat != 0, ev.key.timestamp);
+					}
 					break;
 				case SDL.SDL_EventType.SDL_KEYUP:
 					break;

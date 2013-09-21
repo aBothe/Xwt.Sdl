@@ -52,6 +52,7 @@
     <Compile Include="Xwt.SdlBackend\SdlGradientBackendHandler.cs" />
     <Compile Include="Xwt.SdlBackend\SdlFontBackendHandler.cs" />
     <Compile Include="Xwt.SdlBackend\SdlDesktopBackend.cs" />
+    <Compile Include="Xwt.SdlBackend\KeyCodes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

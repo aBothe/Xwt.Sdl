@@ -186,6 +186,11 @@ namespace Xwt.Sdl
 			this.eventSink.OnMouseExited ();
 		}
 
+		internal void FireKeyDown(Key k, ModifierKeys mods, bool rep, uint timestamp)
+		{
+			this.eventSink.OnKeyPressed(new KeyEventArgs(k, mods, rep, (long)timestamp));
+		}
+
 		internal void OnBoundsChanged(double x, double y, double width, double height)
 		{
 			this.x = x;
