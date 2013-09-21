@@ -106,6 +106,19 @@ namespace Xwt.Sdl
 			}
 		}
 
+		void FocusWidget(WidgetBackend w)
+		{
+			if (focusedWidget != w) {
+				if (focusedWidget != null)
+					focusedWidget.FireLostFocus ();
+
+				focusedWidget = w;
+
+				if (w != null)
+					w.FireGainedFocus ();
+			}
+		}
+
 		internal void HandleWindowEvent(SDL.SDL_Event ev)
 		{
 			if (eventSink == null)
@@ -124,6 +137,12 @@ namespace Xwt.Sdl
 					break;
 
 				case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
+					if (hoveredWidget == null || hoveredWidget.CanGetFocus) {
+						// TODO: Define 'focus' rules
+						FocusWidget (hoveredWidget);
+					}
+
+
 					return;
 				case SDL.SDL_EventType.SDL_MOUSEBUTTONUP:
 					return;
@@ -151,6 +170,7 @@ namespace Xwt.Sdl
 						if (hoveredWidget != null)
 							hoveredWidget.FireMouseEnter ();
 					}
+
 					return;
 				case SDL.SDL_EventType.SDL_MOUSEWHEEL:
 					return;
@@ -241,13 +261,15 @@ namespace Xwt.Sdl
 
 			GL.LoadIdentity ();
 
+			var off = 0.0;
 			if (menu != null) {
+				off = menu.Height;
 				menu.Draw (Width);
-				GL.Translate (0.0, (float)menu.Height, 0.0);
+				GL.Translate (0.0, (float)off, 0.0);
 			}
 
 			if (child != null)
-				child.Draw ();
+				child.Draw (new Rectangle(padding.Top, padding.Left, Width-padding.Right, Height-off-padding.Bottom));
 
 			SDL.SDL_GL_SwapWindow (window);
 

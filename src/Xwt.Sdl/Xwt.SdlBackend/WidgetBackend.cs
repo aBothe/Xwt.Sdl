@@ -181,6 +181,11 @@ namespace Xwt.Sdl
 			eventSink.OnMouseEntered ();
 		}
 
+		internal void FireMouseMoved(uint timestamp, int x, int y)
+		{
+			eventSink.OnMouseMoved(new MouseMovedEventArgs((long)timestamp, (double)x,(double)y));
+		}
+
 		internal void FireMouseLeave()
 		{
 			this.eventSink.OnMouseExited ();
@@ -219,10 +224,10 @@ namespace Xwt.Sdl
 			ParentWindow.Invalidate (rect);
 		}
 
-		public virtual void Draw()
+		public virtual void Draw(Rectangle dirtyRect)
 		{
 			OpenTK.Graphics.OpenGL.GL.Color3 (0.0, 0.0, .3);
-			OpenTK.Graphics.OpenGL.GL.Rect (x, y, width, height);
+			OpenTK.Graphics.OpenGL.GL.Rect (dirtyRect.X, dirtyRect.Y, dirtyRect.Right, dirtyRect.Bottom);
 		}
 
 		#endregion
@@ -355,7 +360,7 @@ namespace Xwt.Sdl
 
 		public object NativeWidget {
 			get {
-				throw new NotImplementedException ();
+				return null;
 			}
 		}
 

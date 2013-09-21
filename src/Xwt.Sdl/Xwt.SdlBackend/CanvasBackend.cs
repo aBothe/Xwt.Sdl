@@ -33,18 +33,20 @@ namespace Xwt.Sdl
 	public class CanvasBackend : WidgetBackend, ICanvasBackend
 	{
 		List<Tuple<WidgetBackend, Rectangle>> children = new List<Tuple<WidgetBackend, Rectangle>>();
+		public new ICanvasEventSink EventSink {get{return base.EventSink as ICanvasEventSink; }}
+
 
 		public CanvasBackend ()
 		{
-
 		}
-
-		public override void Draw ()
+		/*
+		public override void Draw (Rectangle dirtyRect)
 		{
 			// Draw actual content
-			base.Draw ();
+			EventSink.OnDraw (null, dirtyRect);
+
 			// Draw child widgets
-		}
+		}*/
 
 		public override WidgetBackend GetChildAt (double x, double y)
 		{
