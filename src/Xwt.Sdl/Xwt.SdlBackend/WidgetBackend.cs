@@ -326,12 +326,14 @@ namespace Xwt.Sdl
 			}
 		}
 
+		protected virtual bool WidgetSupportsFocusing {get{return true;}}
+		bool cangetfocus = true;
 		public bool CanGetFocus {
 			get {
-				throw new NotImplementedException ();
+				return WidgetSupportsFocusing && cangetfocus;
 			}
 			set {
-				throw new NotImplementedException ();
+				cangetfocus = value;
 			}
 		}
 
