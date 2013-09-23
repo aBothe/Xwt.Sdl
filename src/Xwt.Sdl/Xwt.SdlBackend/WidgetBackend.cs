@@ -64,6 +64,8 @@ namespace Xwt.Sdl
 
 		IWidgetEventSink eventSink;
 		public IWidgetEventSink EventSink {get{return eventSink;}}
+		bool trackMouseMoved = false;
+
 		bool focused;
 		bool visible;
 		bool sensitive;
@@ -183,7 +185,8 @@ namespace Xwt.Sdl
 
 		internal void FireMouseMoved(uint timestamp, int x, int y)
 		{
-			eventSink.OnMouseMoved(new MouseMovedEventArgs((long)timestamp, (double)x,(double)y));
+			if (trackMouseMoved)
+				eventSink.OnMouseMoved(new MouseMovedEventArgs((long)timestamp, (double)x,(double)y));
 		}
 
 		internal void FireMouseLeave()
@@ -426,12 +429,14 @@ namespace Xwt.Sdl
 
 		public void EnableEvent (object eventId)
 		{
-
+			if ((int)eventId == (int)WidgetEvent.MouseMoved)
+				trackMouseMoved = true;
 		}
 
 		public void DisableEvent (object eventId)
 		{
-
+			if ((int)eventId == (int)WidgetEvent.MouseMoved)
+				trackMouseMoved = false;
 		}
 
 		#endregion

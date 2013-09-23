@@ -40,7 +40,8 @@ namespace Xwt.Sdl.Tests
 			mw.MainMenu = new Menu ();
 			var c = new Canvas ();
 			mw.Content = c;
-			c.MouseEntered += (sender, e) => mw.Title = "Canvas";
+			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
+			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";
 			c.MouseExited += (sender, e) =>  mw.Title = "------";
 			mw.Title = "SDL2 Test!";
 			mw.CloseRequested+=
