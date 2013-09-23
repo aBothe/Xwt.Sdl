@@ -191,10 +191,34 @@ namespace Xwt.Sdl
 			this.eventSink.OnMouseExited ();
 		}
 
+		readonly ButtonEventArgs buttonEA = new ButtonEventArgs();
+		internal bool FireMouseButton(bool down, PointerButton butt,int x, int y, int multiplePress = 1)
+		{
+			buttonEA.Handled = false;
+			buttonEA.X = (double)x;
+			buttonEA.Y = (double)y;
+			buttonEA.Button = butt;
+			buttonEA.MultiplePress = multiplePress;
+
+			if (down)
+				this.eventSink.OnButtonPressed (buttonEA);
+			else
+				this.eventSink.OnButtonReleased (buttonEA);
+
+			return buttonEA.Handled;
+		}
+
 		internal void FireKeyDown(Key k, ModifierKeys mods, bool rep, uint timestamp)
 		{
 			this.eventSink.OnKeyPressed(new KeyEventArgs(k, mods, rep, (long)timestamp));
 		}
+
+		internal void FireKeyUp(Key k, ModifierKeys mods, bool rep, uint timestamp)
+		{
+			this.eventSink.OnKeyPressed(new KeyEventArgs(k, mods, rep, (long)timestamp));
+		}
+
+		internal virtual void FireTextInput(char c, uint timestamp) {}
 
 		internal void OnBoundsChanged(double x, double y, double width, double height)
 		{

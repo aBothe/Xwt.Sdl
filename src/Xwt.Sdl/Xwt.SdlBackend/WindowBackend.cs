@@ -119,6 +119,37 @@ namespace Xwt.Sdl
 			}
 		}
 
+		void HandleMouseButtonEvent(SDL.SDL_MouseButtonEvent ev)
+		{
+			if (focusedWidget == null)
+				return;
+
+			bool isButtonDownEvt = ev.type == SDL.SDL_EventType.SDL_CONTROLLERBUTTONDOWN;
+
+			PointerButton butt;
+			switch (ev.button) {
+				default:
+					butt = PointerButton.Left;
+					break;
+				case (byte)SDL.SDL_BUTTON_MIDDLE:
+					butt = PointerButton.Middle;
+					break;
+				case (byte)SDL.SDL_BUTTON_RIGHT:
+					butt = PointerButton.Right;
+					break;
+				case (byte)SDL.SDL_BUTTON_X1:
+					butt = PointerButton.ExtendedButton1;
+					break;
+				case (byte)SDL.SDL_BUTTON_X2:
+					butt = PointerButton.ExtendedButton2;
+					break;
+			}
+
+			var w = focusedWidget;
+			while (w != null && !w.FireMouseButton (isButtonDownEvt, butt, ev.x, ev.y))
+				w = w.Parent;
+		}
+
 		internal void HandleWindowEvent(SDL.SDL_Event ev)
 		{
 			if (eventSink == null)
@@ -136,15 +167,18 @@ namespace Xwt.Sdl
 				case SDL.SDL_EventType.SDL_KEYUP:
 					break;
 
+				
 				case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
 					if (hoveredWidget == null || hoveredWidget.CanGetFocus) {
 						// TODO: Define 'focus' rules
 						FocusWidget (hoveredWidget);
 					}
 
-
+					HandleMouseButtonEvent (ev.button);
 					return;
+				
 				case SDL.SDL_EventType.SDL_MOUSEBUTTONUP:
+					HandleMouseButtonEvent (ev.button);
 					return;
 				case SDL.SDL_EventType.SDL_MOUSEMOTION:
 					if (!focused)
@@ -164,13 +198,15 @@ namespace Xwt.Sdl
 
 					var w = GetWidgetAt ((double)x, (double)y);
 					if (w != hoveredWidget) {
-						if(hoveredWidget != null)
+						if (hoveredWidget != null)
 							hoveredWidget.FireMouseLeave ();
 						hoveredWidget = w;
 						if (hoveredWidget != null)
 							hoveredWidget.FireMouseEnter ();
 					}
 
+					if (hoveredWidget != null)
+						hoveredWidget.FireMouseMoved (ev.motion.timestamp, x, y);
 					return;
 				case SDL.SDL_EventType.SDL_MOUSEWHEEL:
 					return;
