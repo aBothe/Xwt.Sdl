@@ -183,10 +183,14 @@ namespace Xwt.Sdl
 			eventSink.OnMouseEntered ();
 		}
 
-		internal void FireMouseMoved(uint timestamp, int x, int y)
+		internal bool FireMouseMoved(uint timestamp, int x, int y)
 		{
-			if (trackMouseMoved)
-				eventSink.OnMouseMoved(new MouseMovedEventArgs((long)timestamp, (double)x,(double)y));
+			MouseMovedEventArgs mouseMovedEA;
+			if (trackMouseMoved) {
+				eventSink.OnMouseMoved (mouseMovedEA = new MouseMovedEventArgs((long)timestamp, (double)x,(double)y));
+				return mouseMovedEA.Handled;
+			}
+			return false;
 		}
 
 		internal void FireMouseLeave()
@@ -211,14 +215,25 @@ namespace Xwt.Sdl
 			return buttonEA.Handled;
 		}
 
-		internal void FireKeyDown(Key k, ModifierKeys mods, bool rep, uint timestamp)
+		internal bool FireMouseWheel(uint timestamp, int x, int y, ScrollDirection dir)
 		{
-			this.eventSink.OnKeyPressed(new KeyEventArgs(k, mods, rep, (long)timestamp));
+			var mouseScrolledEA = new MouseScrolledEventArgs ((long)timestamp, (double)x, (double)y, dir);
+			eventSink.OnMouseScrolled (mouseScrolledEA);
+			return mouseScrolledEA.Handled;
 		}
 
-		internal void FireKeyUp(Key k, ModifierKeys mods, bool rep, uint timestamp)
+		internal bool FireKeyDown(Key k, ModifierKeys mods, bool rep, uint timestamp)
 		{
-			this.eventSink.OnKeyPressed(new KeyEventArgs(k, mods, rep, (long)timestamp));
+			var ea = new KeyEventArgs(k, mods, rep, (long)timestamp);
+			this.eventSink.OnKeyPressed(ea);
+			return ea.Handled;
+		}
+
+		internal bool FireKeyUp(Key k, ModifierKeys mods, bool rep, uint timestamp)
+		{
+			var ea = new KeyEventArgs(k, mods, rep, (long)timestamp);
+			this.eventSink.OnKeyPressed(ea);
+			return ea.Handled;
 		}
 
 		internal virtual void FireTextInput(char c, uint timestamp) {}

@@ -150,24 +150,34 @@ namespace Xwt.Sdl
 				w = w.Parent;
 		}
 
+		void HandleKeyEvent(SDL.SDL_KeyboardEvent ev)
+		{
+			Key k;
+			ModifierKeys mods;
+
+			Sdl.KeyCodes.ConvertToXwtKey (ev.keysym, out k, out mods);
+
+			var w = focusedWidget;
+			if(ev.type == SDL.SDL_EventType.SDL_KEYDOWN)
+				while (w != null && !w.FireKeyDown(k, mods, ev.repeat != 0, ev.timestamp))
+					w = w.Parent;
+			else
+				while (w != null && !w.FireKeyUp(k, mods, ev.repeat != 0, ev.timestamp))
+					w = w.Parent;
+		}
+
 		internal void HandleWindowEvent(SDL.SDL_Event ev)
 		{
+			WidgetBackend w;
 			if (eventSink == null)
 				return;
 
 			switch (ev.type) {
-				case SDL.SDL_EventType.SDL_KEYDOWN:
-					Key k;
-					ModifierKeys mods;
-
-					if (focusedWidget != null) {
-						focusedWidget.FireKeyDown (Key.N, ModifierKeys.None, ev.key.repeat != 0, ev.key.timestamp);
-					}
-					break;
 				case SDL.SDL_EventType.SDL_KEYUP:
+				case SDL.SDL_EventType.SDL_KEYDOWN:
+					HandleKeyEvent (ev.key);
 					break;
 
-				
 				case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
 					if (hoveredWidget == null || hoveredWidget.CanGetFocus) {
 						// TODO: Define 'focus' rules
@@ -196,7 +206,7 @@ namespace Xwt.Sdl
 						return;
 					}
 
-					var w = GetWidgetAt ((double)x, (double)y);
+					w = GetWidgetAt ((double)x, (double)y);
 					if (w != hoveredWidget) {
 						if (hoveredWidget != null)
 							hoveredWidget.FireMouseLeave ();
@@ -205,10 +215,28 @@ namespace Xwt.Sdl
 							hoveredWidget.FireMouseEnter ();
 					}
 
-					if (hoveredWidget != null)
-						hoveredWidget.FireMouseMoved (ev.motion.timestamp, x, y);
+					while (w != null && !w.FireMouseMoved (ev.motion.timestamp, x, y))
+						w = w.Parent;
 					return;
 				case SDL.SDL_EventType.SDL_MOUSEWHEEL:
+					if(hoveredWidget!=null)
+					{
+						ScrollDirection dir;
+						if(ev.wheel.y > 0)
+							dir = ScrollDirection.Up;
+						else
+							dir = ScrollDirection.Down;
+
+						if(ev.wheel.x > 0)
+							dir |= ScrollDirection.Right;
+						else if(ev.wheel.x < 0)
+							dir |= ScrollDirection.Left;
+
+						// TODO: Are X/Y values absolute or relative scroll values?
+						w = hoveredWidget;
+						while (w != null && !w.FireMouseWheel (ev.wheel.timestamp, ev.wheel.x, ev.wheel.y, dir))
+							w = w.Parent;
+					}
 					return;
 
 				case SDL.SDL_EventType.SDL_WINDOWEVENT:
@@ -233,9 +261,9 @@ namespace Xwt.Sdl
 					eventSink.OnShown ();
 					break;
 				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MOVED:
-					int w, h;
-					SDL.SDL_GetWindowSize (window, out w, out h);
-					eventSink.OnBoundsChanged (new Rectangle ((double)ev.window.data1, (double)ev.window.data2, (double)w, (double)h));
+					int width, h;
+					SDL.SDL_GetWindowSize (window, out width, out h);
+					eventSink.OnBoundsChanged (new Rectangle ((double)ev.window.data1, (double)ev.window.data2, (double)width, (double)h));
 					break;
 				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED:
 					int x, y;
