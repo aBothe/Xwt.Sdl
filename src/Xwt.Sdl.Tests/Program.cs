@@ -32,7 +32,10 @@ namespace Xwt.Sdl.Tests
 	{
 		public static void Main (string[] args)
 		{
-			Application.Initialize ("Xwt.Sdl.SdlEngine, Xwt.Sdl");
+			if (true)
+				Application.Initialize ("Xwt.Sdl.SdlEngine, Xwt.Sdl");
+			else
+				Application.Initialize (ToolkitType.Gtk);
 
 			var mw = new Window();
 			mw.Size = new Size (600, 600);

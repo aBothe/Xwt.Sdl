@@ -42,6 +42,7 @@ namespace Xwt.Sdl
 		public uint WindowId {get{return id;}}
 		public IWindowFrameEventSink eventSink;
 
+		int menuHeight=0;
 		int oldWidth;
 		int oldHeight;
 		int Width;
@@ -146,7 +147,7 @@ namespace Xwt.Sdl
 			}
 
 			var w = focusedWidget;
-			while (w != null && !w.FireMouseButton (isButtonDownEvt, butt, ev.x, ev.y))
+			while (w != null && !w.FireMouseButton (isButtonDownEvt, butt, ev.x, ev.y-menuHeight))
 				w = w.Parent;
 		}
 
@@ -215,7 +216,7 @@ namespace Xwt.Sdl
 							hoveredWidget.FireMouseEnter ();
 					}
 
-					while (w != null && !w.FireMouseMoved (ev.motion.timestamp, x, y))
+					while (w != null && !w.FireMouseMoved (ev.motion.timestamp, x, y-menuHeight))
 						w = w.Parent;
 					return;
 				case SDL.SDL_EventType.SDL_MOUSEWHEEL:
@@ -376,6 +377,7 @@ namespace Xwt.Sdl
 		public void SetMainMenu (IMenuBackend menu)
 		{
 			this.menu = menu as MenuBackend;
+			menuHeight = menu == null ? 0 : (int)this.menu.Height;
 			UpdateChildBounds ();
 			Invalidate ();
 		}

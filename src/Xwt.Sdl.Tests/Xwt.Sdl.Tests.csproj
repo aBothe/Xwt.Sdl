@@ -30,6 +30,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="Xwt.Gtk">
+      <HintPath>..\..\ext\xwt\Xwt.Gtk\bin\Debug\Xwt.Gtk.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />

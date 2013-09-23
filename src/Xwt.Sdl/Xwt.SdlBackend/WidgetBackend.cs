@@ -187,7 +187,7 @@ namespace Xwt.Sdl
 		{
 			MouseMovedEventArgs mouseMovedEA;
 			if (trackMouseMoved) {
-				eventSink.OnMouseMoved (mouseMovedEA = new MouseMovedEventArgs((long)timestamp, (double)x,(double)y));
+				eventSink.OnMouseMoved (mouseMovedEA = new MouseMovedEventArgs((long)timestamp, (double)x-this.x,(double)y-this.y));
 				return mouseMovedEA.Handled;
 			}
 			return false;
@@ -202,8 +202,8 @@ namespace Xwt.Sdl
 		internal bool FireMouseButton(bool down, PointerButton butt,int x, int y, int multiplePress = 1)
 		{
 			buttonEA.Handled = false;
-			buttonEA.X = (double)x;
-			buttonEA.Y = (double)y;
+			buttonEA.X = (double)x-this.x;
+			buttonEA.Y = (double)y-this.y;
 			buttonEA.Button = butt;
 			buttonEA.MultiplePress = multiplePress;
 
@@ -217,7 +217,7 @@ namespace Xwt.Sdl
 
 		internal bool FireMouseWheel(uint timestamp, int x, int y, ScrollDirection dir)
 		{
-			var mouseScrolledEA = new MouseScrolledEventArgs ((long)timestamp, (double)x, (double)y, dir);
+			var mouseScrolledEA = new MouseScrolledEventArgs ((long)timestamp, (double)x-this.x, (double)y-this.y, dir);
 			eventSink.OnMouseScrolled (mouseScrolledEA);
 			return mouseScrolledEA.Handled;
 		}
