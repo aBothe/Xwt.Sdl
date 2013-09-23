@@ -160,10 +160,10 @@ namespace Xwt.Sdl
 
 			var w = focusedWidget;
 			if(ev.type == SDL.SDL_EventType.SDL_KEYDOWN)
-				while (w != null && !w.FireKeyDown(k, mods, ev.repeat != 0, ev.timestamp))
+				while (w != null && !w.FireKeyDown(k, (char)ev.keysym.unicode, mods, ev.repeat != 0, ev.timestamp))
 					w = w.Parent;
 			else
-				while (w != null && !w.FireKeyUp(k, mods, ev.repeat != 0, ev.timestamp))
+				while (w != null && !w.FireKeyUp(k, (char)ev.keysym.unicode, mods, ev.repeat != 0, ev.timestamp))
 					w = w.Parent;
 		}
 

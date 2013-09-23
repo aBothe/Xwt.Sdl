@@ -46,9 +46,12 @@ namespace Xwt.Sdl
 		}
 
 		WeakReference parentRef;
-		public WidgetBackend Parent { get { return parentRef.Target as WidgetBackend; }}
+		public WidgetBackend Parent { get { return parentRef != null ? parentRef.Target as WidgetBackend : null; }}
 		public WindowBackend ParentWindow {
 			get{
+				if (parentRef == null)
+					return null;
+
 				if (parentRef.Target is WidgetBackend)
 					return (parentRef.Target as WidgetBackend).ParentWindow;
 
@@ -160,30 +163,30 @@ namespace Xwt.Sdl
 			return null;
 		}
 
-		internal void FireLostFocus()
+		internal virtual void FireLostFocus()
 		{
 			focused = false;
 			this.eventSink.OnLostFocus ();
 		}
 
-		internal void FireGainedFocus()
+		internal virtual void FireGainedFocus()
 		{
 			focused = true;
 			this.eventSink.OnGotFocus ();
 		}
 
-		internal void OnWidgetResized()
+		internal virtual void OnWidgetResized()
 		{
 			this.eventSink.OnBoundsChanged ();
 			Invalidate ();
 		}
 
-		internal void FireMouseEnter()
+		internal virtual void FireMouseEnter()
 		{
 			eventSink.OnMouseEntered ();
 		}
 
-		internal bool FireMouseMoved(uint timestamp, int x, int y)
+		internal virtual bool FireMouseMoved(uint timestamp, int x, int y)
 		{
 			MouseMovedEventArgs mouseMovedEA;
 			if (trackMouseMoved) {
@@ -193,13 +196,13 @@ namespace Xwt.Sdl
 			return false;
 		}
 
-		internal void FireMouseLeave()
+		internal virtual void FireMouseLeave()
 		{
 			this.eventSink.OnMouseExited ();
 		}
 
 		readonly ButtonEventArgs buttonEA = new ButtonEventArgs();
-		internal bool FireMouseButton(bool down, PointerButton butt,int x, int y, int multiplePress = 1)
+		internal virtual bool FireMouseButton(bool down, PointerButton butt,int x, int y, int multiplePress = 1)
 		{
 			buttonEA.Handled = false;
 			buttonEA.X = (double)x-this.x;
@@ -215,30 +218,28 @@ namespace Xwt.Sdl
 			return buttonEA.Handled;
 		}
 
-		internal bool FireMouseWheel(uint timestamp, int x, int y, ScrollDirection dir)
+		internal virtual bool FireMouseWheel(uint timestamp, int x, int y, ScrollDirection dir)
 		{
 			var mouseScrolledEA = new MouseScrolledEventArgs ((long)timestamp, (double)x-this.x, (double)y-this.y, dir);
 			eventSink.OnMouseScrolled (mouseScrolledEA);
 			return mouseScrolledEA.Handled;
 		}
 
-		internal bool FireKeyDown(Key k, ModifierKeys mods, bool rep, uint timestamp)
+		internal virtual bool FireKeyDown(Key k, char ch, ModifierKeys mods, bool rep, uint timestamp)
 		{
 			var ea = new KeyEventArgs(k, mods, rep, (long)timestamp);
 			this.eventSink.OnKeyPressed(ea);
 			return ea.Handled;
 		}
 
-		internal bool FireKeyUp(Key k, ModifierKeys mods, bool rep, uint timestamp)
+		internal virtual bool FireKeyUp(Key k, char ch, ModifierKeys mods, bool rep, uint timestamp)
 		{
 			var ea = new KeyEventArgs(k, mods, rep, (long)timestamp);
 			this.eventSink.OnKeyPressed(ea);
 			return ea.Handled;
 		}
 
-		internal virtual void FireTextInput(char c, uint timestamp) {}
-
-		internal void OnBoundsChanged(double x, double y, double width, double height)
+		internal virtual void OnBoundsChanged(double x, double y, double width, double height)
 		{
 			this.x = x;
 			this.y = y;
@@ -258,12 +259,16 @@ namespace Xwt.Sdl
 		/// </summary>
 		public void Invalidate()
 		{
-			ParentWindow.Invalidate (new Rectangle(x,y, width, height));
+			var pw = ParentWindow;
+			if(pw != null)
+				pw.Invalidate (new Rectangle(x,y, width, height));
 		}
 
 		public void Invalidate(Rectangle rect)
 		{
-			ParentWindow.Invalidate (rect);
+			var pw = ParentWindow;
+			if(pw != null)
+				pw.Invalidate (rect);
 		}
 
 		public virtual void Draw(Rectangle dirtyRect)

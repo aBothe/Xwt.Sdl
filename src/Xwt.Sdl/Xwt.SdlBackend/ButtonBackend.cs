@@ -1,5 +1,5 @@
 //
-// Program.cs
+// ButtonBackend.cs
 //
 // Author:
 //       Alexander Bothe <info@alexanderbothe.com>
@@ -24,41 +24,71 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using Xwt;
+using Xwt.Backends;
+using SDL2;
+using OpenTK.Graphics.OpenGL;
 
-namespace Xwt.Sdl.Tests
+namespace Xwt.Sdl
 {
-	class MainClass
+	public class ButtonBackend : WidgetBackend, IButtonBackend
 	{
-		public static void Main (string[] args)
+		ButtonStyle style;
+		ButtonType type;
+		string label;
+		bool mnemonic;
+		ImageDescription image;
+		ContentPosition pos;
+
+		bool hovered;
+
+		public override void Draw (Rectangle dirtyRect)
 		{
-			if (true)
-				Application.Initialize ("Xwt.Sdl.SdlEngine, Xwt.Sdl");
+			if (hovered)
+				GL.Color3 (1f, 0f, 0f);
 			else
-				Application.Initialize (ToolkitType.Gtk);
-
-			var mw = new Window();
-			mw.Size = new Size (600, 600);
-
-			mw.MainMenu = new Menu ();
-			var c = new Button ();
-			mw.Content = c;
-			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
-			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";
-			c.MouseExited += (sender, e) =>  mw.Title = "------";
-			mw.Title = "SDL2 Test!";
-			mw.CloseRequested+=
-				(sender, a) => Application.Exit();
-			mw.Show();
-
-			/*
-			var mw2 = new Window ();
-			bool bb=true;
-			mw2.Size = new Size (500, 100);
-			mw2.Title = "Shallow";
-			mw2.Show ();
-			*/
-			Application.Run ();
+				GL.Color3 (1f, 1f, 1f);
+			GL.Rect (X, Y, Width, Height);
+			//base.Draw (dirtyRect);
 		}
+
+		internal override void FireMouseEnter ()
+		{
+			hovered = true;
+			base.FireMouseEnter ();
+			Invalidate ();
+		}
+
+		internal override void FireMouseLeave ()
+		{
+			hovered = false;
+			base.FireMouseLeave ();
+			Invalidate ();
+		}
+
+		#region IButtonBackend implementation
+
+		public void SetButtonStyle (ButtonStyle style)
+		{
+			this.style = style;
+			Invalidate ();
+		}
+
+		public void SetButtonType (ButtonType type)
+		{
+			this.type = type;
+			Invalidate ();
+		}
+
+		public void SetContent (string label, bool useMnemonic, ImageDescription image, ContentPosition position)
+		{
+			this.label = label;
+			this.mnemonic = useMnemonic;
+			this.image = image;
+			this.pos = position;
+			Invalidate ();
+		}
+
+		#endregion
 	}
 }
+
