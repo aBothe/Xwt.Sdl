@@ -27,27 +27,60 @@ using System;
 using Xwt.Backends;
 using SDL2;
 using OpenTK.Graphics.OpenGL;
+using FTGL;
 
 namespace Xwt.Sdl
 {
 	public class ButtonBackend : WidgetBackend, IButtonBackend
 	{
+		#region Properties
 		ButtonStyle style;
 		ButtonType type;
-		string label;
+		string label = "Button";
 		bool mnemonic;
 		ImageDescription image;
 		ContentPosition pos;
+		public new IButtonEventSink EventSink {get{return base.EventSink as IButtonEventSink;}}
 
 		bool hovered;
+		float v,w;
+		#endregion
+
+		static IntPtr font;
+		static ButtonBackend()
+		{
+			font = Fonts.CreatePixmapFont("/usr/share/fonts/TTF/SourceSansPro-Regular.ttf");
+			GL.Enable (EnableCap.ColorMaterial);
+			if(font == IntPtr.Zero)
+				throw new FTGLException();
+
+			if (Fonts.SetFontFaceSize(font, 100) != 1)
+				throw new FTGLException ();
+
+			var err = Fonts.GetFontError (font);
+
+			if (err != IntPtr.Zero)
+				throw new FTGLException ();
+		}
+
+		~ButtonBackend()
+		{
+			Fonts.DestroyFont(font);
+		}
+
 
 		public override void Draw (Rectangle dirtyRect)
 		{
-			if (hovered)
-				GL.Color3 (1f, 0f, 0f);
-			else
-				GL.Color3 (1f, 1f, 1f);
+			GL.Color3 (0f, w, v);
 			GL.Rect (X, Y, Width, Height);
+
+			if (label != null) {
+				GL.Enable (EnableCap.Texture2D);
+				//GL.PushMatrix ();
+				GL.Color4 (0f, 0f, 0f,1f);
+				Fonts.RenderFont (font, label, RenderMode.All);
+				//GL.PopMatrix ();
+			}
 			//base.Draw (dirtyRect);
 		}
 
@@ -63,6 +96,21 @@ namespace Xwt.Sdl
 			hovered = false;
 			base.FireMouseLeave ();
 			Invalidate ();
+		}
+
+		internal override bool FireMouseButton (bool down, PointerButton butt, int x, int y, int multiplePress = 1)
+		{
+			var ret = base.FireMouseButton (down, butt, x, y, multiplePress);
+			EventSink.OnClicked ();
+			return ret;
+		}
+
+		internal override bool FireMouseMoved (uint timestamp, int x, int y)
+		{
+			v = x / (float)Width;
+			w = y / (float)Height;
+			Invalidate ();
+			return base.FireMouseMoved (timestamp, x, y);
 		}
 
 		#region IButtonBackend implementation

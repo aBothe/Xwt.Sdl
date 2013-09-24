@@ -1,5 +1,5 @@
 //
-// CanvasBackend.cs
+// Layouts.cs
 //
 // Author:
 //       Alexander Bothe <info@alexanderbothe.com>
@@ -24,64 +24,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using Xwt.Backends;
-using OpenTK.Graphics.OpenGL;
-using System.Collections.Generic;
 
-namespace Xwt.Sdl
+namespace FTGL
 {
-	public class CanvasBackend : WidgetBackend, ICanvasBackend
+	public static class Layouts
 	{
-		List<Tuple<WidgetBackend, Rectangle>> children = new List<Tuple<WidgetBackend, Rectangle>>();
-		public new ICanvasEventSink EventSink {get{return base.EventSink as ICanvasEventSink; }}
 
-
-		public CanvasBackend ()
-		{
-
-		}
-		/*
-		public override void Draw (Rectangle dirtyRect)
-		{
-			// Draw actual content
-			EventSink.OnDraw (null, dirtyRect);
-
-			// Draw child widgets
-		}*/
-
-		public override WidgetBackend GetChildAt (double x, double y)
-		{
-			return null;
-		}
-
-		#region ICanvasBackend implementation
-
-		public void QueueDraw ()
-		{
-			Invalidate ();
-		}
-
-		public void QueueDraw (Rectangle rect)
-		{
-			Invalidate (rect);
-		}
-
-		public void AddChild (IWidgetBackend widget, Rectangle bounds)
-		{
-
-		}
-
-		public void SetChildBounds (IWidgetBackend widget, Rectangle bounds)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public void RemoveChild (IWidgetBackend widget)
-		{
-			throw new NotImplementedException ();
-		}
-
-		#endregion
 	}
 }
 

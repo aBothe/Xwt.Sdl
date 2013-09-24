@@ -54,6 +54,8 @@
     <Compile Include="Xwt.SdlBackend\SdlDesktopBackend.cs" />
     <Compile Include="Xwt.SdlBackend\KeyCodes.cs" />
     <Compile Include="Xwt.SdlBackend\ButtonBackend.cs" />
+    <Compile Include="FTGL#\Fonts.cs" />
+    <Compile Include="FTGL#\Layouts.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -64,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Xwt.SdlBackend\" />
+    <Folder Include="FTGL#\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\ext\SDL2#.dll.config">
