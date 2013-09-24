@@ -53,6 +53,13 @@ namespace FTGL
 	{
 		private const string nativeLibName = "ftgl.dll";
 
+		/*
+		 * To apply custom colors to Pixmap fonts, call the following methods:
+		 * glPixelTransferf(GL_RED_BIAS, -1.0f);
+		 * glPixelTransferf(GL_GREEN_BIAS, -1.0f);
+		 * glPixelTransferf(GL_BLUE_BIAS, -1.0f);
+		 */
+
 		/// <summary>
 		/// Create a specialised FTGLfont object for handling pixmap (grey scale) fonts.
 		/// </summary>
@@ -61,6 +68,10 @@ namespace FTGL
 		[DllImport(nativeLibName, EntryPoint = "ftglCreatePixmapFont", CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr CreatePixmapFont([In] [MarshalAs(UnmanagedType.LPStr)] string pathToTtf);
 	
+		[DllImport(nativeLibName, EntryPoint = "ftglCreateTextureFont", CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr CreateTextureFont([In] [MarshalAs(UnmanagedType.LPStr)] string pathToTtf);
+
+
 		[DllImport(nativeLibName, EntryPoint = "ftglDestroyFont", CallingConvention = CallingConvention.Cdecl)]
 		public static extern void DestroyFont(IntPtr font);
 
