@@ -82,7 +82,7 @@ namespace Xwt.Sdl
 			throw new NotImplementedException ();
 		}
 
-		public override void AddAttribute (object backend, Xwt.Drawing.TextAttribute attribute)
+		public override void AddAttribute (object backend, TextAttribute attribute)
 		{
 			throw new NotImplementedException ();
 		}
