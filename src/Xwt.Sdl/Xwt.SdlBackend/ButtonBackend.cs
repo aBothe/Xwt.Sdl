@@ -46,47 +46,24 @@ namespace Xwt.Sdl
 		float v,w;
 		#endregion
 
-		static IntPtr font;
-		static ButtonBackend()
-		{
-			font = Fonts.CreateTextureFont("/usr/share/fonts/TTF/SourceSansPro-Regular.ttf");
-			GL.Enable (EnableCap.ColorMaterial);
-			GL.Enable (EnableCap.Blend);
-			GL.Enable (EnableCap.Texture2D);
-
-			if(font == IntPtr.Zero)
-				throw new FTGLException();
-
-			if (Fonts.SetFontFaceSize(font, 15) != 1)
-				throw new FTGLException ();
-
-			var err = Fonts.GetFontError (font);
-
-			if (err != IntPtr.Zero)
-				throw new FTGLException ();
-		}
-
-		~ButtonBackend()
-		{
-			//Fonts.DestroyFont(font);
-		}
-
-
 		public override void Draw (Rectangle dirtyRect)
 		{
+			base.Draw (dirtyRect);
+
 			GL.Color3 (0f, w, v);
 			GL.Rect (X, Y, Width, Height);
 
 			if (label != null) {
+				var font = FontBackend;
 				GL.PushMatrix ();
 				var abs = AbsoluteLocation;
-				GL.Translate (0.0, Fonts.GetFontFaceSize(font), 0.0);
+				GL.Translate (0.0, font.Size, 0.0);
 				GL.Rotate (180f, 1f, 0f, 0f); 
 				GL.Color4 (1f, 0f, 0f,1f);
-				Fonts.RenderFont (font, label, RenderMode.Front);
+				font.Render (label);
 				GL.PopMatrix ();
 			}
-			//base.Draw (dirtyRect);
+
 		}
 
 		internal override void FireMouseEnter ()

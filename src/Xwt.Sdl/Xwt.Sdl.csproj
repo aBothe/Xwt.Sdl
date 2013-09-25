@@ -56,6 +56,7 @@
     <Compile Include="Xwt.SdlBackend\ButtonBackend.cs" />
     <Compile Include="FTGL#\Fonts.cs" />
     <Compile Include="FTGL#\Layouts.cs" />
+    <Compile Include="FTGL#\FontWrapper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

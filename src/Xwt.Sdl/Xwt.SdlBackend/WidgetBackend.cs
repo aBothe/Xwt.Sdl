@@ -292,6 +292,9 @@ namespace Xwt.Sdl
 		public void Dispose ()
 		{
 			widgetStore.Remove (Id);
+
+			if (customFont != null)
+				customFont.Dispose ();
 		}
 
 		public Point ConvertToScreenCoordinates (Point widgetCoordinates)
@@ -413,12 +416,15 @@ namespace Xwt.Sdl
 			}
 		}
 
+		protected FontWrapper FontBackend {get{return customFont ?? SdlFontBackendHandler.SystemDefaultFont;}}
+		FontWrapper customFont;
 		public virtual object Font {
 			get {
-				return null;
+				return FontBackend;
 			}
 			set {
-
+				customFont = value as FontWrapper;
+				Invalidate ();
 			}
 		}
 

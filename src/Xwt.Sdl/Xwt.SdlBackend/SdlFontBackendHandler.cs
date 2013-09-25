@@ -27,6 +27,7 @@ using System;
 using Xwt.Backends;
 using Xwt.Drawing;
 using System.Collections.Generic;
+using FTGL;
 
 namespace Xwt.Sdl
 {
@@ -37,10 +38,22 @@ namespace Xwt.Sdl
 		}
 
 		#region implemented abstract members of FontBackendHandler
+		static FontWrapper sysFont;
+		public static FontWrapper SystemDefaultFont
+		{
+			get{ 
+				if(sysFont != null)
+					return sysFont;
+
+				sysFont = FontWrapper.LoadFile ("/usr/share/fonts/TTF/SourceSansPro-Regular.ttf");
+				sysFont.Size = 11;
+				return sysFont;
+			}
+		}
 
 		public override object GetSystemDefaultFont ()
 		{
-			throw new NotImplementedException ();
+			return SystemDefaultFont;
 		}
 
 		public override IEnumerable<string> GetInstalledFonts ()
