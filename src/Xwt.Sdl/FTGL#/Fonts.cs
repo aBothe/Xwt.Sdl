@@ -46,7 +46,23 @@ namespace FTGL
 
 	public class FTGLException : Exception
 	{
+		public FTGLException(string msg) : base(msg) {}
 
+		public FTGLException(IntPtr font) : base(string.Format("ftgl Exception: {0}", Fonts.GetFontError(font))) {
+
+		}
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct FontBoundaries
+	{
+		public float Lower;
+		public float Left;
+		public float Near;
+
+		public float Upper;
+		public float Right;
+		public float Far;
 	}
 
 	public static class Fonts
@@ -102,16 +118,32 @@ namespace FTGL
 		public static extern int SetFontFaceSize(IntPtr font, uint faceSize, uint deviceResolution=0);
 
 
-		[DllImport(nativeLibName, EntryPoint = "ftglGetFontBBox", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetFontBBox(IntPtr font, 
-			[In] [MarshalAs(UnmanagedType.LPStr)] string text, int textLength, 
-			[In] [MarshalAs(UnmanagedType.LPArray, SizeConst = 6)] float[] boundaries);
-
-		[StructLayout(LayoutKind.Sequential)]
-		public unsafe struct FontBoundaries
+		public static FontBoundaries GetFontBoundaryBox(IntPtr font, string text)
 		{
-			public fixed float Boundaries[6];
+			var bbox=new FontBoundaries();
+			if(text != null)
+				GetFontBoundaryBox (font, text, text.Length, ref bbox);
+			return bbox;
 		}
+
+		[DllImport(nativeLibName, EntryPoint = "ftglGetFontBBox", CallingConvention = CallingConvention.Cdecl)]
+		public static extern void GetFontBoundaryBox(IntPtr font, 
+			[MarshalAs(UnmanagedType.LPStr)] string text, int textLength,
+			[MarshalAs(UnmanagedType.Struct)] ref FontBoundaries boundaries
+		);
+
+		/// <summary>
+		/// Gets the font Boundary box.
+		/// </summary>
+		/// <param name="font">Font.</param>
+		/// <param name="text">Text.</param>
+		/// <param name="textLength">Text length.</param>
+		/// <param name="boundaries">Boundaries. Must be at least 6 items large!</param>
+		[DllImport(nativeLibName, EntryPoint = "ftglGetFontBBox", CallingConvention = CallingConvention.Cdecl)]
+		public static extern void GetFontBoundaryBox(IntPtr font, 
+			[In] [MarshalAs(UnmanagedType.LPStr)] string text, int textLength, 
+			[In] [MarshalAs(UnmanagedType.LPArray, SizeConst = 6)] float[] boundaries
+		);
 
 		/// <summary>
 		/// Get the advance width for a string.
