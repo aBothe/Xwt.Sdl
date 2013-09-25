@@ -27,6 +27,7 @@ using System;
 using Xwt.Backends;
 using Xwt.Drawing;
 using System.Collections.Generic;
+using FTGL;
 
 namespace Xwt.Sdl
 {
@@ -273,7 +274,7 @@ namespace Xwt.Sdl
 
 		public virtual void Draw(Rectangle dirtyRect)
 		{
-			OpenTK.Graphics.OpenGL.GL.Color3 (0.0, 0.0, .3);
+			OpenTK.Graphics.OpenGL.GL.Color4 (backgroundColor.Red,backgroundColor.Green, backgroundColor.Blue, backgroundColor.Alpha);
 			OpenTK.Graphics.OpenGL.GL.Rect (dirtyRect.X, dirtyRect.Y, dirtyRect.Right, dirtyRect.Bottom);
 		}
 
