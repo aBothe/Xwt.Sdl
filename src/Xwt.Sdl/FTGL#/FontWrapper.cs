@@ -50,6 +50,10 @@ namespace FTGL
 		}
 
 		static Dictionary<int, FontEntry> fontCache = new Dictionary<int, FontEntry>();
+		/// <summary>
+		/// FIXME: Make extra font handles/objects for each different font size. 
+		/// </summary>
+		static Dictionary<int, uint> lastSetSizes = new Dictionary<int, uint>();
 
 		readonly FontKind kind;
 		readonly int Hash;
@@ -68,9 +72,15 @@ namespace FTGL
 			}
 		}
 
+		/// <summary>
+		/// Sets the font size. Time intensive!
+		/// </summary>
 		void SetRenderSize()
 		{
-			Fonts.SetFontFaceSize (font, RenderSize);
+			if (lastSetSizes[Hash] != RenderSize) {
+				Fonts.SetFontFaceSize (font, RenderSize);
+				lastSetSizes[Hash] = RenderSize;
+			}
 		}
 
 		public float LineHeight
@@ -139,6 +149,9 @@ namespace FTGL
 
 		private FontWrapper(int hash,IntPtr font, FontKind kind)
 		{
+			if (!lastSetSizes.ContainsKey (hash))
+				lastSetSizes [hash] = 0;
+
 			this.kind = kind;
 			this.Hash = hash;
 			this.disp = kind != FontKind.Texture;
@@ -160,6 +173,7 @@ namespace FTGL
 					if(disp)
 						Fonts.DestroyFont(font);
 					fontCache.Remove (Hash);
+					lastSetSizes.Remove (Hash);
 				}
 			}
 		}
