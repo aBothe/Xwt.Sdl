@@ -46,7 +46,7 @@ namespace Xwt.Sdl
 					return sysFont;
 
 				sysFont = FontWrapper.LoadFile ("/usr/share/fonts/TTF/SourceSansPro-Regular.ttf");
-				sysFont.FontSize = 11;
+				sysFont.FontSize = 13;
 				return sysFont;
 			}
 		}
