@@ -67,12 +67,11 @@ namespace Xwt.Sdl
 				font.Render (label);
 				GL.PopMatrix ();
 			}
-
 		}
 
 		internal override void FireMouseEnter ()
 		{
-			hovered = true;
+			hovered = Sensitive;
 			clicked = false;
 			base.FireMouseEnter ();
 			Invalidate ();
