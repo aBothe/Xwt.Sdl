@@ -61,7 +61,7 @@ namespace Xwt.Sdl
 			if (label != null) {
 				var font = FontBackend;
 				GL.PushMatrix ();
-				GL.Translate (X + Width/2.0 - font.GetAdvance (label)/2.0d, Y + Height/2.0d + (double)font.FontSize/2.0d, 0.0);
+				GL.Translate (X + Width/2.0 - font.GetAdvance (label)/2.0d, Y + Height/2.0d + (double)font.FontSize/2.5d, 0.0);
 				GL.Rotate (180f, 1f, 0f, 0f); 
 				GL.Color4 (0f, 0f, 0f,1f);
 				font.Render (label);
