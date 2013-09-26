@@ -42,24 +42,28 @@ namespace Xwt.Sdl
 		ContentPosition pos;
 		public new IButtonEventSink EventSink {get{return base.EventSink as IButtonEventSink;}}
 
+		bool clicked;
 		bool hovered;
 		float v,w;
 		#endregion
 
 		public override void Draw (Rectangle dirtyRect)
 		{
-			base.Draw (dirtyRect);
+			if (clicked)
+				GL.Color3 (0.5f, .5f, .5f);
+			else if (hovered)
+				GL.Color3 (0.8f, 0.8f, 0.8f);
+			else
+				GL.Color3 (0.6f, 0.6f, 0.6f);
 
-			GL.Color3 (0f, w, v);
-			GL.Rect (X, Y, Width, Height);
+			GL.Rect (X, Y, X + Width, Y+ Height);
 
 			if (label != null) {
 				var font = FontBackend;
 				GL.PushMatrix ();
-				var abs = AbsoluteLocation;
-				GL.Translate (0.0, font.Size, 0.0);
+				GL.Translate (X + Width/2.0 - font.GetAdvance (label), Y + Height/2.0 - font.FontSize/2.0, 0.0);
 				GL.Rotate (180f, 1f, 0f, 0f); 
-				GL.Color4 (1f, 0f, 0f,1f);
+				GL.Color4 (0f, 0f, 0f,1f);
 				font.Render (label);
 				GL.PopMatrix ();
 			}
@@ -69,6 +73,7 @@ namespace Xwt.Sdl
 		internal override void FireMouseEnter ()
 		{
 			hovered = true;
+			clicked = false;
 			base.FireMouseEnter ();
 			Invalidate ();
 		}
@@ -76,6 +81,7 @@ namespace Xwt.Sdl
 		internal override void FireMouseLeave ()
 		{
 			hovered = false;
+			clicked = false;
 			base.FireMouseLeave ();
 			Invalidate ();
 		}
@@ -83,16 +89,16 @@ namespace Xwt.Sdl
 		internal override bool FireMouseButton (bool down, PointerButton butt, int x, int y, int multiplePress = 1)
 		{
 			var ret = base.FireMouseButton (down, butt, x, y, multiplePress);
-			EventSink.OnClicked ();
+			if (Sensitive) {
+				if (down) {
+					clicked = true;
+				} else if(clicked) {
+					clicked = false;
+					EventSink.OnClicked ();
+				}
+				Invalidate ();
+			}
 			return ret;
-		}
-
-		internal override bool FireMouseMoved (uint timestamp, int x, int y)
-		{
-			v = x / (float)Width;
-			w = y / (float)Height;
-			Invalidate ();
-			return base.FireMouseMoved (timestamp, x, y);
 		}
 
 		#region IButtonBackend implementation

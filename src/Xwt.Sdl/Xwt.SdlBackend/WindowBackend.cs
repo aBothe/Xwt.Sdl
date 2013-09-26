@@ -125,7 +125,7 @@ namespace Xwt.Sdl
 			if (focusedWidget == null)
 				return;
 
-			bool isButtonDownEvt = ev.type == SDL.SDL_EventType.SDL_CONTROLLERBUTTONDOWN;
+			bool isButtonDownEvt = ev.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN;
 
 			PointerButton butt;
 			switch (ev.button) {
@@ -359,8 +359,8 @@ namespace Xwt.Sdl
 			// The padding does NOT affect the menu position - only the child position!
 			child.OnBoundsChanged (padding.Left, 
 				padding.Top, 
-				(double)Width-padding.Width, 
-				(double)(Height-(menu == null ? 0 : menu.Height)) - padding.Height);
+				(double)Width-padding.Right, 
+				(double)(Height-(menu == null ? 0 : menu.Height)) - padding.Bottom);
 		}
 		#endregion
 

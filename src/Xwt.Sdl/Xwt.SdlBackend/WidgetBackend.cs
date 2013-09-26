@@ -72,7 +72,7 @@ namespace Xwt.Sdl
 
 		bool focused;
 		bool visible;
-		bool sensitive;
+		bool sensitive = true;
 
 		double minWidth, minHeight;
 		double x,y, width, height;
