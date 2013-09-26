@@ -38,11 +38,10 @@ namespace Xwt.Sdl.Tests
 				Application.Initialize (ToolkitType.Gtk);
 
 			var mw = new Window();
-			mw.Size = new Size (600, 600);
+			mw.Size = new Size (100, 150);
 
 			mw.MainMenu = new Menu ();
 			var c = new Button ();
-			c.Sensitive = false;
 			c.Clicked += (sender, e) => mw.Title = "Clicked!";
 			mw.Content = c;
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
