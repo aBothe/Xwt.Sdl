@@ -36,7 +36,7 @@ namespace Xwt.Sdl
 		#region Properties
 		ButtonStyle style;
 		ButtonType type;
-		string label = "Button";
+		string label;
 		bool mnemonic;
 		ImageDescription image;
 		ContentPosition pos;
@@ -61,7 +61,7 @@ namespace Xwt.Sdl
 			if (label != null) {
 				var font = FontBackend;
 				GL.PushMatrix ();
-				GL.Translate (X + Width/2.0 - font.GetAdvance (label)/2.0, Y + Height/2.0 + font.FontSize/2.0, 0.0);
+				GL.Translate (X + Width/2.0 - font.GetAdvance (label)/2.0d, Y + Height/2.0d + (double)font.FontSize/2.0d, 0.0);
 				GL.Rotate (180f, 1f, 0f, 0f); 
 				GL.Color4 (0f, 0f, 0f,1f);
 				font.Render (label);
@@ -98,6 +98,14 @@ namespace Xwt.Sdl
 				Invalidate ();
 			}
 			return ret;
+		}
+
+		public override Size GetPreferredSize ()
+		{
+			var ft = FontBackend;
+			var x = (double)ft.GetAdvance (label ?? string.Empty) + 5d;
+			var y = (!string.IsNullOrEmpty (label) ? (double)ft.LineHeight : 0.0d)+5d;
+			return new Size (x, y);
 		}
 
 		#region IButtonBackend implementation

@@ -325,7 +325,7 @@ namespace Xwt.Sdl
 
 		public void UpdateLayout ()
 		{
-			throw new NotImplementedException ();
+			Invalidate ();
 		}
 
 		public Size GetPreferredSize (SizeConstraint widthConstraint, SizeConstraint heightConstraint)

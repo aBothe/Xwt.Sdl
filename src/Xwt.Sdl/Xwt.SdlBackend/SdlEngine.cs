@@ -190,7 +190,7 @@ namespace Xwt.Sdl
 
 		public override bool HasNativeParent (Widget w)
 		{
-			throw new NotImplementedException ();
+			return true;
 		}
 	}
 }

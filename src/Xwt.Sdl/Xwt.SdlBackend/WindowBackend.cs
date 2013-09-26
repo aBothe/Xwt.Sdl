@@ -390,7 +390,11 @@ namespace Xwt.Sdl
 
 		public void GetMetrics (out Size minSize, out Size decorationSize)
 		{
-			minSize = new Size ();
+			minSize = new Size(padding.Right, padding.Bottom);
+
+			if(menu != null)
+				minSize.Height+=menu.Height;
+
 			decorationSize = new Size ();
 		}
 
