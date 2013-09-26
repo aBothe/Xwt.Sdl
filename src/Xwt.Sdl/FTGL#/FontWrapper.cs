@@ -65,7 +65,7 @@ namespace FTGL
 		readonly bool disp;
 		uint RenderSize;
 
-		public uint Size
+		public uint FontSize
 		{
 			get{ 
 				return RenderSize != 0 ? RenderSize : Fonts.GetFontFaceSize (font);
