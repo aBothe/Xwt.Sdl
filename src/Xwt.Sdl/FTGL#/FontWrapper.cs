@@ -37,28 +37,21 @@ namespace FTGL
 
 	public class FontWrapper : IDisposable
 	{
-		class FontEntry : IDisposable
+		class FontEntry
 		{
 			public readonly IntPtr Handle;
 			public int ReferenceCount;
-			public readonly bool DisposeAfterLastRef;
 
-			public FontEntry(IntPtr h, bool disp)
+			public FontEntry(IntPtr h)
 			{
 				Handle = h;
-				DisposeAfterLastRef = disp;
 				ReferenceCount = 1;
-			}
-
-			public virtual void Dispose ()
-			{
-				if(DisposeAfterLastRef)
-					Fonts.DestroyFont(Handle);
 			}
 		}
 
 		static Dictionary<int, FontEntry> fontCache = new Dictionary<int, FontEntry>();
 
+		readonly FontKind kind;
 		readonly int Hash;
 		public override int GetHashCode (){return Hash;}
 		readonly IntPtr font;
@@ -122,35 +115,33 @@ namespace FTGL
 			FontEntry fe;
 			if (fontCache.TryGetValue (hash, out fe)) {
 				fe.ReferenceCount++;
-				return new FontWrapper (hash,fe.Handle,fe.DisposeAfterLastRef);
+				return new FontWrapper (hash,fe.Handle,kind);
 			}
 
 			IntPtr font;
-			bool disp;
 
 			switch (kind) {
 				case FontKind.Pixmap:
-					disp = true;
 					font = Fonts.CreatePixmapFont (pathToFont);
 					break;
 				default:
 				case FontKind.Texture:
 					font = Fonts.CreateTextureFont (pathToFont);
-					disp = false;
 					break;
 			}
 
 			if (font == IntPtr.Zero)
 				throw new FTGLException (IntPtr.Zero);
 
-			fontCache [hash] = new FontEntry(font, disp);
-			return new FontWrapper (hash, font, disp);
+			fontCache [hash] = new FontEntry(font);
+			return new FontWrapper (hash, font, kind);
 		}
 
-		private FontWrapper(int hash,IntPtr font, bool disposeOnDestroy=true)
+		private FontWrapper(int hash,IntPtr font, FontKind kind)
 		{
+			this.kind = kind;
 			this.Hash = hash;
-			this.disp = disposeOnDestroy;
+			this.disp = kind != FontKind.Texture;
 			this.font = font;
 		}
 
@@ -159,14 +150,15 @@ namespace FTGL
 			Dispose ();
 		}
 
-		bool disposed;
+		bool disposed=false;
 		public virtual void Dispose ()
 		{
-			if (disp && !disposed) {
+			if (!disposed) {
 				disposed = true;
 				var fe = fontCache [Hash];
 				if (--fe.ReferenceCount <= 0) {
-					fe.Dispose ();
+					if(disp)
+						Fonts.DestroyFont(font);
 					fontCache.Remove (Hash);
 				}
 			}
