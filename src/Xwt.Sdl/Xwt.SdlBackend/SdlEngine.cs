@@ -27,12 +27,14 @@ using System;
 using SDL2;
 using Xwt.Backends;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace Xwt.Sdl
 {
 	public class SdlEngine : ToolkitEngineBackend
 	{
 		ManualResetEvent pendingEvents = new ManualResetEvent(true);
+		Stack<Action> runbeforeEventLoop = new Stack<Action>();
 		bool run;
 
 		public override void InitializeApplication ()
@@ -113,6 +115,8 @@ namespace Xwt.Sdl
 			run = true;
 			SDL.SDL_Event ev;
 			while (run) {
+				while (runbeforeEventLoop.Count != 0)
+					runbeforeEventLoop.Pop ().Invoke ();
 				pendingEvents.Reset ();
 				while (SDL.SDL_PollEvent (out ev) != 0) {
 					if (ev.type == SDL.SDL_EventType.SDL_QUIT) {
@@ -178,6 +182,25 @@ namespace Xwt.Sdl
 			throw new NotImplementedException ();
 		}
 
+
+
+		public override object GetNativeParentWindow (Widget w)
+		{
+			return base.GetNativeParentWindow (w);
+		}
+
+		public override bool HandlesSizeNegotiation {
+			get {
+				return base.HandlesSizeNegotiation;
+			}
+		}
+
+		public override void InvokeBeforeMainLoop (Action action)
+		{
+			runbeforeEventLoop.Push (action);
+		}
+
+
 		public override void DispatchPendingEvents ()
 		{
 			pendingEvents.WaitOne ();
@@ -192,6 +215,39 @@ namespace Xwt.Sdl
 		{
 			return true;
 		}
+
+		#region Drawing
+		public override object GetBackendForContext (object nativeContext)
+		{
+			return base.GetBackendForContext (nativeContext);
+		}
+
+		public override object GetBackendForImage (object nativeImage)
+		{
+			return base.GetBackendForImage (nativeImage);
+		}
+
+		public override object GetNativeImage (Xwt.Drawing.Image image)
+		{
+			return base.GetNativeImage (image);
+		}
+
+		public override void RenderImage (object nativeWidget, object nativeContext, ImageDescription img, double x, double y)
+		{
+			base.RenderImage (nativeWidget, nativeContext, img, x, y);
+		}
+
+		public override object RenderWidget (Widget w)
+		{
+			return base.RenderWidget (w);
+		}
+
+		public override ToolkitFeatures SupportedFeatures {
+			get {
+				return ToolkitFeatures.WidgetOpacity;
+			}
+		}
+		#endregion
 	}
 }
 
