@@ -26,6 +26,7 @@
 using System;
 using Xwt.Backends;
 using Xwt.Drawing;
+using Xwt.Sdl.Drawing;
 
 namespace Xwt.Sdl
 {
@@ -60,12 +61,17 @@ namespace Xwt.Sdl
 
 		public override void LineTo (object backend, double x, double y)
 		{
-			throw new NotImplementedException ();
+			var c = backend as GlContextBackend;
+			c.Path.Add (new DrawLineItem (c, x, y));
+			c.X = x;
+			c.Y = y;
 		}
 
 		public override void MoveTo (object backend, double x, double y)
 		{
-			throw new NotImplementedException ();
+			var c = backend as GlContextBackend;
+			c.X = x;
+			c.Y = y;
 		}
 
 		public override void Rectangle (object backend, double x, double y, double width, double height)
@@ -85,22 +91,24 @@ namespace Xwt.Sdl
 
 		public override void RelMoveTo (object backend, double dx, double dy)
 		{
-			throw new NotImplementedException ();
+			var c = backend as GlContextBackend;
+			c.X += dx;
+			c.Y += dy;
 		}
 
 		public override object CreatePath ()
 		{
-			throw new NotImplementedException ();
+			return new GlContextBackend ();
 		}
 
 		public override object CopyPath (object backend)
 		{
-			throw new NotImplementedException ();
+			return (backend as GlContextBackend).Clone ();
 		}
 
 		public override void AppendPath (object backend, object otherBackend)
 		{
-			throw new NotImplementedException ();
+			(backend as GlContextBackend).Path.AddRange ((otherBackend as GlContextBackend).Path);
 		}
 
 		public override bool IsPointInFill (object backend, double x, double y)
@@ -149,7 +157,7 @@ namespace Xwt.Sdl
 
 		public override void Stroke (object backend)
 		{
-			throw new NotImplementedException ();
+			(backend as IDrawContext).Stroke ();
 		}
 
 		public override void StrokePreserve (object backend)
@@ -157,14 +165,14 @@ namespace Xwt.Sdl
 			throw new NotImplementedException ();
 		}
 
-		public override void SetColor (object backend, Xwt.Drawing.Color color)
+		public override void SetColor (object backend, Color color)
 		{
-			throw new NotImplementedException ();
+			(backend as IDrawContext).CurrentColor = color;
 		}
 
 		public override void SetLineWidth (object backend, double width)
 		{
-			throw new NotImplementedException ();
+			(backend as IDrawContext).CurrentLineWidth = width;
 		}
 
 		public override void SetLineDash (object backend, double offset, params double[] pattern)

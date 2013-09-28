@@ -47,7 +47,6 @@
     <Compile Include="Xwt.SdlBackend\CustomWidgetBackend.cs" />
     <Compile Include="Xwt.SdlBackend\CanvasBackend.cs" />
     <Compile Include="Xwt.SdlBackend\ImageHandler.cs" />
-    <Compile Include="Xwt.SdlBackend\SdlContextBackendHandler.cs" />
     <Compile Include="Xwt.SdlBackend\SdlTextLayoutBackendHandler.cs" />
     <Compile Include="Xwt.SdlBackend\SdlGradientBackendHandler.cs" />
     <Compile Include="Xwt.SdlBackend\SdlFontBackendHandler.cs" />
@@ -57,6 +56,9 @@
     <Compile Include="FTGL#\Fonts.cs" />
     <Compile Include="FTGL#\Layouts.cs" />
     <Compile Include="FTGL#\FontWrapper.cs" />
+    <Compile Include="Xwt.SdlBackend\Drawing\DrawPath.cs" />
+    <Compile Include="Xwt.SdlBackend\Drawing\SdlContextBackendHandler.cs" />
+    <Compile Include="Xwt.SdlBackend\Drawing\GlContextBackend.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -68,6 +70,7 @@
   <ItemGroup>
     <Folder Include="Xwt.SdlBackend\" />
     <Folder Include="FTGL#\" />
+    <Folder Include="Xwt.SdlBackend\Drawing\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\ext\SDL2#.dll.config">

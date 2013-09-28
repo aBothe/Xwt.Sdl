@@ -27,30 +27,34 @@ using System;
 using Xwt.Backends;
 using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
+using Xwt.Sdl.Drawing;
 
 namespace Xwt.Sdl
 {
 	public class CanvasBackend : WidgetBackend, ICanvasBackend
 	{
-		List<Tuple<WidgetBackend, Rectangle>> children = new List<Tuple<WidgetBackend, Rectangle>>();
+		List<WidgetBackend> children = new List<WidgetBackend>();
 		public new ICanvasEventSink EventSink {get{return base.EventSink as ICanvasEventSink; }}
+		public readonly GlContextBackend Context = new GlContextBackend ();
 
-
-		public CanvasBackend ()
-		{
-
-		}
-		/*
 		public override void Draw (Rectangle dirtyRect)
 		{
+			base.Draw (dirtyRect);
+
 			// Draw actual content
-			EventSink.OnDraw (null, dirtyRect);
+			EventSink.OnDraw (Context, dirtyRect);
 
 			// Draw child widgets
-		}*/
+			foreach (var ch in children)
+				if(ch.Bounds.IntersectsWith(dirtyRect))
+					ch.Draw (dirtyRect);
+		}
 
 		public override WidgetBackend GetChildAt (double x, double y)
 		{
+			foreach (var ch in children)
+				if (ch.X >= x && ch.Y >= y && x <= ch.X + ch.Width && y <= ch.Y + ch.Height)
+					return ch;
 			return null;
 		}
 
@@ -68,17 +72,22 @@ namespace Xwt.Sdl
 
 		public void AddChild (IWidgetBackend widget, Rectangle bounds)
 		{
-
+			var w = widget as WidgetBackend;
+			w.Parent = this;
+			w.OnBoundsChanged (bounds.X, bounds.Y, bounds.Width, bounds.Height);
+			children.Add (w);
+			Invalidate (bounds);
 		}
 
 		public void SetChildBounds (IWidgetBackend widget, Rectangle bounds)
 		{
-			throw new NotImplementedException ();
+			(widget as WidgetBackend).OnBoundsChanged (bounds.X, bounds.Y, bounds.Width, bounds.Height);
 		}
 
 		public void RemoveChild (IWidgetBackend widget)
 		{
-			throw new NotImplementedException ();
+			var w = widget as WidgetBackend;
+			children.Remove (w);
 		}
 
 		#endregion

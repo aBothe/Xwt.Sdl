@@ -25,9 +25,32 @@
 // THE SOFTWARE.
 using System;
 using Xwt;
+using Xwt.Drawing;
 
 namespace Xwt.Sdl.Tests
 {
+	class MyCanvas : Canvas
+	{
+		public MyCanvas()
+		{
+			base.BackgroundColor = Colors.LightSteelBlue;
+		}
+
+		protected override void OnDraw (Context ctx, Rectangle dirtyRect)
+		{
+			ctx.MoveTo (dirtyRect.X, dirtyRect.Y);
+			ctx.SetColor (Colors.Black);
+			ctx.SetLineWidth (4);
+			ctx.LineTo (dirtyRect.Right, dirtyRect.Bottom);
+			ctx.Stroke ();
+		}
+
+		protected override Size OnGetPreferredSize (SizeConstraint widthConstraint, SizeConstraint heightConstraint)
+		{
+			return new Size(400,300);
+		}
+	}
+
 	class MainClass
 	{
 		public static void Main (string[] args)
@@ -41,9 +64,10 @@ namespace Xwt.Sdl.Tests
 			//mw.Size = new Size (100, 150);
 
 			mw.MainMenu = new Menu ();
-			var c = new Button ();
+			var c = new MyCanvas ();
+			/*
 			c.Label = "ButtongM";
-			c.Clicked += (sender, e) => mw.Title = "Clicked!";
+			c.Clicked += (sender, e) => mw.Title = "Clicked!";*/
 			mw.Content = c;
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";
