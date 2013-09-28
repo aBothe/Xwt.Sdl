@@ -79,6 +79,10 @@ namespace Xwt.Sdl
 
 		double minWidth, minHeight;
 		double x,y, width, height;
+		public Rectangle Bounds
+		{
+			get{return new Rectangle (x, y, width, height);}
+		}
 		SizeConstraint currentWidthConstraint = SizeConstraint.Unconstrained;
 		SizeConstraint currentHeightConstraint = SizeConstraint.Unconstrained;
 /// <summary>
@@ -89,6 +93,7 @@ namespace Xwt.Sdl
 			set{
 				x = value;
 				Invalidate ();
+				OnWidgetResized ();
 			}
 		}
 		/// <summary>
@@ -100,6 +105,7 @@ namespace Xwt.Sdl
 			set{ 
  				y = value;
 				Invalidate ();
+				OnWidgetResized ();
 			}
 		}
 
@@ -108,13 +114,16 @@ namespace Xwt.Sdl
 			set{ 
 				width = value;
 				Invalidate ();
+				OnWidgetResized ();
 			}
 		}
+
 		public double Height {
 			get{return height;}
 			set{ 
 				height = value;
 				Invalidate ();
+				OnWidgetResized ();
 			}
 		}
 
