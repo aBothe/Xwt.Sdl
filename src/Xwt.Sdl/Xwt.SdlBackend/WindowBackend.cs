@@ -261,6 +261,9 @@ namespace Xwt.Sdl
 					Invalidate ();
 					eventSink.OnShown ();
 					break;
+				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_EXPOSED:
+					Invalidate ();
+					break;
 				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MOVED:
 					int width, h;
 					SDL.SDL_GetWindowSize (window, out width, out h);
