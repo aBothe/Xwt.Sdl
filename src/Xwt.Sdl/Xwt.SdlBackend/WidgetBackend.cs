@@ -432,7 +432,7 @@ namespace Xwt.Sdl
 			}
 		}
 
-		Color backgroundColor;
+		Color backgroundColor=Colors.White;
 		public Color BackgroundColor {
 			get { return backgroundColor;}
 			set { backgroundColor = value; Invalidate ();}
