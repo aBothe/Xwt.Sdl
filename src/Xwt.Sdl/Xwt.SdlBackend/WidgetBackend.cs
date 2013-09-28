@@ -47,7 +47,10 @@ namespace Xwt.Sdl
 		}
 
 		WeakReference parentRef;
-		public WidgetBackend Parent { get { return parentRef != null ? parentRef.Target as WidgetBackend : null; }}
+		public WidgetBackend Parent { 
+			get { return parentRef != null ? parentRef.Target as WidgetBackend : null; }
+			set{ parentRef = (value != null) ? new WeakReference (value) : null; }
+		}
 		public WindowBackend ParentWindow {
 			get{
 				if (parentRef == null)
