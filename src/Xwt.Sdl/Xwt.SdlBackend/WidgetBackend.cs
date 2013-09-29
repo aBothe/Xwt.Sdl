@@ -28,6 +28,7 @@ using Xwt.Backends;
 using Xwt.Drawing;
 using System.Collections.Generic;
 using FTGL;
+using Xwt.CairoBackend;
 
 namespace Xwt.Sdl
 {
@@ -284,10 +285,11 @@ namespace Xwt.Sdl
 				pw.Invalidate (rect);
 		}
 
-		public virtual void Draw(Rectangle dirtyRect)
+		public virtual void Draw(CairoContextBackend c,Rectangle dirtyRect)
 		{
-			OpenTK.Graphics.OpenGL.GL.Color4 (backgroundColor.Red,backgroundColor.Green, backgroundColor.Blue, backgroundColor.Alpha);
-			OpenTK.Graphics.OpenGL.GL.Rect (dirtyRect.X, dirtyRect.Y, dirtyRect.Right, dirtyRect.Bottom);
+			c.Context.SetSourceRGBA (backgroundColor.Red, backgroundColor.Green, backgroundColor.Blue, backgroundColor.Alpha);
+			c.Context.Rectangle (CairoConversion.ToCairoRectangle (dirtyRect));
+			c.Context.Fill ();
 		}
 
 		#endregion

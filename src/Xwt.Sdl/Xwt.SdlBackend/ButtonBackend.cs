@@ -47,7 +47,7 @@ namespace Xwt.Sdl
 		float v,w;
 		#endregion
 
-		public override void Draw (Rectangle dirtyRect)
+		public override void Draw (CairoBackend.CairoContextBackend c,Rectangle dirtyRect)
 		{
 			if (clicked)
 				GL.Color3 (0.5f, .5f, .5f);

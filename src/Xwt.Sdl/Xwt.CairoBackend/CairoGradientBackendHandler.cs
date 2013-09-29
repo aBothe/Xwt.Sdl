@@ -1,21 +1,21 @@
-//
-// MenuBackend.cs
-//
+// 
+// GradientBackendHandler.cs
+//  
 // Author:
-//       Alexander Bothe <info@alexanderbothe.com>
-//
-// Copyright (c) 2013 Alexander Bothe
-//
+//       Lluis Sanchez <lluis@xamarin.com>
+// 
+// Copyright (c) 2011 Xamarin Inc
+// 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,69 +23,40 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using Xwt.Backends;
 
-namespace Xwt.Sdl
+namespace Xwt.CairoBackend
 {
-	public class MenuBackend : IMenuBackend
+	public class CairoGradientBackendHandler: GradientBackendHandler
 	{
-		public MenuBackend ()
+		public override object CreateLinear (double x0, double y0, double x1, double y1)
 		{
-			Height = 25.0;
+			return new Cairo.LinearGradient (x0, y0, x1, y1);
 		}
 
-		public readonly double Height;
-
-		public void Draw(CairoBackend.CairoContextBackend c,int width)
+		public override void Dispose (object backend)
 		{
-			c.Context.SetSourceRGB (1, 0, 0);
-			c.Context.Rectangle (0, 0, (double)width, (double)Height);
-			c.Context.Fill ();
+			((IDisposable)backend).Dispose ();
 		}
 
-		#region IMenuBackend implementation
-
-		public void InsertItem (int index, IMenuItemBackend menuItem)
+		public override object CreateRadial (double cx0, double cy0, double radius0, double cx1, double cy1, double radius1)
 		{
-			throw new NotImplementedException ();
+			return new Cairo.RadialGradient (cx0, cy0, radius0, cx1, cy1, radius1);
 		}
 
-		public void RemoveItem (IMenuItemBackend menuItem)
+		public override void AddColorStop (object backend, double position, Xwt.Drawing.Color color)
 		{
-			throw new NotImplementedException ();
+			Cairo.Gradient g = (Cairo.Gradient) backend;
+			g.AddColorStop (position, color.ToCairoColor ());
 		}
 
-		public void Popup ()
-		{
-			throw new NotImplementedException ();
+		public override bool DisposeHandleOnUiThread {
+			get {
+				return true;
+			}
 		}
-
-		public void Popup (IWidgetBackend widget, double x, double y)
-		{
-			throw new NotImplementedException ();
-		}
-
-		#endregion
-
-		#region IBackend implementation
-
-		public void InitializeBackend (object frontend, ApplicationContext context)
-		{
-
-		}
-
-		public void EnableEvent (object eventId)
-		{
-
-		}
-
-		public void DisableEvent (object eventId)
-		{
-
-		}
-
-		#endregion
 	}
 }
 

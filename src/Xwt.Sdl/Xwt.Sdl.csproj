@@ -35,6 +35,7 @@
     <Reference Include="SDL2#">
       <HintPath>..\..\ext\SDL2#.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Cairo" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -56,9 +57,9 @@
     <Compile Include="FTGL#\Fonts.cs" />
     <Compile Include="FTGL#\Layouts.cs" />
     <Compile Include="FTGL#\FontWrapper.cs" />
-    <Compile Include="Xwt.SdlBackend\Drawing\DrawPath.cs" />
-    <Compile Include="Xwt.SdlBackend\Drawing\SdlContextBackendHandler.cs" />
-    <Compile Include="Xwt.SdlBackend\Drawing\GlContextBackend.cs" />
+    <Compile Include="Xwt.CairoBackend\CairoContextBackendHandler.cs" />
+    <Compile Include="Xwt.CairoBackend\CairoConversion.cs" />
+    <Compile Include="Xwt.CairoBackend\CairoGradientBackendHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -70,7 +71,6 @@
   <ItemGroup>
     <Folder Include="Xwt.SdlBackend\" />
     <Folder Include="FTGL#\" />
-    <Folder Include="Xwt.SdlBackend\Drawing\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\ext\SDL2#.dll.config">

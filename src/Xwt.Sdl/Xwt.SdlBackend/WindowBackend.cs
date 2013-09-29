@@ -24,10 +24,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Runtime.InteropServices;
 using Xwt.Backends;
 using SDL2;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
 
 namespace Xwt.Sdl
@@ -37,7 +36,8 @@ namespace Xwt.Sdl
 		#region Properties
 		internal static Dictionary<uint, WeakReference> windowCache = new Dictionary<uint, WeakReference>();
 		IntPtr window;
-		IntPtr ctxt;
+		SDL.SDL_Surface windowSurface;
+
 		uint id;
 		public uint WindowId {get{return id;}}
 		public IWindowFrameEventSink eventSink;
@@ -71,17 +71,12 @@ namespace Xwt.Sdl
 		static WindowBackend()
 		{
 			// Workaround, so that this "No current gl context" exception won't become thrown.
-			GraphicsContext.CurrentContext = new IntPtr (1);
+			//GraphicsContext.CurrentContext = new IntPtr (1);
 		}
 
 		void UpdateViewPort()
 		{
-			SDL.SDL_GL_MakeCurrent (window, ctxt);
-			GL.Viewport (0, 0, Width, Height);
-			GL.MatrixMode (MatrixMode.Projection);
-			GL.LoadIdentity ();
-			GL.Ortho (0.0, (double)Width, (double)Height, 0.0, -1, 1);
-			GL.MatrixMode (MatrixMode.Modelview);
+			windowSurface = SDL_.SDL_GetWindowSurface (window);
 		}
 
 		public WidgetBackend GetWidgetAt(double x, double y)
@@ -319,27 +314,21 @@ namespace Xwt.Sdl
 				return false;
 			redraw = false;
 
-			SDL.SDL_GL_MakeCurrent (window, ctxt);
+			using (var cairoSurface = new Cairo.ImageSurface (windowSurface.pixels, Cairo.Format.RGB24, windowSurface.w, windowSurface.h, windowSurface.pitch))
+			using(var cctxt = new Cairo.Context (cairoSurface))
+			using(var ctxt = new CairoBackend.CairoContextBackend(1) { TempSurface = cairoSurface, Context =  cctxt })
+			{
+				var off = 0.0;
+				if (menu != null) {
+					off = menu.Height;
+					menu.Draw (ctxt, Width);
+				}
 
-			// Is clearing the background really needed?
-			if (!padding.IsEmpty) {
-				GL.ClearColor (1f, 1f, 1f, 1f);
-				GL.Clear (ClearBufferMask.ColorBufferBit);
+				if (child != null)
+					child.Draw (ctxt, new Rectangle (padding.Left, padding.Top+off, Width - padding.Right, Height - off - padding.Bottom));
+
+				SDL.SDL_UpdateWindowSurface (window);
 			}
-
-			GL.LoadIdentity ();
-
-			var off = 0.0;
-			if (menu != null) {
-				off = menu.Height;
-				menu.Draw (Width);
-				GL.Translate (0.0, (float)off, 0.0);
-			}
-
-			if (child != null)
-				child.Draw (new Rectangle(padding.Top, padding.Left, Width-padding.Right, Height-off-padding.Bottom));
-
-			SDL.SDL_GL_SwapWindow (window);
 
 			return true;
 		}
@@ -424,18 +413,10 @@ namespace Xwt.Sdl
 		{
 			this.eventSink = eventSink;
 
-			window = SDL.SDL_CreateWindow (null, 0, 0, 400, 300, SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE | SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL);
+			window = SDL.SDL_CreateWindow (null, 0, 0, 400, 300, SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE/* | SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL*/);
 
 			if(window == IntPtr.Zero)
 				throw new SdlException ();
-
-			ctxt = SDL.SDL_GL_CreateContext (window);
-			if (ctxt == IntPtr.Zero)
-				throw new SdlException ();
-
-			SDL.SDL_GL_MakeCurrent (window, ctxt);
-			SDL.SDL_GL_SetAttribute (SDL.SDL_GLattr.SDL_GL_MULTISAMPLESAMPLES, 8);
-			SDL.SDL_GL_SetAttribute (SDL.SDL_GLattr.SDL_GL_DOUBLEBUFFER, 1);
 
 			id = SDL.SDL_GetWindowID (window);
 
@@ -444,8 +425,8 @@ namespace Xwt.Sdl
 
 		public virtual void Dispose ()
 		{
-			SDL.SDL_GL_DeleteContext (ctxt);
 			SDL.SDL_DestroyWindow (window);
+
 			windowCache.Remove (id);
 		}
 

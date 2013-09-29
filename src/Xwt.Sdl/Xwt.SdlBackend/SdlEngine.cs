@@ -28,6 +28,7 @@ using SDL2;
 using Xwt.Backends;
 using System.Threading;
 using System.Collections.Generic;
+using OpenTK.Graphics.OpenGL;
 
 namespace Xwt.Sdl
 {
@@ -39,7 +40,7 @@ namespace Xwt.Sdl
 
 		public override void InitializeApplication ()
 		{
-			OpenTK.Graphics.OpenGL.GL.LoadAll ();
+			GL.LoadAll ();
 			if (SDL.SDL_Init (SDL.SDL_INIT_VIDEO) < 0)
 				throw new SdlException ();
 		}
@@ -58,9 +59,9 @@ namespace Xwt.Sdl
 			RegisterBackend<IListStoreBackend, ListStoreBackend> ();*/
 			RegisterBackend<ICanvasBackend, CanvasBackend> ();
 			RegisterBackend<ImageBackendHandler, ImageHandler> ();
-			RegisterBackend<Xwt.Backends.ContextBackendHandler, SdlContextBackendHandler> ();
+			RegisterBackend<Xwt.Backends.ContextBackendHandler, CairoBackend.CairoContextBackendHandler> ();
 			RegisterBackend<TextLayoutBackendHandler, SdlTextLayoutBackendHandler> ();
-			RegisterBackend<DrawingPathBackendHandler, SdlContextBackendHandler> ();
+			RegisterBackend<DrawingPathBackendHandler, CairoBackend.CairoContextBackendHandler> ();
 			RegisterBackend<GradientBackendHandler, SdlGradientBackendHandler> ();
 			RegisterBackend<FontBackendHandler, SdlFontBackendHandler> ();
 			RegisterBackend<IMenuBackend, MenuBackend> ();

@@ -27,7 +27,7 @@ using System;
 using Xwt.Backends;
 using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
-using Xwt.Sdl.Drawing;
+using Xwt.CairoBackend;
 
 namespace Xwt.Sdl
 {
@@ -35,19 +35,18 @@ namespace Xwt.Sdl
 	{
 		List<WidgetBackend> children = new List<WidgetBackend>();
 		public new ICanvasEventSink EventSink {get{return base.EventSink as ICanvasEventSink; }}
-		public readonly GlContextBackend Context = new GlContextBackend ();
 
-		public override void Draw (Rectangle dirtyRect)
+		public override void Draw (CairoContextBackend c,Rectangle dirtyRect)
 		{
-			base.Draw (dirtyRect);
+			base.Draw (c,dirtyRect);
 
 			// Draw actual content
-			EventSink.OnDraw (Context, dirtyRect);
+			EventSink.OnDraw (c, dirtyRect);
 
 			// Draw child widgets
 			foreach (var ch in children)
 				if(ch.Bounds.IntersectsWith(dirtyRect))
-					ch.Draw (dirtyRect);
+					ch.Draw (c,dirtyRect);
 		}
 
 		public override WidgetBackend GetChildAt (double x, double y)

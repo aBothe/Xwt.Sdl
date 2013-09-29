@@ -36,7 +36,7 @@ namespace Xwt.Sdl
 
 		#region implemented abstract members of WidgetBackend
 
-		public override void Draw (Rectangle rect)
+		public override void Draw (CairoBackend.CairoContextBackend c,Rectangle rect)
 		{
 			throw new NotImplementedException ();
 		}

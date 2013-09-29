@@ -1,21 +1,21 @@
-//
-// DrawPath.cs
-//
+// 
+// CairoConversion.cs
+//  
 // Author:
-//       Alexander Bothe <info@alexanderbothe.com>
-//
-// Copyright (c) 2013 Alexander Bothe
-//
+//       Lluis Sanchez <lluis@xamarin.com>
+// 
+// Copyright (c) 2012 Xamarin Inc
+// 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,28 +26,37 @@
 using System;
 using Xwt.Drawing;
 
-namespace Xwt.Sdl.Drawing
+namespace Xwt.CairoBackend
 {
-	public interface IDrawPathItem {
-		void Stroke(IDrawContext c);
-	}
-
-	public class DrawLineItem : IDrawPathItem
+	public static class CairoConversion
 	{
-		public DrawLineItem(GlContextBackend c, double toX, double toY)
+		public static Cairo.Rectangle ToCairoRectangle(this Rectangle rect)
 		{
-			LineWidth = c.CurrentLineWidth;
-			Color = c.CurrentColor;
-			Location = new Rectangle (c.X, c.Y, toX - c.X, toY - c.Y);
+			return new Cairo.Rectangle (rect.X, rect.Y, rect.Width, rect.Height);
 		}
 
-		public double LineWidth;
-		public Color Color;
-		public Rectangle Location;
-
-		public void Stroke(IDrawContext c)
+		public static Rectangle ToXwtRectangle(this Cairo.Rectangle rect)
 		{
-			c.StrokeLine (this);
+			return new Rectangle (rect.X, rect.Y, rect.Width, rect.Height);
+		}
+
+		public static Cairo.Color ToCairoColor (this Color col)
+		{
+			return new Cairo.Color (col.Red, col.Green, col.Blue, col.Alpha);
+		}
+		
+		public static void SelectFont (this Cairo.Context ctx, Font font)
+		{
+			Cairo.FontSlant slant;
+			switch (font.Style) {
+			case FontStyle.Oblique: slant = Cairo.FontSlant.Oblique; break;
+			case FontStyle.Italic: slant = Cairo.FontSlant.Italic; break;
+			default: slant = Cairo.FontSlant.Normal; break;
+			}
+			
+			Cairo.FontWeight w = font.Weight >= FontWeight.Bold ? Cairo.FontWeight.Bold : Cairo.FontWeight.Normal;
+			
+			ctx.SelectFontFace (font.Family, slant, w);
 		}
 	}
 }

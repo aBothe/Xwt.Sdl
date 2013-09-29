@@ -34,6 +34,13 @@ namespace SDL2
 
 		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
 		public static extern void SDL_SetWindowMinimumSize(IntPtr window,int         min_w,int         min_h);
+
+		public static SDL.SDL_Surface SDL_GetWindowSurface(IntPtr window)
+		{
+			var p = SDL.SDL_GetWindowSurface (window);
+
+			return (SDL.SDL_Surface)Marshal.PtrToStructure (p, typeof(SDL.SDL_Surface));
+		}
 	}
 }
 

@@ -41,8 +41,21 @@ namespace Xwt.Sdl.Tests
 			ctx.MoveTo (dirtyRect.X, dirtyRect.Y);
 			ctx.SetColor (Colors.Black);
 			ctx.SetLineWidth (4);
+			ctx.LineTo (dirtyRect.Right, dirtyRect.Bottom/8);
+			ctx.MoveTo (0, 0);
 			ctx.LineTo (dirtyRect.Right, dirtyRect.Bottom);
+			//ctx.RelLineTo (-120, -150);
+			//ctx.ClosePath ();
+			//ctx.Fill ();
 			ctx.Stroke ();
+
+			//ctx.NewPath ();
+			/*
+			ctx.SetColor (Colors.Red);
+			ctx.SetLineWidth (4);
+			ctx.MoveTo (0, 0);
+			ctx.LineTo (dirtyRect.Right/2, dirtyRect.Bottom);
+			ctx.Stroke ();*/
 		}
 
 		protected override Size OnGetPreferredSize (SizeConstraint widthConstraint, SizeConstraint heightConstraint)
