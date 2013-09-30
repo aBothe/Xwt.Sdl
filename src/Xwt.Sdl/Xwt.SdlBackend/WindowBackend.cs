@@ -310,12 +310,18 @@ namespace Xwt.Sdl
 			using(var cctxt = new Cairo.Context (cairoSurface))
 			using(var ctxt = new CairoBackend.CairoContextBackend(1) { TempSurface = cairoSurface, Context =  cctxt })
 			{
+				cctxt.SetSourceRGB (1, 1, 1);
+				cctxt.Rectangle (0, 0, Width, Height);
+				cctxt.Fill ();
+
 				if (menu != null)
 					menu.Draw (ctxt, Width);
 
-				if (child != null)
-					child.Draw (ctxt, new Rectangle (padding.Left, padding.Top+menuHeight, Width - padding.Right, Height - menuHeight - padding.Bottom));
-
+				if (child != null) {
+					ctxt.GlobalXOffset = padding.Left;
+					ctxt.GlobalYOffset = padding.Top + menuHeight;
+					child.Draw (ctxt, new Rectangle (0, 0, Width - padding.Right, Height - menuHeight - padding.Bottom));
+				}
 				SDL.SDL_UpdateWindowSurface (window);
 			}
 

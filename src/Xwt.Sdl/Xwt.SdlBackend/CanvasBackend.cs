@@ -40,13 +40,15 @@ namespace Xwt.Sdl
 		{
 			base.Draw (c,dirtyRect);
 
+
 			// Draw actual content
-			EventSink.OnDraw (c, dirtyRect);
+			EventSink.OnDraw (c, new Rectangle(0,0, Width, Height));
 
 			// Draw child widgets
 			foreach (var ch in children)
 				if(ch.Bounds.IntersectsWith(dirtyRect))
 					ch.Draw (c,dirtyRect);
+			//c.Restore ();
 		}
 
 		public override WidgetBackend GetChildAt (double x, double y)

@@ -26,20 +26,24 @@
 using System;
 using Xwt.Backends;
 using Xwt.Drawing;
+using Cairo;
 
 namespace Xwt.CairoBackend
 {
 	public class CairoTextLayoutBackendHandler : TextLayoutBackendHandler
 	{
-		public CairoTextLayoutBackendHandler ()
-		{
-		}
-
 		#region implemented abstract members of TextLayoutBackendHandler
 
 		public override object Create ()
 		{
-			throw new NotImplementedException ();
+			var surf = new ImageSurface (Format.A1, 0, 0);
+			var c = new Cairo.Context (surf);
+			return new CairoContextBackend (1) { Context = c, TempSurface = surf };
+		}
+
+		public override void Dispose (object backend)
+		{
+			(backend as CairoContextBackend).Dispose ();
 		}
 
 		public override void SetWidth (object backend, double value)
@@ -54,12 +58,12 @@ namespace Xwt.CairoBackend
 
 		public override void SetText (object backend, string text)
 		{
-			throw new NotImplementedException ();
+			(backend as CairoContextBackend).Text = text;
 		}
 
 		public override void SetFont (object backend, Font font)
 		{
-			throw new NotImplementedException ();
+			CairoConversion.SelectFont ((backend as CairoContextBackend).Context, font);
 		}
 
 		public override void SetTrimming (object backend, Xwt.Drawing.TextTrimming textTrimming)
@@ -69,7 +73,10 @@ namespace Xwt.CairoBackend
 
 		public override Size GetSize (object backend)
 		{
-			throw new NotImplementedException ();
+			var c = backend as CairoContextBackend;
+			var ext = c.Context.TextExtents (c.Text);
+
+			return new Size (ext.Width, ext.Height);
 		}
 
 		public override int GetIndexFromCoordinates (object backend, double x, double y)

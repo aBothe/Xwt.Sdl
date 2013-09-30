@@ -287,8 +287,9 @@ namespace Xwt.Sdl
 		public virtual void Draw(CairoContextBackend c,Rectangle dirtyRect)
 		{
 			c.Context.SetSourceRGBA (backgroundColor.Red, backgroundColor.Green, backgroundColor.Blue, backgroundColor.Alpha);
-			c.Context.Rectangle (CairoConversion.ToCairoRectangle (dirtyRect));
-			c.Context.Fill ();
+			c.Context.Rectangle (dirtyRect.X + c.GlobalXOffset, dirtyRect.Y + c.GlobalYOffset, dirtyRect.Width, dirtyRect.Height);
+			c.Context.FillPreserve ();
+			c.Context.Clip ();
 		}
 
 		#endregion
@@ -442,14 +443,14 @@ namespace Xwt.Sdl
 			}
 		}
 
-		protected Cairo.ScaledFont FontBackend {get{return customFont ?? CairoFontBackendHandler.SystemDefaultFont;}}
-		Cairo.ScaledFont customFont;
+		internal InternalFontDescription FontBackend {get{return customFont ?? CairoFontBackendHandler.SystemDefaultFont;}}
+		InternalFontDescription customFont;
 		public virtual object Font {
 			get {
 				return FontBackend;
 			}
 			set {
-				customFont = value as Cairo.ScaledFont;
+				customFont = value as InternalFontDescription;
 				Invalidate ();
 			}
 		}

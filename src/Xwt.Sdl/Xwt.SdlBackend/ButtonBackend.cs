@@ -47,6 +47,8 @@ namespace Xwt.Sdl
 
 		public override void Draw (CairoBackend.CairoContextBackend c,Rectangle dirtyRect)
 		{
+			base.Draw (c, dirtyRect);
+
 			if (clicked)
 				c.Context.SetSourceRGB (0.5f, .5f, .5f);
 			else if (hovered)
