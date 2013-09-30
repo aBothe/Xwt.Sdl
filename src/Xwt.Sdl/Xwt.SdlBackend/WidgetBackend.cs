@@ -345,16 +345,22 @@ namespace Xwt.Sdl
 		{
 			currentWidthConstraint = widthConstraint;
 			currentHeightConstraint = heightConstraint;
-			var sz = GetPreferredSize ();
-			var win = ParentWindow;
-			if (win != null && !win.Padding.IsEmpty) {
-				sz.Height += win.Padding.Bottom;
-				sz.Width += win.Padding.Right;
+
+			using (var surf = new Cairo.ImageSurface (Cairo.Format.A1, 0, 0))
+			using (var c = new Cairo.Context (surf)) {
+				var sz = GetPreferredSize (c);
+
+				//ISSUE: Maybe put the widget's padding directly into this class in order to get the exact padding measurements?
+				var win = ParentWindow;
+				if (win != null && !win.Padding.IsEmpty) {
+					sz.Height += win.Padding.Bottom;
+					sz.Width += win.Padding.Right;
+				}
+				return sz;
 			}
-			return sz;
 		}
 
-		public virtual Size GetPreferredSize() { return Size.Zero; }
+		public virtual Size GetPreferredSize(Cairo.Context fontExtentContext) { return Size.Zero; }
 
 		public void DragStart (DragStartData data)
 		{

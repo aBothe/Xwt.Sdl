@@ -59,8 +59,6 @@ namespace Xwt.Sdl
 
 			if (label != null) {
 				c.Context.SetSourceRGB (0, 0, 0);
-
-				//c.Context.SelectFontFace ("Sans", Cairo.FontSlant.Normal, Cairo.FontWeight.Normal);
 				var ext = c.Context.TextExtents (label);
 				c.Context.MoveTo (X + Width/2.0 -  ext.Width/2.0d, Y + Height/2.0d + ext.Height/2.5d);
 				c.Context.ShowText (label);
@@ -98,17 +96,12 @@ namespace Xwt.Sdl
 			return ret;
 		}
 
-		public override Size GetPreferredSize ()
+		public override Size GetPreferredSize (Cairo.Context c)
 		{
-			using (var surf = new Cairo.ImageSurface (Cairo.Format.A1, 1, 1))
-			using (var c = new Cairo.Context (surf)) {
-				//c.SelectFontFace ("Sans", Cairo.FontSlant.Normal, Cairo.FontWeight.Normal);
-
-				var ext = c.TextExtents (label ?? string.Empty);
-				var x = ext.Width + 5;
-				var y = (!string.IsNullOrEmpty (label) ? ext.Height : 0.0d) + 10d;
-				return new Size (x, y);
-			}
+			var ext = c.TextExtents (label ?? string.Empty);
+			var x = ext.Width + 5;
+			var y = (!string.IsNullOrEmpty (label) ? ext.Height : 0.0d) + 10d;
+			return new Size (x, y);
 		}
 
 		#region IButtonBackend implementation
