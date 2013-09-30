@@ -68,12 +68,6 @@ namespace Xwt.Sdl
 		#endregion
 
 		#region Extension
-		static WindowBackend()
-		{
-			// Workaround, so that this "No current gl context" exception won't become thrown.
-			//GraphicsContext.CurrentContext = new IntPtr (1);
-		}
-
 		void UpdateViewPort()
 		{
 			windowSurface = SDL_.SDL_GetWindowSurface (window);
@@ -348,11 +342,12 @@ namespace Xwt.Sdl
 			if (child == null)
 				return;
 
+			var vertOff = menu == null ? 0 : menu.Height;
 			// The padding does NOT affect the menu position - only the child position!
 			child.OnBoundsChanged (padding.Left, 
-				padding.Top, 
+				padding.Top + vertOff, 
 				(double)Width-padding.Right, 
-				(double)(Height-(menu == null ? 0 : menu.Height)) - padding.Bottom);
+				(double)Height-vertOff - padding.Bottom);
 		}
 		#endregion
 
@@ -374,6 +369,7 @@ namespace Xwt.Sdl
 			Invalidate ();
 		}
 
+		public Rectangle Padding {get{ return padding; }}
 		public void SetPadding (double left, double top, double right, double bottom)
 		{
 			padding = new Rectangle (left, top, right, bottom);

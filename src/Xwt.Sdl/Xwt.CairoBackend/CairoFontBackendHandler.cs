@@ -1,5 +1,5 @@
 //
-// SdlTextLayoutBackendHandler.cs
+// SdlFontBackendHandler.cs
 //
 // Author:
 //       Alexander Bothe <info@alexanderbothe.com>
@@ -26,68 +26,106 @@
 using System;
 using Xwt.Backends;
 using Xwt.Drawing;
+using Cairo;
+using System.Collections.Generic;
 
-namespace Xwt.Sdl
+namespace Xwt.CairoBackend
 {
-	public class SdlTextLayoutBackendHandler : TextLayoutBackendHandler
+	class FontHandle
 	{
-		public SdlTextLayoutBackendHandler ()
+		public FontFace Face;
+
+	}
+
+	public class CairoFontBackendHandler : FontBackendHandler
+	{
+		public CairoFontBackendHandler ()
 		{
+
 		}
 
-		#region implemented abstract members of TextLayoutBackendHandler
-
-		public override object Create ()
+		#region implemented abstract members of FontBackendHandler
+		static FontFace sysFont;
+		public static FontFace SystemDefaultFont
 		{
-			throw new NotImplementedException ();
+			get{ 
+				if(sysFont != null)
+					return sysFont;
+
+				return null;
+				/*
+				sysFont =  ("/usr/share/fonts/TTF/SourceSansPro-Regular.ttf");
+				sysFont.FontSize = 13;
+				return sysFont;*/
+			}
 		}
 
-		public override void SetWidth (object backend, double value)
+		public override object GetSystemDefaultFont ()
 		{
-			throw new NotImplementedException ();
+			return SystemDefaultFont;
 		}
 
-		public override void SetHeight (object backend, double value)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override void SetText (object backend, string text)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override void SetFont (object backend, Font font)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override void SetTrimming (object backend, Xwt.Drawing.TextTrimming textTrimming)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override Size GetSize (object backend)
+		public override IEnumerable<string> GetInstalledFonts ()
 		{
 			throw new NotImplementedException ();
 		}
 
-		public override int GetIndexFromCoordinates (object backend, double x, double y)
+		public override object Create (string fontName, double size, FontStyle style, Xwt.Drawing.FontWeight weight, FontStretch stretch)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public override Point GetCoordinateFromIndex (object backend, int index)
+		public override object Copy (object handle)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public override void AddAttribute (object backend, TextAttribute attribute)
+		public override object SetSize (object handle, double size)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public override void ClearAttributes (object backend)
+		public override object SetFamily (object handle, string family)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override object SetStyle (object handle, FontStyle style)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override object SetWeight (object handle, Xwt.Drawing.FontWeight weight)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override object SetStretch (object handle, FontStretch stretch)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override double GetSize (object handle)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override string GetFamily (object handle)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override FontStyle GetStyle (object handle)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override Xwt.Drawing.FontWeight GetWeight (object handle)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override FontStretch GetStretch (object handle)
 		{
 			throw new NotImplementedException ();
 		}

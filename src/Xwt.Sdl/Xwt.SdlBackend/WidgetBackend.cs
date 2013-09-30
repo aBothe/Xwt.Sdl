@@ -27,7 +27,6 @@ using System;
 using Xwt.Backends;
 using Xwt.Drawing;
 using System.Collections.Generic;
-using FTGL;
 using Xwt.CairoBackend;
 
 namespace Xwt.Sdl
@@ -307,9 +306,9 @@ namespace Xwt.Sdl
 		public void Dispose ()
 		{
 			widgetStore.Remove (Id);
-
+			/*
 			if (customFont != null)
-				customFont.Dispose ();
+				customFont.Dispose ();*/
 		}
 
 		public Point ConvertToScreenCoordinates (Point widgetCoordinates)
@@ -346,7 +345,13 @@ namespace Xwt.Sdl
 		{
 			currentWidthConstraint = widthConstraint;
 			currentHeightConstraint = heightConstraint;
-			return GetPreferredSize ();
+			var sz = GetPreferredSize ();
+			var win = ParentWindow;
+			if (win != null && !win.Padding.IsEmpty) {
+				sz.Height += win.Padding.Bottom;
+				sz.Width += win.Padding.Right;
+			}
+			return sz;
 		}
 
 		public virtual Size GetPreferredSize() { return Size.Zero; }
@@ -431,14 +436,14 @@ namespace Xwt.Sdl
 			}
 		}
 
-		protected FontWrapper FontBackend {get{return customFont ?? SdlFontBackendHandler.SystemDefaultFont;}}
-		FontWrapper customFont;
+		protected object FontBackend {get{return customFont ?? CairoFontBackendHandler.SystemDefaultFont;}}
+		object customFont;
 		public virtual object Font {
 			get {
 				return FontBackend;
 			}
 			set {
-				customFont = value as FontWrapper;
+				customFont = value as object;
 				Invalidate ();
 			}
 		}

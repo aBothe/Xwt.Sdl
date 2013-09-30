@@ -40,6 +40,11 @@ namespace Xwt.Sdl.Tests
 		{
 			ctx.MoveTo (dirtyRect.X, dirtyRect.Y);
 			ctx.SetColor (Colors.Black);
+
+			var tl = new TextLayout (this);
+			tl.Text = "hello";
+			ctx.DrawTextLayout (tl, 10, 10);
+
 			ctx.SetLineWidth (4);
 			ctx.LineTo (dirtyRect.Right, dirtyRect.Bottom/8);
 			ctx.MoveTo (0, 0);
@@ -77,10 +82,10 @@ namespace Xwt.Sdl.Tests
 			//mw.Size = new Size (100, 150);
 
 			mw.MainMenu = new Menu ();
-			var c = new MyCanvas ();
-			/*
+			var c = new Button ();
+
 			c.Label = "ButtongM";
-			c.Clicked += (sender, e) => mw.Title = "Clicked!";*/
+			c.Clicked += (sender, e) => mw.Title = "Clicked!";
 			mw.Content = c;
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";

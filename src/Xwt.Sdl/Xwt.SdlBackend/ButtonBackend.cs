@@ -26,8 +26,6 @@
 using System;
 using Xwt.Backends;
 using SDL2;
-using OpenTK.Graphics.OpenGL;
-using FTGL;
 
 namespace Xwt.Sdl
 {
@@ -50,22 +48,22 @@ namespace Xwt.Sdl
 		public override void Draw (CairoBackend.CairoContextBackend c,Rectangle dirtyRect)
 		{
 			if (clicked)
-				GL.Color3 (0.5f, .5f, .5f);
+				c.Context.SetSourceRGB (0.5f, .5f, .5f);
 			else if (hovered)
-				GL.Color3 (0.8f, 0.8f, 0.8f);
+				c.Context.SetSourceRGB (0.8f, 0.8f, 0.8f);
 			else
-				GL.Color3 (0.6f, 0.6f, 0.6f);
+				c.Context.SetSourceRGB (0.6f, 0.6f, 0.6f);
 
-			GL.Rect (X, Y, X + Width, Y+ Height);
+			c.Context.Rectangle (X, Y, Width, Height);
+			c.Context.Fill ();
 
 			if (label != null) {
-				var font = FontBackend;
-				GL.PushMatrix ();
-				GL.Translate (X + Width/2.0 - font.GetAdvance (label)/2.0d, Y + Height/2.0d + (double)font.FontSize/2.5d, 0.0);
-				GL.Rotate (180f, 1f, 0f, 0f); 
-				GL.Color4 (0f, 0f, 0f,1f);
-				font.Render (label);
-				GL.PopMatrix ();
+				c.Context.SetSourceRGB (0, 0, 0);
+
+				//c.Context.SelectFontFace ("Sans", Cairo.FontSlant.Normal, Cairo.FontWeight.Normal);
+				var ext = c.Context.TextExtents (label);
+				c.Context.MoveTo (X + Width/2.0 -  ext.Width/2.0d, Y + Height/2.0d + ext.Height/2.5d);
+				c.Context.ShowText (label);
 			}
 		}
 
@@ -102,10 +100,15 @@ namespace Xwt.Sdl
 
 		public override Size GetPreferredSize ()
 		{
-			var ft = FontBackend;
-			var x = (double)ft.GetAdvance (label ?? string.Empty) + 5d;
-			var y = (!string.IsNullOrEmpty (label) ? (double)ft.LineHeight : 0.0d)+5d;
-			return new Size (x, y);
+			using (var surf = new Cairo.ImageSurface (Cairo.Format.A1, 1, 1))
+			using (var c = new Cairo.Context (surf)) {
+				//c.SelectFontFace ("Sans", Cairo.FontSlant.Normal, Cairo.FontWeight.Normal);
+
+				var ext = c.TextExtents (label ?? string.Empty);
+				var x = ext.Width + 5;
+				var y = (!string.IsNullOrEmpty (label) ? ext.Height : 0.0d) + 10d;
+				return new Size (x, y);
+			}
 		}
 
 		#region IButtonBackend implementation

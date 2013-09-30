@@ -55,7 +55,7 @@ namespace Xwt.CairoBackend
 			}
 			
 			Cairo.FontWeight w = font.Weight >= FontWeight.Bold ? Cairo.FontWeight.Bold : Cairo.FontWeight.Normal;
-			
+
 			ctx.SelectFontFace (font.Family, slant, w);
 		}
 	}

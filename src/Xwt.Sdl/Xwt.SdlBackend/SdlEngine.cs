@@ -60,10 +60,10 @@ namespace Xwt.Sdl
 			RegisterBackend<ICanvasBackend, CanvasBackend> ();
 			RegisterBackend<ImageBackendHandler, ImageHandler> ();
 			RegisterBackend<Xwt.Backends.ContextBackendHandler, CairoBackend.CairoContextBackendHandler> ();
-			RegisterBackend<TextLayoutBackendHandler, SdlTextLayoutBackendHandler> ();
+			RegisterBackend<TextLayoutBackendHandler, CairoBackend.CairoTextLayoutBackendHandler> ();
 			RegisterBackend<DrawingPathBackendHandler, CairoBackend.CairoContextBackendHandler> ();
-			RegisterBackend<GradientBackendHandler, SdlGradientBackendHandler> ();
-			RegisterBackend<FontBackendHandler, SdlFontBackendHandler> ();
+			RegisterBackend<GradientBackendHandler, CairoBackend.CairoGradientBackendHandler> ();
+			RegisterBackend<FontBackendHandler, CairoBackend.CairoFontBackendHandler> ();
 			RegisterBackend<IMenuBackend, MenuBackend> ();
 			/*RegisterBackend<IMenuItemBackend, MenuItemBackend> ();
 			RegisterBackend<ICheckBoxMenuItemBackend, CheckBoxMenuItemBackend> ();
