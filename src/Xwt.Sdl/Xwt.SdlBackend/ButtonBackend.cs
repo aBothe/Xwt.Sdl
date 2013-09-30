@@ -58,7 +58,7 @@ namespace Xwt.Sdl
 				var Height = this.Height - 2;
 
 				const double borderColor = 0.6;
-				const double radius = 5;
+				const double radius = 3;
 
 				// Top left corner
 				c.Context.Arc (X +radius, Y + radius, radius, -Math.PI, -Math.PI/2);
@@ -90,16 +90,16 @@ namespace Xwt.Sdl
 			{
 				double grey;
 				if (clicked)
-					grey = 0.5;
+					grey = 0.9;
 				else if (hovered)
-					grey = 0.8;
+					grey = 1;
 				else
-					grey = 0.6;
+					grey = 0.95;
 
 				var g = new Cairo.LinearGradient (X + Width / 2, Y, X + Width / 2, Y + Height);
 				g.AddColorStop (0, new Cairo.Color (grey, grey, grey));
 
-				grey *= 1.45;
+				grey /= 1.2;
 				g.AddColorStop (1, new Cairo.Color (grey, grey, grey));
 
 				c.Context.SetSource (g);
