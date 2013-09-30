@@ -42,7 +42,7 @@ namespace Xwt.Sdl
 		public uint WindowId {get{return id;}}
 		public IWindowFrameEventSink eventSink;
 
-		int menuHeight=0;
+		double menuHeight=0;
 		int oldWidth;
 		int oldHeight;
 		int Width;
@@ -75,15 +75,13 @@ namespace Xwt.Sdl
 
 		public WidgetBackend GetWidgetAt(double x, double y)
 		{
-			double off=0.0;
 			if (menu != null) {
-				if (y <= menu.Height) // Normalize y value
+				if (y <= menuHeight) // Normalize y value
 					return null; // .. or return a widget wrapper
-				off = menu.Height;
 			}
 
 			if (child == null || 
-				y < padding.Top+off || x < padding.Left || 
+				y < padding.Top + menuHeight || x < padding.Left || 
 				y+padding.Height > Height || x + padding.Width > Width)
 				return null;
 
@@ -136,7 +134,7 @@ namespace Xwt.Sdl
 			}
 
 			var w = focusedWidget;
-			while (w != null && !w.FireMouseButton (isButtonDownEvt, butt, ev.x, ev.y-menuHeight))
+			while (w != null && !w.FireMouseButton (isButtonDownEvt, butt, ev.x, ev.y-(int)menuHeight))
 				w = w.Parent;
 		}
 
@@ -205,7 +203,7 @@ namespace Xwt.Sdl
 							hoveredWidget.FireMouseEnter ();
 					}
 
-					while (w != null && !w.FireMouseMoved (ev.motion.timestamp, x, y-menuHeight))
+					while (w != null && !w.FireMouseMoved (ev.motion.timestamp, x-(int)padding.Left, y-(int)menuHeight-(int)padding.Top))
 						w = w.Parent;
 					return;
 				case SDL.SDL_EventType.SDL_MOUSEWHEEL:
@@ -312,14 +310,11 @@ namespace Xwt.Sdl
 			using(var cctxt = new Cairo.Context (cairoSurface))
 			using(var ctxt = new CairoBackend.CairoContextBackend(1) { TempSurface = cairoSurface, Context =  cctxt })
 			{
-				var off = 0.0;
-				if (menu != null) {
-					off = menu.Height;
+				if (menu != null)
 					menu.Draw (ctxt, Width);
-				}
 
 				if (child != null)
-					child.Draw (ctxt, new Rectangle (padding.Left, padding.Top+off, Width - padding.Right, Height - off - padding.Bottom));
+					child.Draw (ctxt, new Rectangle (padding.Left, padding.Top+menuHeight, Width - padding.Right, Height - menuHeight - padding.Bottom));
 
 				SDL.SDL_UpdateWindowSurface (window);
 			}
@@ -342,12 +337,11 @@ namespace Xwt.Sdl
 			if (child == null)
 				return;
 
-			var vertOff = menu == null ? 0 : menu.Height;
 			// The padding does NOT affect the menu position - only the child position!
 			child.OnBoundsChanged (padding.Left, 
-				padding.Top + vertOff, 
+				padding.Top + menuHeight, 
 				(double)Width-padding.Right, 
-				(double)Height-vertOff - padding.Bottom);
+				(double)Height - menuHeight - padding.Bottom);
 		}
 		#endregion
 

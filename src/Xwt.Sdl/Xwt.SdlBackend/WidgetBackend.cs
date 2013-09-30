@@ -203,7 +203,7 @@ namespace Xwt.Sdl
 		{
 			MouseMovedEventArgs mouseMovedEA;
 			if (trackMouseMoved) {
-				eventSink.OnMouseMoved (mouseMovedEA = new MouseMovedEventArgs((long)timestamp, (double)x-this.x,(double)y-this.y));
+				eventSink.OnMouseMoved (mouseMovedEA = new MouseMovedEventArgs((long)timestamp, (double)x,(double)y));
 				return mouseMovedEA.Handled;
 			}
 			return false;
