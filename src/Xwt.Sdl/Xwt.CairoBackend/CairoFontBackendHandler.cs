@@ -31,12 +31,6 @@ using System.Collections.Generic;
 
 namespace Xwt.CairoBackend
 {
-	class FontHandle
-	{
-		public FontFace Face;
-
-	}
-
 	public class CairoFontBackendHandler : FontBackendHandler
 	{
 		public CairoFontBackendHandler ()
@@ -45,18 +39,14 @@ namespace Xwt.CairoBackend
 		}
 
 		#region implemented abstract members of FontBackendHandler
-		static FontFace sysFont;
-		public static FontFace SystemDefaultFont
+		static Cairo.ScaledFont sysFont;
+		public static ScaledFont SystemDefaultFont
 		{
 			get{ 
 				if(sysFont != null)
 					return sysFont;
 
 				return null;
-				/*
-				sysFont =  ("/usr/share/fonts/TTF/SourceSansPro-Regular.ttf");
-				sysFont.FontSize = 13;
-				return sysFont;*/
 			}
 		}
 

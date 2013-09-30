@@ -436,14 +436,14 @@ namespace Xwt.Sdl
 			}
 		}
 
-		protected object FontBackend {get{return customFont ?? CairoFontBackendHandler.SystemDefaultFont;}}
-		object customFont;
+		protected Cairo.ScaledFont FontBackend {get{return customFont ?? CairoFontBackendHandler.SystemDefaultFont;}}
+		Cairo.ScaledFont customFont;
 		public virtual object Font {
 			get {
 				return FontBackend;
 			}
 			set {
-				customFont = value as object;
+				customFont = value as Cairo.ScaledFont;
 				Invalidate ();
 			}
 		}
