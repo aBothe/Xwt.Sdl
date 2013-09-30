@@ -82,10 +82,8 @@ namespace Xwt.Sdl.Tests
 			//mw.Size = new Size (100, 150);
 
 			mw.MainMenu = new Menu ();
-			var c = new MyCanvas ();
-			/*var c = new Button ();
-			c.Label = "ButtongM";
-			c.Clicked += (sender, e) => mw.Title = "Clicked!";*/
+			//var c = new MyCanvas ();
+			var c = new Button {Label = "Button Test Caption"};
 			mw.Content = c;
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";

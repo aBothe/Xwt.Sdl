@@ -47,18 +47,68 @@ namespace Xwt.Sdl
 
 		public override void Draw (CairoBackend.CairoContextBackend c,Rectangle dirtyRect)
 		{
+			// Generic background?
 			base.Draw (c, dirtyRect);
 
-			if (clicked)
-				c.Context.SetSourceRGB (0.5f, .5f, .5f);
-			else if (hovered)
-				c.Context.SetSourceRGB (0.8f, 0.8f, 0.8f);
-			else
-				c.Context.SetSourceRGB (0.6f, 0.6f, 0.6f);
+			// Border
+			{
+				var Y = this.Y + 1;
+				var X = this.X + 1;
+				var Width = this.Width - 2;
+				var Height = this.Height - 2;
 
-			c.Context.Rectangle (X, Y, Width, Height);
-			c.Context.Fill ();
+				const double borderColor = 0.6;
+				const double radius = 5;
 
+				// Top left corner
+				c.Context.Arc (X +radius, Y + radius, radius, -Math.PI, -Math.PI/2);
+
+				// top edge
+				c.Context.RelLineTo (Width - (radius*2), 0);
+
+				// top right corner
+				c.Context.Arc (X + Width -radius, Y + radius, radius, -Math.PI/2, 0);
+
+				// left edge
+				c.Context.RelLineTo (0, Height-radius*2);
+
+				// bottom right corner
+				c.Context.Arc (X + Width -radius, Y + Height - radius, radius, 0, Math.PI/2);
+
+				// bottom corner
+				c.Context.RelLineTo (-Width+(radius*2), 0);
+
+				// bottom left corner
+				c.Context.Arc (X + radius, Y + Height - radius, radius, Math.PI/2, Math.PI);
+
+				c.Context.ClosePath ();
+				c.Context.SetSourceRGB (borderColor, borderColor, borderColor);
+				c.Context.StrokePreserve ();
+			}
+
+			// button background
+			{
+				double grey;
+				if (clicked)
+					grey = 0.5;
+				else if (hovered)
+					grey = 0.8;
+				else
+					grey = 0.6;
+
+				var g = new Cairo.LinearGradient (X + Width / 2, Y, X + Width / 2, Y + Height);
+				g.AddColorStop (0, new Cairo.Color (grey, grey, grey));
+
+				grey *= 1.45;
+				g.AddColorStop (1, new Cairo.Color (grey, grey, grey));
+
+				c.Context.SetSource (g);
+				c.Context.Fill ();
+
+				g.Dispose ();
+			}
+
+			// Label
 			if (label != null) {
 				c.Context.SetSourceRGB (0, 0, 0);
 				var ext = c.Context.TextExtents (label);
