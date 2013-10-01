@@ -83,8 +83,11 @@ namespace Xwt.Sdl.Tests
 
 			mw.MainMenu = new Menu ();
 			//var c = new MyCanvas ();
-			var c = new Button {Label = "Button Test Caption"};
+			var c = new Button();
+			c.Label = "Button Test Caption";
 			c.Cursor = CursorType.Hand;
+			//c.Image = Image.FromFile ("./ts.png");
+			c.Clicked += (sender, e) => {GC.Collect ();};
 			mw.Content = c;
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";

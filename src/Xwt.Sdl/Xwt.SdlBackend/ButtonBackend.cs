@@ -44,6 +44,10 @@ namespace Xwt.Sdl
 		float v,w;
 		#endregion
 
+		const double imageToLabelSpace = 10.0;
+		const double yMargin = 8;
+		const double xMargin = 8;
+
 		public override void Draw (CairoBackend.CairoContextBackend c,Rectangle dirtyRect)
 		{
 			// Border
@@ -94,7 +98,7 @@ namespace Xwt.Sdl
 				else
 					grey = 0.95;
 
-				var g = new Cairo.LinearGradient (X + Width / 2, Y, X + Width / 2, Y + Height);
+				var g = new Cairo.LinearGradient (c.GlobalXOffset + Width / 2, c.GlobalYOffset, c.GlobalXOffset + Width / 2, c.GlobalYOffset + Height);
 				g.AddColorStop (0, new Cairo.Color (grey, grey, grey));
 
 				grey /= 1.2;
@@ -106,16 +110,51 @@ namespace Xwt.Sdl
 				g.Dispose ();
 			}
 
+			Cairo.TextExtents labelExt;
+			if (label != null)
+				labelExt = c.Context.TextExtents (label);
+			else
+				labelExt = new Cairo.TextExtents ();
+
+			// Image
+			if (!image.IsNull) {
+				var imgBck = image.Backend as System.Drawing.Bitmap;
+				var data = imgBck.LockBits (new System.Drawing.Rectangle (0, 0, imgBck.Width, imgBck.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+				var imgSurf = new Cairo.ImageSurface (data.Scan0, Cairo.Format.Argb32, data.Width, data.Height, data.Stride);
+
+				var imgY = c.GlobalYOffset + Height / 2.0 - imgSurf.Height / 2;
+				if(string.IsNullOrEmpty(label))
+					c.Context.SetSource (imgSurf,c.GlobalXOffset + Width/2 - imgSurf.Width/2, imgY);
+				else
+					c.Context.SetSource (imgSurf,c.GlobalXOffset + Width/2 - (labelExt.Width + imageToLabelSpace + imgSurf.Width)/2, imgY);
+				c.Context.Paint ();
+
+				imgSurf.Dispose ();
+				imgBck.UnlockBits (data);
+			}
+
 			// Label
 			if (label != null) {
 				if (!Sensitive)
 					c.Context.SetSourceRGB (0.5,0.5,0.5);
 				else
 					c.Context.SetSourceRGB (0, 0, 0);
-				var ext = c.Context.TextExtents (label);
-				c.Context.MoveTo (X + Width/2.0 -  ext.Width/2.0d, Y + Height/2.0d + ext.Height/2.5d);
+
+				c.Context.MoveTo (c.GlobalXOffset + Width/2.0 + (-labelExt.Width + (image.IsNull ? 0.0 : (imageToLabelSpace + (image.Backend as System.Drawing.Bitmap).Width)))/2, 
+					c.GlobalYOffset + Height/2.0d + labelExt.Height/2.5d);
 				c.Context.ShowText (label);
 			}
+		}
+
+		public override Size GetPreferredSize (Cairo.Context c)
+		{
+			var ext = string.IsNullOrEmpty(label) ? new Cairo.TextExtents() : c.TextExtents (label);
+			var imgSz = image.Size;
+			var x = ext.Width + imgSz.Width;
+			if (!string.IsNullOrEmpty (label) && imgSz.Width > 0)
+				x += imageToLabelSpace;
+			var y = Math.Max(ext.Height, imgSz.Height);
+			return new Size (x + xMargin, y + yMargin);
 		}
 
 		internal override void FireMouseEnter ()
@@ -145,14 +184,6 @@ namespace Xwt.Sdl
 				Invalidate ();
 			}
 			return ret;
-		}
-
-		public override Size GetPreferredSize (Cairo.Context c)
-		{
-			var ext = c.TextExtents (label ?? string.Empty);
-			var x = ext.Width + 5;
-			var y = (!string.IsNullOrEmpty (label) ? ext.Height : 0.0d) + 10d;
-			return new Size (x, y);
 		}
 
 		#region IButtonBackend implementation
