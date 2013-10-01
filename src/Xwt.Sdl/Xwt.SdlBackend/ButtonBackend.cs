@@ -41,15 +41,11 @@ namespace Xwt.Sdl
 		public new IButtonEventSink EventSink {get{return base.EventSink as IButtonEventSink;}}
 
 		bool clicked;
-		bool hovered;
 		float v,w;
 		#endregion
 
 		public override void Draw (CairoBackend.CairoContextBackend c,Rectangle dirtyRect)
 		{
-			// Generic background?
-			base.Draw (c, dirtyRect);
-
 			// Border
 			{
 				var Y = this.Y + 1;
@@ -89,9 +85,11 @@ namespace Xwt.Sdl
 			// button background
 			{
 				double grey;
-				if (clicked)
+				if (!Sensitive)
+					grey = 0.7;
+				else if (clicked)
 					grey = 0.9;
-				else if (hovered)
+				else if (MouseEntered)
 					grey = 1;
 				else
 					grey = 0.95;
@@ -110,7 +108,10 @@ namespace Xwt.Sdl
 
 			// Label
 			if (label != null) {
-				c.Context.SetSourceRGB (0, 0, 0);
+				if (!Sensitive)
+					c.Context.SetSourceRGB (0.5,0.5,0.5);
+				else
+					c.Context.SetSourceRGB (0, 0, 0);
 				var ext = c.Context.TextExtents (label);
 				c.Context.MoveTo (X + Width/2.0 -  ext.Width/2.0d, Y + Height/2.0d + ext.Height/2.5d);
 				c.Context.ShowText (label);
@@ -119,7 +120,6 @@ namespace Xwt.Sdl
 
 		internal override void FireMouseEnter ()
 		{
-			hovered = Sensitive;
 			clicked = false;
 			base.FireMouseEnter ();
 			Invalidate ();
@@ -127,7 +127,6 @@ namespace Xwt.Sdl
 
 		internal override void FireMouseLeave ()
 		{
-			hovered = false;
 			clicked = false;
 			base.FireMouseLeave ();
 			Invalidate ();

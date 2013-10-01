@@ -194,10 +194,50 @@ namespace Xwt.Sdl
 			Invalidate ();
 		}
 
+		protected bool MouseEntered;
 		internal virtual void FireMouseEnter()
 		{
+			MouseEntered = true;
+			if(cursorSet)
+				SetSysCursor (cursor);
 			eventSink.OnMouseEntered ();
 		}
+
+		static IntPtr oldCursor;
+		public static void SetSysCursor(CursorType cur)
+		{
+			if (oldCursor != IntPtr.Zero) {
+				SDL2.SDL.SDL_FreeCursor (oldCursor);
+				oldCursor = IntPtr.Zero;
+			}
+			SDL2.SDL.SDL_SystemCursor sysCur;
+
+			if (cur == CursorType.Arrow)
+				sysCur = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_ARROW;
+			else if (cur == CursorType.Crosshair)
+				sysCur = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_CROSSHAIR;
+			else if (cur == CursorType.Hand)
+				sysCur = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_HAND;
+			else if (cur == CursorType.IBeam)
+				sysCur = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_IBEAM;
+			else if (cur == CursorType.ResizeLeft)
+				return;
+			else if (cur == CursorType.ResizeLeftRight)
+				sysCur = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZEWE;
+			else if (cur == CursorType.ResizeRight)
+				return;
+			else if (cur == CursorType.ResizeUp)
+				return;
+			else if (cur == CursorType.ResizeUpDown)
+				sysCur = SDL2.SDL.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENS;
+			else if (cur == CursorType.ResizeDown)
+				return;
+			else
+				return;
+
+			oldCursor = SDL2.SDL.SDL_CreateSystemCursor (sysCur);
+			SDL2.SDL.SDL_SetCursor (oldCursor);
+		} 
 
 		internal virtual bool FireMouseMoved(uint timestamp, int x, int y)
 		{
@@ -211,6 +251,9 @@ namespace Xwt.Sdl
 
 		internal virtual void FireMouseLeave()
 		{
+			MouseEntered = false;
+			if(cursorSet)
+				SetSysCursor (CursorType.Arrow);
 			this.eventSink.OnMouseExited ();
 		}
 
@@ -378,9 +421,14 @@ namespace Xwt.Sdl
 			throw new NotImplementedException ();
 		}
 
+		bool cursorSet = false;
+		CursorType cursor;
 		public void SetCursor (CursorType cursorType)
 		{
-			throw new NotImplementedException ();
+			cursor = cursorType;
+			if (MouseEntered)
+				SetSysCursor (cursor);
+			cursorSet = true;
 		}
 
 		public bool Visible {
