@@ -32,13 +32,19 @@ namespace Xwt.CairoBackend
 {
 	public class CairoTextLayoutBackendHandler : TextLayoutBackendHandler
 	{
+		public override bool DisposeHandleOnUiThread {
+			get {
+				return false;
+			}
+		}
+
 		#region implemented abstract members of TextLayoutBackendHandler
 
 		public override object Create ()
 		{
 			var surf = new ImageSurface (Format.A1, 0, 0);
 			var c = new Cairo.Context (surf);
-			return new CairoContextBackend (1) { Context = c, TempSurface = surf };
+			return new CairoContextBackend (1,c, surf, true);
 		}
 
 		public override void Dispose (object backend)

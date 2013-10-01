@@ -41,10 +41,10 @@ namespace Xwt.Sdl.Tests
 			ctx.MoveTo (dirtyRect.X, dirtyRect.Y);
 			ctx.SetColor (Colors.Black);
 
-			var tl = new TextLayout (this);
-			tl.Text = "hello";
-			ctx.DrawTextLayout (tl, dirtyRect.X, dirtyRect.Y);
-
+			using (var tl = new TextLayout (this)) {
+				tl.Text = "hello";
+				ctx.DrawTextLayout (tl, dirtyRect.X, dirtyRect.Y);
+			}
 			ctx.SetLineWidth (4);
 			ctx.LineTo (dirtyRect.Right, dirtyRect.Bottom/8);
 			ctx.MoveTo (0, 0);
@@ -82,13 +82,17 @@ namespace Xwt.Sdl.Tests
 			//mw.Size = new Size (100, 150);
 
 			mw.MainMenu = new Menu ();
-			//var c = new MyCanvas ();
-			var c = new Button();
-			c.Label = "Button Test Caption";
-			c.Cursor = CursorType.Hand;
-			//c.Image = Image.FromFile ("./ts.png");
-			c.Clicked += (sender, e) => {GC.Collect ();};
+			var c = new MyCanvas ();
+
+			var butt = new Button();
+			butt.Label = "Button Test Caption";
+			butt.Cursor = CursorType.Hand;
+			//butt.Image = Image.FromFile ("./ts.png");
+			butt.Clicked += (sender, e) => {GC.Collect ();};
 			mw.Content = c;
+
+			c.AddChild (butt, 1, 120);
+
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";
 			c.MouseExited += (sender, e) =>  mw.Title = "------";

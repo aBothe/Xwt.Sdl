@@ -37,6 +37,11 @@ namespace Xwt.Sdl
 		{
 			return new System.Drawing.Bitmap (stream);
 		}
+		public override void Dispose (object backend)
+		{
+			(backend as System.Drawing.Bitmap).Dispose ();
+		}
+
 		public override void SaveToStream (object backend, Stream stream, ImageFileType fileType)
 		{
 			var bmp = backend as System.Drawing.Bitmap;

@@ -52,8 +52,8 @@ namespace Xwt.Sdl
 		{
 			// Border
 			{
-				var Y = this.Y + 1;
-				var X = this.X + 1;
+				var Y = c.GlobalXOffset + 1;
+				var X = c.GlobalYOffset + 1;
 				var Width = this.Width - 2;
 				var Height = this.Height - 2;
 

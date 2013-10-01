@@ -38,8 +38,16 @@ namespace Xwt.CairoBackend
 		public double GlobalAlpha = 1;
 		public Cairo.Context Context;
 		public Cairo.Surface TempSurface;
+
 		public double ScaleFactor = 1;
 		public double PatternAlpha = 1;
+		public readonly bool AllowContextDisposal;
+		public virtual void Dispose() { 
+			if (AllowContextDisposal) {
+				Context.Dispose (); 
+				TempSurface.Dispose ();
+			}
+		}
 		public string Text;
 
 		public double GlobalXOffset;
@@ -64,21 +72,12 @@ namespace Xwt.CairoBackend
 			public string Text;
 		}
 
-		public CairoContextBackend (double scaleFactor)
+		public CairoContextBackend (double scaleFactor, Cairo.Context ctxt, Cairo.Surface surf, bool allowDispose=false)
 		{
+			this.AllowContextDisposal = allowDispose;
+			this.Context = ctxt;
+			this.TempSurface = surf;
 			ScaleFactor = scaleFactor;
-		}
-
-		public void Dispose ()
-		{
-			IDisposable d = Context;
-			if (d != null) {
-				d.Dispose ();
-			}
-			d = TempSurface;
-			if (d != null) {
-				d.Dispose ();
-			}
 		}
 
 		public void Save ()
@@ -103,7 +102,7 @@ namespace Xwt.CairoBackend
 	{
 		public override bool DisposeHandleOnUiThread {
 			get {
-				return true;
+				return false;
 			}
 		}
 
@@ -389,10 +388,7 @@ namespace Xwt.CairoBackend
 		public override object CreatePath ()
 		{
 			Cairo.Surface sf = new Cairo.ImageSurface (null, Cairo.Format.A1, 0, 0, 0);
-			return new CairoContextBackend (1) { // scale doesn't matter here, we are going to use it only for creating a path
-				TempSurface = sf,
-				Context = new Cairo.Context (sf)
-			};
+			return new CairoContextBackend (1, new Cairo.Context (sf), sf, true); // scale doesn't matter here, we are going to use it only for creating a path
 		}
 
 		public override object CopyPath (object backend)

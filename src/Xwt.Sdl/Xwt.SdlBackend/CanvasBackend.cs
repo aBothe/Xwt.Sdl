@@ -40,14 +40,19 @@ namespace Xwt.Sdl
 		{
 			base.Draw (c,dirtyRect);
 
-
 			// Draw actual content
 			EventSink.OnDraw (c, new Rectangle(0,0, Width, Height));
 
 			// Draw child widgets
 			foreach (var ch in children)
-				if(ch.Bounds.IntersectsWith(dirtyRect))
-					ch.Draw (c,dirtyRect);
+				if (ch.Bounds.IntersectsWith (dirtyRect)) {
+					c.PushGlobalOffset ();
+					c.GlobalXOffset += ch.X;
+					c.GlobalYOffset += ch.Y;
+					c.Context.MoveTo (c.GlobalXOffset, c.GlobalYOffset);
+					ch.Draw (c, dirtyRect);
+					c.PopGlobalOffset ();
+				}
 			//c.Restore ();
 		}
 

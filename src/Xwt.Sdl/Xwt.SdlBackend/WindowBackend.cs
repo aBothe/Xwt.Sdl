@@ -308,8 +308,8 @@ namespace Xwt.Sdl
 
 			using (var cairoSurface = new Cairo.ImageSurface (windowSurface.pixels, Cairo.Format.RGB24, windowSurface.w, windowSurface.h, windowSurface.pitch))
 			using(var cctxt = new Cairo.Context (cairoSurface))
-			using(var ctxt = new CairoBackend.CairoContextBackend(1) { TempSurface = cairoSurface, Context =  cctxt })
 			{
+				var ctxt = new CairoBackend.CairoContextBackend (1, cctxt, cairoSurface);
 				cctxt.SetSourceRGB (1, 1, 1);
 				cctxt.Rectangle (0, 0, Width, Height);
 				cctxt.Fill ();
