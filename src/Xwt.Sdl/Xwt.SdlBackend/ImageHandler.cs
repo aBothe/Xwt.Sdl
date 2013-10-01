@@ -32,18 +32,30 @@ namespace Xwt.Sdl
 {
 	public class ImageHandler : ImageBackendHandler
 	{
-		public ImageHandler ()
-		{
-		}
-
 		#region implemented abstract members of ImageBackendHandler
-		public override object LoadFromStream (System.IO.Stream stream)
+		public override object LoadFromStream (Stream stream)
 		{
-			throw new NotImplementedException ();
+			return new System.Drawing.Bitmap (stream);
 		}
-		public override void SaveToStream (object backend, Stream stream, Xwt.Drawing.ImageFileType fileType)
+		public override void SaveToStream (object backend, Stream stream, ImageFileType fileType)
 		{
-			throw new NotImplementedException ();
+			var bmp = backend as System.Drawing.Bitmap;
+
+			System.Drawing.Imaging.ImageFormat fmt;
+			switch (fileType) {
+				case ImageFileType.Bmp:
+					fmt = System.Drawing.Imaging.ImageFormat.Bmp;
+					break;
+				case ImageFileType.Jpeg:
+					fmt = System.Drawing.Imaging.ImageFormat.Jpeg;
+					break;
+				case ImageFileType.Png:
+					fmt = System.Drawing.Imaging.ImageFormat.Png;
+					break;
+				default:
+					throw new ArgumentOutOfRangeException ("fileType", "Invalid image type!");
+			}
+			bmp.Save (stream, fmt);
 		}
 		public override Image GetStockIcon (string id)
 		{
@@ -63,11 +75,12 @@ namespace Xwt.Sdl
 		}
 		public override Size GetSize (object handle)
 		{
-			throw new NotImplementedException ();
+			var img = handle as System.Drawing.Image;
+			return new Size (img.Width, img.Height);
 		}
 		public override object CopyBitmap (object handle)
 		{
-			throw new NotImplementedException ();
+			return (handle as System.Drawing.Bitmap).Clone ();
 		}
 		public override void CopyBitmapArea (object srcHandle, int srcX, int srcY, int width, int height, object destHandle, int destX, int destY)
 		{
@@ -77,13 +90,19 @@ namespace Xwt.Sdl
 		{
 			throw new NotImplementedException ();
 		}
-		public override void SetBitmapPixel (object handle, int x, int y, Color color)
+		public override void SetBitmapPixel (object handle, int x, int y, Xwt.Drawing.Color color)
 		{
-			throw new NotImplementedException ();
+			(handle as System.Drawing.Bitmap).SetPixel (x, y, 
+				System.Drawing.Color.FromArgb(
+					(int)(color.Alpha*255.0),
+					(int)(color.Red*255.0),
+					(int)(color.Green*255.0),
+					(int)(color.Blue*255.0)));
 		}
-		public override Color GetBitmapPixel (object handle, int x, int y)
+		public override Xwt.Drawing.Color GetBitmapPixel (object handle, int x, int y)
 		{
-			throw new NotImplementedException ();
+			var col = (handle as System.Drawing.Bitmap).GetPixel (x, y);
+			return new Xwt.Drawing.Color ((double)col.R/255.0, (double)col.G, (double)col.B/255.0, (double)col.A/255.0);
 		}
 		#endregion
 	}
