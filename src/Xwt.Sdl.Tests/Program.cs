@@ -91,7 +91,7 @@ namespace Xwt.Sdl.Tests
 			butt.Clicked += (sender, e) => {GC.Collect ();};
 			mw.Content = c;
 
-			c.AddChild (butt, 1, 120);
+			c.AddChild (butt, 30, 120);
 
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";

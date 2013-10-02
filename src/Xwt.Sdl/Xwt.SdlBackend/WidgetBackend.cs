@@ -137,21 +137,27 @@ namespace Xwt.Sdl
 			}
 		}
 
+		public void GetAbsoluteLocation(out double absX, out double absY)
+		{
+			absX = x;
+			absY = y;
+			WeakReference wref = parentRef;
+			WidgetBackend w;
+			while (wref != null && (w = wref.Target as WidgetBackend) != null) {
+				absX += w.x;
+				absY += w.y;
+				wref = w.parentRef;
+			}
+		}
+
 		/// <summary>
 		/// The location relative to the absolute parent window.
 		/// </summary>
 		public Point AbsoluteLocation
 		{
 			get{ 
-				double absX = x, absY = y;
-				WeakReference wref = parentRef;
-				WidgetBackend w;
-				while (wref != null && (w = wref.Target as WidgetBackend) != null) {
-					absX += w.x;
-					absY += w.y;
-					wref = w.parentRef;
-				}
-
+				double absX, absY;
+				GetAbsoluteLocation (out absX, out absY);
 				return new Point (absX, absY);
 			}
 		}
@@ -305,8 +311,15 @@ namespace Xwt.Sdl
 			OnWidgetResized ();
 		}
 
+		public virtual IEnumerable<WidgetBackend> Children {get{ return null; }}
+
 		public virtual WidgetBackend GetChildAt(double x, double y)
 		{
+			var children = Children;
+			if(children != null)
+				foreach (var ch in children)
+					if (x >= ch.X && y >= ch.Y && x <= ch.X + ch.Width && y <= ch.Y + ch.Height)
+						return ch;
 			return null;
 		}
 
@@ -315,24 +328,32 @@ namespace Xwt.Sdl
 		/// </summary>
 		public void Invalidate()
 		{
+			double x, y;
+			GetAbsoluteLocation (out x, out y);
 			var pw = ParentWindow;
 			if(pw != null)
-				pw.Invalidate (new Rectangle(x,y, width, height));
+				pw.Invalidate (new Rectangle(x, y, width, height));
 		}
 
 		public void Invalidate(Rectangle rect)
 		{
+			double x, y;
+			GetAbsoluteLocation (out x, out y);
+
 			var pw = ParentWindow;
 			if(pw != null)
-				pw.Invalidate (rect);
+				pw.Invalidate (rect.Offset(x,y));
 		}
 
 		public virtual void Draw(CairoContextBackend c,Rectangle dirtyRect)
 		{
 			c.Context.SetSourceRGBA (backgroundColor.Red, backgroundColor.Green, backgroundColor.Blue, backgroundColor.Alpha);
 			c.Context.Rectangle (dirtyRect.X + c.GlobalXOffset, dirtyRect.Y + c.GlobalYOffset, dirtyRect.Width, dirtyRect.Height);
-			c.Context.FillPreserve ();
-			c.Context.Clip ();
+			c.Context.Fill ();
+			/*
+			var loc = AbsoluteLocation;
+			c.Context.Rectangle (loc.X, loc.Y, Width, Height);
+			c.Context.Clip ();*/
 		}
 
 		#endregion

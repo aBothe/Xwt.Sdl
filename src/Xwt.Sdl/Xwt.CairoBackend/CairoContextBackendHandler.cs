@@ -54,16 +54,6 @@ namespace Xwt.CairoBackend
 		public double GlobalYOffset;
 
 		Stack<Tuple<double, double>> globalOffsetStack = new Stack<Tuple<double, double>>();
-		public void PushGlobalOffset()
-		{
-			globalOffsetStack.Push (new Tuple<double, double> (GlobalXOffset, GlobalYOffset));
-		}
-		public void PopGlobalOffset()
-		{
-			var t = globalOffsetStack.Pop ();
-			GlobalXOffset = t.Item1;
-			GlobalYOffset = t.Item2;
-		}
 
 		Stack<Data> dataStack = new Stack<Data> ();
 

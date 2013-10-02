@@ -34,6 +34,11 @@ namespace Xwt.Sdl
 	public class CanvasBackend : WidgetBackend, ICanvasBackend
 	{
 		List<WidgetBackend> children = new List<WidgetBackend>();
+		public override IEnumerable<WidgetBackend> Children {
+			get {
+				return children;
+			}
+		}
 		public new ICanvasEventSink EventSink {get{return base.EventSink as ICanvasEventSink; }}
 
 		public override void Draw (CairoContextBackend c,Rectangle dirtyRect)
@@ -41,27 +46,13 @@ namespace Xwt.Sdl
 			base.Draw (c,dirtyRect);
 
 			// Draw actual content
+			GetAbsoluteLocation (out c.GlobalXOffset, out c.GlobalYOffset);
 			EventSink.OnDraw (c, new Rectangle(0,0, Width, Height));
 
 			// Draw child widgets
 			foreach (var ch in children)
-				if (ch.Bounds.IntersectsWith (dirtyRect)) {
-					c.PushGlobalOffset ();
-					c.GlobalXOffset += ch.X;
-					c.GlobalYOffset += ch.Y;
-					c.Context.MoveTo (c.GlobalXOffset, c.GlobalYOffset);
+				if (ch.Bounds.IntersectsWith (dirtyRect))
 					ch.Draw (c, dirtyRect);
-					c.PopGlobalOffset ();
-				}
-			//c.Restore ();
-		}
-
-		public override WidgetBackend GetChildAt (double x, double y)
-		{
-			foreach (var ch in children)
-				if (ch.X >= x && ch.Y >= y && x <= ch.X + ch.Width && y <= ch.Y + ch.Height)
-					return ch;
-			return null;
 		}
 
 		#region ICanvasBackend implementation

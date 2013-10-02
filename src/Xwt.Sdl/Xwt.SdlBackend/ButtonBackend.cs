@@ -47,39 +47,39 @@ namespace Xwt.Sdl
 		const double imageToLabelSpace = 10.0;
 		const double yMargin = 8;
 		const double xMargin = 8;
+		const double cornerRadius = 5;
 
 		public override void Draw (CairoBackend.CairoContextBackend c,Rectangle dirtyRect)
 		{
+			double X, Y;
+			GetAbsoluteLocation (out X, out Y);
+
 			// Border
 			{
-				var Y = c.GlobalXOffset + 1;
-				var X = c.GlobalYOffset + 1;
-				var Width = this.Width - 2;
-				var Height = this.Height - 2;
-
 				const double borderColor = 0.6;
-				const double radius = 3;
+
+				c.Context.MoveTo (X + cornerRadius, Y + cornerRadius);
 
 				// Top left corner
-				c.Context.Arc (X +radius, Y + radius, radius, -Math.PI, -Math.PI/2);
+				c.Context.Arc (X +cornerRadius, Y + cornerRadius, cornerRadius, -Math.PI, -Math.PI/2);
 
 				// top edge
-				c.Context.RelLineTo (Width - (radius*2), 0);
+				c.Context.RelLineTo (Width - (cornerRadius*2), 0);
 
 				// top right corner
-				c.Context.Arc (X + Width -radius, Y + radius, radius, -Math.PI/2, 0);
+				c.Context.Arc (X + Width -cornerRadius, Y + cornerRadius, cornerRadius, -Math.PI/2, 0);
 
 				// left edge
-				c.Context.RelLineTo (0, Height-radius*2);
+				c.Context.RelLineTo (0, Height-cornerRadius*2);
 
 				// bottom right corner
-				c.Context.Arc (X + Width -radius, Y + Height - radius, radius, 0, Math.PI/2);
+				c.Context.Arc (X + Width -cornerRadius, Y + Height - cornerRadius, cornerRadius, 0, Math.PI/2);
 
 				// bottom corner
-				c.Context.RelLineTo (-Width+(radius*2), 0);
+				c.Context.RelLineTo (-Width+(cornerRadius*2), 0);
 
 				// bottom left corner
-				c.Context.Arc (X + radius, Y + Height - radius, radius, Math.PI/2, Math.PI);
+				c.Context.Arc (X + cornerRadius, Y + Height - cornerRadius, cornerRadius, Math.PI/2, Math.PI);
 
 				c.Context.ClosePath ();
 				c.Context.SetSourceRGB (borderColor, borderColor, borderColor);
@@ -98,7 +98,7 @@ namespace Xwt.Sdl
 				else
 					grey = 0.95;
 
-				var g = new Cairo.LinearGradient (c.GlobalXOffset + Width / 2, c.GlobalYOffset, c.GlobalXOffset + Width / 2, c.GlobalYOffset + Height);
+				var g = new Cairo.LinearGradient (X + Width / 2, Y, X + Width / 2, Y + Height);
 				g.AddColorStop (0, new Cairo.Color (grey, grey, grey));
 
 				grey /= 1.2;
@@ -109,6 +109,8 @@ namespace Xwt.Sdl
 
 				g.Dispose ();
 			}
+
+			CairoBackend.CairoConversion.SelectFont (c.Context, FontBackend);
 
 			Cairo.TextExtents labelExt;
 			if (label != null)
@@ -122,11 +124,11 @@ namespace Xwt.Sdl
 				var data = imgBck.LockBits (new System.Drawing.Rectangle (0, 0, imgBck.Width, imgBck.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 				var imgSurf = new Cairo.ImageSurface (data.Scan0, Cairo.Format.Argb32, data.Width, data.Height, data.Stride);
 
-				var imgY = c.GlobalYOffset + Height / 2.0 - imgSurf.Height / 2;
+				var imgY = Y + Height / 2.0 - imgSurf.Height / 2;
 				if(string.IsNullOrEmpty(label))
-					c.Context.SetSource (imgSurf,c.GlobalXOffset + Width/2 - imgSurf.Width/2, imgY);
+					c.Context.SetSource (imgSurf,X + Width/2 - imgSurf.Width/2, imgY);
 				else
-					c.Context.SetSource (imgSurf,c.GlobalXOffset + Width/2 - (labelExt.Width + imageToLabelSpace + imgSurf.Width)/2, imgY);
+					c.Context.SetSource (imgSurf,X + Width/2 - (labelExt.Width + imageToLabelSpace + imgSurf.Width)/2, imgY);
 				c.Context.Paint ();
 
 				imgSurf.Dispose ();
@@ -140,8 +142,8 @@ namespace Xwt.Sdl
 				else
 					c.Context.SetSourceRGB (0, 0, 0);
 
-				c.Context.MoveTo (c.GlobalXOffset + Width/2.0 + (-labelExt.Width + (image.IsNull ? 0.0 : (imageToLabelSpace + (image.Backend as System.Drawing.Bitmap).Width)))/2, 
-					c.GlobalYOffset + Height/2.0d + labelExt.Height/2.5d);
+				c.Context.MoveTo (X + Width/2.0 + (-labelExt.Width + (image.IsNull ? 0.0 : (imageToLabelSpace + (image.Backend as System.Drawing.Bitmap).Width)))/2, 
+					Y + Height/2.0d + labelExt.Height/2.5d);
 				c.Context.ShowText (label);
 			}
 		}
@@ -150,11 +152,11 @@ namespace Xwt.Sdl
 		{
 			var ext = string.IsNullOrEmpty(label) ? new Cairo.TextExtents() : c.TextExtents (label);
 			var imgSz = image.Size;
-			var x = ext.Width + imgSz.Width;
+			var x = ext.Width + imgSz.Width + cornerRadius/2;
 			if (!string.IsNullOrEmpty (label) && imgSz.Width > 0)
 				x += imageToLabelSpace;
 			var y = Math.Max(ext.Height, imgSz.Height);
-			return new Size (x + xMargin, y + yMargin);
+			return new Size (x + xMargin, y + yMargin + cornerRadius/2);
 		}
 
 		internal override void FireMouseEnter ()

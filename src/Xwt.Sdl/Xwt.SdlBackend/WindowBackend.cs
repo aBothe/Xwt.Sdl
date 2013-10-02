@@ -87,6 +87,8 @@ namespace Xwt.Sdl
 
 			var w = child;
 			while (true) {
+				x -= w.X;
+				y -= w.Y;
 				var ch = w.GetChildAt (x, y);
 				if (ch == null)
 					return w;
