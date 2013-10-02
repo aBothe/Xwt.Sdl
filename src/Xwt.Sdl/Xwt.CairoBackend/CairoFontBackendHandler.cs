@@ -96,7 +96,8 @@ namespace Xwt.CairoBackend
 
 		public override IEnumerable<string> GetInstalledFonts ()
 		{
-			throw new NotImplementedException ();
+			foreach (var ft in System.Drawing.FontFamily.Families)
+				yield return ft.Name;
 		}
 
 		public override object Create (string fontName, double size, FontStyle style, Xwt.Drawing.FontWeight weight, FontStretch stretch)
