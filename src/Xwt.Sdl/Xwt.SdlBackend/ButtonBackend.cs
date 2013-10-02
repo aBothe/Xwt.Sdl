@@ -147,7 +147,7 @@ namespace Xwt.Sdl
 			}
 		}
 
-		public override Size GetPreferredSize (Cairo.Context c)
+		protected override Size GetPreferredSize (Cairo.Context c)
 		{
 			var ext = string.IsNullOrEmpty(label) ? new Cairo.TextExtents() : c.TextExtents (label);
 			var imgSz = image.Size;

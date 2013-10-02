@@ -426,7 +426,7 @@ namespace Xwt.Sdl
 			}
 		}
 
-		public virtual Size GetPreferredSize(Cairo.Context fontExtentContext) { return Size.Zero; }
+		protected virtual Size GetPreferredSize(Cairo.Context fontExtentContext) { return Size.Zero; }
 
 		public void DragStart (DragStartData data)
 		{
