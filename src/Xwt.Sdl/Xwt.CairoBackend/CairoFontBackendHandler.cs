@@ -55,6 +55,28 @@ namespace Xwt.CairoBackend
 
 	public class CairoFontBackendHandler : FontBackendHandler
 	{
+		internal static InternalFontDescription ToFontDescription(System.Drawing.Font ft)
+		{
+			var fd = new InternalFontDescription ();
+
+			fd.Family = ft.FontFamily.Name;
+			fd.Scale = (double)ft.Size;
+
+			if (ft.Bold) {
+				fd.Slant |= FontSlant.Oblique;
+				fd.Style |= FontStyle.Oblique;
+			}
+
+			if (ft.Italic) {
+				fd.Slant |= FontSlant.Italic;
+				fd.Style |= FontStyle.Italic;
+			}
+
+			// TODO: Font weights?
+
+			return fd;
+		}
+
 		#region implemented abstract members of FontBackendHandler
 		static InternalFontDescription sysFont;
 		internal static InternalFontDescription SystemDefaultFont
@@ -63,11 +85,7 @@ namespace Xwt.CairoBackend
 				if(sysFont != null)
 					return sysFont;
 
-				using (var tempSurf = new Cairo.ImageSurface (Format.A1, 0, 0))
-				using (var c = new Cairo.Context (tempSurf)) {
-					//TODO: Read out current context font family name etc.
-					return sysFont = new InternalFontDescription{ Family = "Sans, Arial", Scale = 20 };
-				}
+				return ToFontDescription (System.Drawing.SystemFonts.CaptionFont);
 			}
 		}
 

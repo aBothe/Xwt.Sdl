@@ -58,8 +58,6 @@ namespace Xwt.Sdl
 			{
 				const double borderColor = 0.6;
 
-				c.Context.MoveTo (X + cornerRadius, Y + cornerRadius);
-
 				// Top left corner
 				c.Context.Arc (X +cornerRadius, Y + cornerRadius, cornerRadius, -Math.PI, -Math.PI/2);
 

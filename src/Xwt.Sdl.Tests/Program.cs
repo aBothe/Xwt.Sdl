@@ -87,7 +87,7 @@ namespace Xwt.Sdl.Tests
 			var butt = new Button();
 			butt.Label = "Button Test Caption";
 			butt.Cursor = CursorType.Hand;
-			//butt.Image = Image.FromFile ("./ts.png");
+			butt.Image = Image.FromFile ("./ts.png");
 			butt.Clicked += (sender, e) => {GC.Collect ();};
 			mw.Content = c;
 

@@ -413,6 +413,7 @@ namespace Xwt.Sdl
 
 			using (var surf = new Cairo.ImageSurface (Cairo.Format.A1, 0, 0))
 			using (var c = new Cairo.Context (surf)) {
+				c.SelectFont (FontBackend);
 				var sz = GetPreferredSize (c);
 
 				//ISSUE: Maybe put the widget's padding directly into this class in order to get the exact padding measurements?
