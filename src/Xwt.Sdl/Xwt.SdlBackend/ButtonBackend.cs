@@ -83,6 +83,7 @@ namespace Xwt.Sdl
 
 				c.Context.ClosePath ();
 				c.Context.SetSourceRGB (borderColor, borderColor, borderColor);
+				c.Context.LineWidth = 1;
 				c.Context.StrokePreserve ();
 			}
 
