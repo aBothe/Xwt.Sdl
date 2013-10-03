@@ -108,6 +108,16 @@ namespace Xwt.Sdl
 				g.Dispose ();
 			}
 
+			// Focus dash border
+			if (HasFocus) {
+				c.Context.LineWidth = 0.7;
+				c.Context.SetColor (style.FocusDashBorderColor);
+				c.Context.SetDash (style.FocusDashLine, 0);
+
+				c.Context.Rectangle (X + xMargin/2, Y + yMargin/2, Width - xMargin, Height - yMargin);
+				c.Context.Stroke ();
+			}
+
 			CairoBackend.CairoConversion.SelectFont (c.Context, FontBackend);
 
 			Cairo.TextExtents labelExt;
