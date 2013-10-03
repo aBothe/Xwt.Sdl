@@ -117,22 +117,31 @@ namespace Xwt.Sdl
 			else
 				labelExt = new Cairo.TextExtents ();
 
+			double imageWidth;
+
 			// Image
 			if (!image.IsNull) {
 				var imgBck = image.Backend as System.Drawing.Bitmap;
 				var data = imgBck.LockBits (new System.Drawing.Rectangle (0, 0, imgBck.Width, imgBck.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 				var imgSurf = new Cairo.ImageSurface (data.Scan0, Cairo.Format.Argb32, data.Width, data.Height, data.Stride);
+				imageWidth = (double)imgSurf.Width;
 
 				var imgY = Y + Height / 2.0 - imgSurf.Height / 2;
-				if(string.IsNullOrEmpty(label))
-					c.Context.SetSource (imgSurf,X + Width/2 - imgSurf.Width/2, imgY);
-				else
-					c.Context.SetSource (imgSurf,X + Width/2 - (labelExt.Width + imageToLabelSpace + imgSurf.Width)/2, imgY);
+				if (string.IsNullOrEmpty (label))
+					c.Context.SetSource (imgSurf, X + Width / 2 - imageWidth / 2, imgY);
+				else {
+					var contentWidth = labelExt.Width + imageToLabelSpace + imageWidth;
+					if (contentWidth < Width)
+						c.Context.SetSource (imgSurf, X + Width / 2 - contentWidth / 2, imgY);
+					else
+						c.Context.SetSource (imgSurf, X + xMargin, imgY);
+				}
 				c.Context.Paint ();
 
 				imgSurf.Dispose ();
 				imgBck.UnlockBits (data);
-			}
+			} else
+				imageWidth = 0;
 
 			// Label
 			if (label != null) {
@@ -141,8 +150,17 @@ namespace Xwt.Sdl
 				else
 					c.Context.SetSourceRGB (0, 0, 0);
 
-				c.Context.MoveTo (X + Width/2.0 + (-labelExt.Width + (image.IsNull ? 0.0 : (imageToLabelSpace + (image.Backend as System.Drawing.Bitmap).Width)))/2, 
-					Y + Height/2.0d + labelExt.Height/2.5d);
+				double movX;
+
+				if (imageWidth != 0)
+					imageWidth += imageToLabelSpace;
+
+				if (labelExt.Width + imageWidth < Width)
+					movX = Width / 2.0 + (-labelExt.Width + imageWidth) / 2;
+				else
+					movX = xMargin + imageWidth;
+
+				c.Context.MoveTo (X+movX,	Y + Height / 2.0d + labelExt.Height / 2.5d);
 				c.Context.ShowText (label);
 			}
 		}
