@@ -52,9 +52,9 @@ namespace Xwt.Sdl
 		}
 
 		const double imageToLabelSpace = 10.0;
-		const double yMargin = 8;
-		const double xMargin = 8;
-		const double cornerRadius = 5;
+		const double yPadding = 5;
+		const double xPadding = 10;
+		const double cornerRadius = 3;
 
 		public override void Draw (CairoBackend.CairoContextBackend c,Rectangle dirtyRect)
 		{
@@ -64,6 +64,8 @@ namespace Xwt.Sdl
 
 			// Border
 			{
+				c.Context.MoveTo (X, Y + cornerRadius);
+
 				// Top left corner
 				c.Context.Arc (X +cornerRadius, Y + cornerRadius, cornerRadius, -Math.PI, -Math.PI/2);
 
@@ -117,11 +119,11 @@ namespace Xwt.Sdl
 
 			// Focus dash border
 			if (HasFocus) {
-				c.Context.LineWidth = 0.7;
+				c.Context.LineWidth = 1;
 				c.Context.SetColor (style.FocusDashBorderColor);
 				c.Context.SetDash (style.FocusDashLine, 0);
 
-				c.Context.Rectangle (X + xMargin/2, Y + yMargin/2, Width - xMargin, Height - yMargin);
+				c.Context.Rectangle (X + xPadding/2, Y + yPadding/2, Width - xPadding, Height - yPadding);
 				c.Context.Stroke ();
 			}
 
@@ -150,7 +152,7 @@ namespace Xwt.Sdl
 					if (contentWidth < Width)
 						c.Context.SetSource (imgSurf, X + Width / 2 - contentWidth / 2, imgY);
 					else
-						c.Context.SetSource (imgSurf, X + xMargin, imgY);
+						c.Context.SetSource (imgSurf, X + xPadding, imgY);
 				}
 				c.Context.Paint ();
 
@@ -174,7 +176,7 @@ namespace Xwt.Sdl
 				if (labelExt.Width + imageWidth < Width)
 					movX = Width / 2.0 + (-labelExt.Width + imageWidth) / 2;
 				else
-					movX = xMargin + imageWidth;
+					movX = xPadding + imageWidth;
 
 				c.Context.MoveTo (X+movX,	Y + Height / 2.0d + labelExt.Height / 2.5d);
 				c.Context.ShowText (label);
@@ -189,7 +191,7 @@ namespace Xwt.Sdl
 			if (!string.IsNullOrEmpty (label) && imgSz.Width > 0)
 				x += imageToLabelSpace;
 			var y = Math.Max(ext.Height, imgSz.Height);
-			return new Size (x + xMargin, y + yMargin + cornerRadius/2);
+			return new Size (x + xPadding, y + yPadding + cornerRadius/2);
 		}
 
 		internal override void FireMouseEnter ()
