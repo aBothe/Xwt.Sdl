@@ -395,10 +395,21 @@ namespace Xwt.Sdl
 			minHeight = height;
 		}
 
-		public void SetSizeRequest (double width, double height)
+		public void SetSizeRequest (double w, double h)
 		{
-			this.width = minWidth > 0.0 && minWidth > width ? minWidth : width;
-			this.height = minHeight > 0.0 && minHeight > height ? minHeight : height;
+			if (w >= 0) {
+				this.width = Math.Max (w, minWidth);
+
+				if (currentWidthConstraint.IsConstrained && w > currentWidthConstraint.AvailableSize)
+					width = currentWidthConstraint.AvailableSize;
+			}
+
+			if (h >= 0) {
+				this.height = Math.Max (h, minHeight);
+
+				if (currentHeightConstraint.IsConstrained && h > currentHeightConstraint.AvailableSize)
+					width = currentHeightConstraint.AvailableSize;
+			}
 			OnWidgetResized ();
 		}
 
