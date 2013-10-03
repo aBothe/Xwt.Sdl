@@ -44,6 +44,12 @@ namespace Xwt.Sdl
 		float v,w;
 		#endregion
 
+		protected override void SensitivityChanged ()
+		{
+			if (!Sensitive)
+				clicked = false;
+		}
+
 		const double imageToLabelSpace = 10.0;
 		const double yMargin = 8;
 		const double xMargin = 8;
