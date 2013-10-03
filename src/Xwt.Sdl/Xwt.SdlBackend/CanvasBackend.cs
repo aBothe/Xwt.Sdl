@@ -50,8 +50,14 @@ namespace Xwt.Sdl
 			EventSink.OnDraw (c, new Rectangle(0,0, Width, Height));
 
 			// Draw child widgets
+			double absX, absY;
+			GetAbsoluteLocation (out absX, out absY);
+
+			dirtyRect.X -= absX;
+			dirtyRect.Y -= absY;
+
 			foreach (var ch in children)
-				if (ch.Bounds.IntersectsWith (dirtyRect))
+				if(ch.Bounds.IntersectsWith(dirtyRect))
 					ch.Draw (c, dirtyRect);
 		}
 

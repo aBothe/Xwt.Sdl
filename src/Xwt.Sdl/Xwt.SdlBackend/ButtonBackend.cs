@@ -165,7 +165,7 @@ namespace Xwt.Sdl
 			}
 		}
 
-		protected override Size GetPreferredSize (Cairo.Context c)
+		protected override Size GetPreferredSize (Cairo.Context c, double maxX, double maxY)
 		{
 			var ext = string.IsNullOrEmpty(label) ? new Cairo.TextExtents() : c.TextExtents (label);
 			var imgSz = image.Size;
@@ -203,6 +203,13 @@ namespace Xwt.Sdl
 				Invalidate ();
 			}
 			return ret;
+		}
+
+		public override object Font {
+			set {
+				base.Font = value;
+				UpdateWidgetPreferredSize ();
+			}
 		}
 
 		#region IButtonBackend implementation

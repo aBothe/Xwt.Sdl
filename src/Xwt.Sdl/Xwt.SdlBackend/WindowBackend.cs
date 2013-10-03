@@ -320,9 +320,11 @@ namespace Xwt.Sdl
 					menu.Draw (ctxt, Width);
 
 				if (child != null) {
-					ctxt.GlobalXOffset = padding.Left;
-					ctxt.GlobalYOffset = padding.Top + menuHeight;
-					child.Draw (ctxt, new Rectangle (0, 0, Width - padding.Right, Height - menuHeight - padding.Bottom));
+					child.Draw (ctxt, new Rectangle (
+						padding.Left, 
+						padding.Top + menuHeight, 
+						Width - padding.Right, 
+						Height - menuHeight - padding.Bottom));
 				}
 				SDL.SDL_UpdateWindowSurface (window);
 			}

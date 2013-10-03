@@ -79,12 +79,13 @@ namespace Xwt.Sdl
 
 		double minWidth, minHeight;
 		double x,y, width, height;
+		protected SizeConstraint currentWidthConstraint, currentHeightConstraint;
+
 		public Rectangle Bounds
 		{
 			get{return new Rectangle (x, y, width, height);}
 		}
-		SizeConstraint currentWidthConstraint = SizeConstraint.Unconstrained;
-		SizeConstraint currentHeightConstraint = SizeConstraint.Unconstrained;
+
 /// <summary>
 		/// Horizontal distance to the parent widget's left border.
 		/// </summary>
@@ -198,6 +199,12 @@ namespace Xwt.Sdl
 		{
 			this.eventSink.OnBoundsChanged ();
 			Invalidate ();
+		}
+
+		protected void UpdateWidgetPreferredSize()
+		{
+			var sz = eventSink.GetPreferredSize (currentWidthConstraint, currentHeightConstraint);
+			OnBoundsChanged (x, y, Math.Max(sz.Width, minWidth), Math.Max(sz.Height,minHeight));
 		}
 
 		protected bool MouseEntered;
@@ -408,25 +415,16 @@ namespace Xwt.Sdl
 
 		public Size GetPreferredSize (SizeConstraint widthConstraint, SizeConstraint heightConstraint)
 		{
-			currentWidthConstraint = widthConstraint;
-			currentHeightConstraint = heightConstraint;
-
 			using (var surf = new Cairo.ImageSurface (Cairo.Format.A1, 0, 0))
 			using (var c = new Cairo.Context (surf)) {
 				c.SelectFont (FontBackend);
-				var sz = GetPreferredSize (c);
-
-				//ISSUE: Maybe put the widget's padding directly into this class in order to get the exact padding measurements?
-				var win = ParentWindow;
-				if (win != null && !win.Padding.IsEmpty) {
-					sz.Height += win.Padding.Bottom;
-					sz.Width += win.Padding.Right;
-				}
-				return sz;
+				return GetPreferredSize (c, 
+					widthConstraint.IsConstrained ? widthConstraint.AvailableSize : double.MaxValue, 
+					heightConstraint.IsConstrained ? heightConstraint.AvailableSize : double.MaxValue);
 			}
 		}
 
-		protected virtual Size GetPreferredSize(Cairo.Context fontExtentContext) { return Size.Zero; }
+		protected virtual Size GetPreferredSize(Cairo.Context fontExtentContext,double maxWidth, double maxHeight) { return Size.Zero; }
 
 		public void DragStart (DragStartData data)
 		{
