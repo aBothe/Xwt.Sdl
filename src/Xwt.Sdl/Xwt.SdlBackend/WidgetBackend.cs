@@ -479,12 +479,14 @@ namespace Xwt.Sdl
 			}
 		}
 
+		protected virtual void SensitivityChanged() {}
 		public bool Sensitive {
 			get {
 				return sensitive;
 			}
 			set {
 				sensitive = value;
+				SensitivityChanged();
 				Invalidate ();
 			}
 		}
