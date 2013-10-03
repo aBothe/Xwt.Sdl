@@ -354,15 +354,23 @@ namespace Xwt.Sdl
 				pw.Invalidate (rect.Offset(x,y));
 		}
 
+		/// <summary>
+		/// Draw the widget.
+		/// </summary>
+		/// <param name="c">Drawing context</param>
+		/// <param name="dirtyRect">The previously invalidated area that needs to be redrawn. 
+		/// Consists of absolute coordinates, i.e. (0,0) represents 
+		/// the upper left corner of the widget's window.</param>
 		public virtual void Draw(CairoContextBackend c,Rectangle dirtyRect)
 		{
-			c.Context.SetSourceRGBA (backgroundColor.Red, backgroundColor.Green, backgroundColor.Blue, backgroundColor.Alpha);
-			c.Context.Rectangle (dirtyRect.X + c.GlobalXOffset, dirtyRect.Y + c.GlobalYOffset, dirtyRect.Width, dirtyRect.Height);
+			c.Context.SetColor (backgroundColor);
+
+			double absX, absY;
+			GetAbsoluteLocation (out absX, out absY);
+
+			c.Context.Rectangle (Math.Max(absX, dirtyRect.X), Math.Max(absY, dirtyRect.Y), 
+				Math.Min(width, dirtyRect.Width), Math.Min(height, dirtyRect.Height));
 			c.Context.Fill ();
-			/*
-			var loc = AbsoluteLocation;
-			c.Context.Rectangle (loc.X, loc.Y, Width, Height);
-			c.Context.Clip ();*/
 		}
 
 		#endregion
