@@ -187,12 +187,14 @@ namespace Xwt.Sdl
 		{
 			focused = false;
 			this.eventSink.OnLostFocus ();
+			Invalidate ();
 		}
 
 		internal virtual void FireGainedFocus()
 		{
 			focused = true;
 			this.eventSink.OnGotFocus ();
+			Invalidate ();
 		}
 
 		internal virtual void OnWidgetResized()
@@ -268,6 +270,7 @@ namespace Xwt.Sdl
 			if(cursorSet)
 				SetSysCursor (CursorType.Arrow);
 			this.eventSink.OnMouseExited ();
+			Invalidate ();
 		}
 
 		readonly ButtonEventArgs buttonEA = new ButtonEventArgs();
