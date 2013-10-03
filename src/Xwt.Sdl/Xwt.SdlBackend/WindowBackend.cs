@@ -135,7 +135,7 @@ namespace Xwt.Sdl
 					break;
 			}
 
-			var w = focusedWidget;
+			var w = hoveredWidget;
 			while (w != null && !w.FireMouseButton (isButtonDownEvt, butt, ev.x, ev.y-(int)menuHeight))
 				w = w.Parent;
 		}
