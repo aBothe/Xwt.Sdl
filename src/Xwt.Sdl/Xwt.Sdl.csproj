@@ -57,6 +57,7 @@
     <Compile Include="Xwt.CairoBackend\CairoGradientBackendHandler.cs" />
     <Compile Include="Xwt.CairoBackend\CairoFontBackendHandler.cs" />
     <Compile Include="Xwt.CairoBackend\CairoTextLayoutBackendHandler.cs" />
+    <Compile Include="Xwt.SdlBackend\WidgetStyles.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
