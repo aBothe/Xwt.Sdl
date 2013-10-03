@@ -51,13 +51,12 @@ namespace Xwt.Sdl
 
 		public override void Draw (CairoBackend.CairoContextBackend c,Rectangle dirtyRect)
 		{
+			var style = WidgetStyles.Instance;
 			double X, Y;
 			GetAbsoluteLocation (out X, out Y);
 
 			// Border
 			{
-				const double borderColor = 0.6;
-
 				// Top left corner
 				c.Context.Arc (X +cornerRadius, Y + cornerRadius, cornerRadius, -Math.PI, -Math.PI/2);
 
@@ -80,8 +79,8 @@ namespace Xwt.Sdl
 				c.Context.Arc (X + cornerRadius, Y + Height - cornerRadius, cornerRadius, Math.PI/2, Math.PI);
 
 				c.Context.ClosePath ();
-				c.Context.SetSourceRGB (borderColor, borderColor, borderColor);
-				c.Context.LineWidth = 1;
+				c.Context.SetColor (style.ButtonBorderColor);
+				c.Context.LineWidth = style.ButtonBorderLineWidth;
 				c.Context.StrokePreserve ();
 			}
 
@@ -89,13 +88,13 @@ namespace Xwt.Sdl
 			{
 				double grey;
 				if (!Sensitive)
-					grey = 0.7;
+					grey = style.ButtonInsensitiveGrey;
 				else if (clicked)
-					grey = 0.9;
+					grey = style.ButtonClickedGrey;
 				else if (MouseEntered)
-					grey = 1;
+					grey = style.ButtonHoveredGrey;
 				else
-					grey = 0.95;
+					grey = style.ButtonDefaultGrey;
 
 				var g = new Cairo.LinearGradient (X + Width / 2, Y, X + Width / 2, Y + Height);
 				g.AddColorStop (0, new Cairo.Color (grey, grey, grey));
@@ -146,9 +145,9 @@ namespace Xwt.Sdl
 			// Label
 			if (label != null) {
 				if (!Sensitive)
-					c.Context.SetSourceRGB (0.5,0.5,0.5);
+					c.Context.SetColor(style.ButtonInsensitiveLabelColor);
 				else
-					c.Context.SetSourceRGB (0, 0, 0);
+					c.Context.SetColor(style.ButtonLabelColor);
 
 				double movX;
 
