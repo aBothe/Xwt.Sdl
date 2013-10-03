@@ -26,6 +26,7 @@
 using System;
 using Xwt.Backends;
 using SDL2;
+using Xwt.CairoBackend;
 
 namespace Xwt.Sdl
 {
@@ -202,7 +203,6 @@ namespace Xwt.Sdl
 		{
 			clicked = false;
 			base.FireMouseLeave ();
-			Invalidate ();
 		}
 
 		internal override bool FireMouseButton (bool down, PointerButton butt, int x, int y, int multiplePress = 1)
