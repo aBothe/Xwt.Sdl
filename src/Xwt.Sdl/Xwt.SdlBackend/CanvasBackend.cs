@@ -46,18 +46,21 @@ namespace Xwt.Sdl
 			base.Draw (c,dirtyRect);
 
 			// Draw actual content
-			GetAbsoluteLocation (out c.GlobalXOffset, out c.GlobalYOffset);
-			EventSink.OnDraw (c, new Rectangle(0,0, Width, Height));
-
-			// Draw child widgets
 			double absX, absY;
 			GetAbsoluteLocation (out absX, out absY);
+			c.GlobalXOffset = absX;
+			c.GlobalYOffset = absY;
 
-			dirtyRect.X -= absX;
-			dirtyRect.Y -= absY;
-
+			EventSink.OnDraw (c,new Rectangle (
+				Math.Max (0d, dirtyRect.X - absX),
+				Math.Max (0d, dirtyRect.Y - absY), 
+				Math.Min (Width, dirtyRect.Width),
+				Math.Min (Height, dirtyRect.Height)));
+			
+			// Draw child widgets
 			foreach (var ch in children)
-				if(ch.Bounds.IntersectsWith(dirtyRect))
+				if(!((dirtyRect.Left >= (absX+ch.X+ch.Width)) || (dirtyRect.Right <= (absX+ch.X)) ||
+					(dirtyRect.Top >= (absY+ch.Y+ch.Height)) || (dirtyRect.Bottom <= (absY+ch.Y))))
 					ch.Draw (c, dirtyRect);
 		}
 
@@ -70,7 +73,7 @@ namespace Xwt.Sdl
 
 		public void QueueDraw (Rectangle rect)
 		{
-			Invalidate (rect);
+			Invalidate (rect.Offset(AbsoluteLocation));
 		}
 
 		public void AddChild (IWidgetBackend widget, Rectangle bounds)
