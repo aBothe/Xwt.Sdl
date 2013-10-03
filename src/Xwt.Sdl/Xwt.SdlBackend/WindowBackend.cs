@@ -291,14 +291,32 @@ namespace Xwt.Sdl
 			}
 		}
 
+		bool clearBackground = true;
 		public void Invalidate()
 		{
 			Invalidate (Bounds);
+			clearBackground = true;
 		}
 
 		public void Invalidate(Rectangle region)
 		{
-			invalidatedRegion = region;
+			if (redraw) {
+				if (region.X < invalidatedRegion.X) {
+					invalidatedRegion.Width += invalidatedRegion.X - region.X;
+					invalidatedRegion.X = region.X;
+				}
+				if (region.Y < invalidatedRegion.Y) {
+					invalidatedRegion.Height += invalidatedRegion.Y - region.Y;
+					invalidatedRegion.Y = region.Y;
+				}
+
+				if (region.Right > invalidatedRegion.Right)
+					invalidatedRegion.Width += region.Right - invalidatedRegion.Right;
+				if (region.Bottom > invalidatedRegion.Bottom)
+					invalidatedRegion.Height += region.Bottom - invalidatedRegion.Bottom;
+			}
+			else
+				invalidatedRegion = region;
 			redraw = true;
 		}
 
