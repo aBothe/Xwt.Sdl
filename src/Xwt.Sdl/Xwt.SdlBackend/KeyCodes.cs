@@ -32,8 +32,45 @@ namespace Xwt.Sdl
 	{
 		public static void ConvertToXwtKey(SDL.SDL_Keysym s, out Key k, out ModifierKeys mod)
 		{
-			k = Key.a;
-			mod = ModifierKeys.None;
+			switch (s.mod) {
+				case SDL.SDL_Keymod.KMOD_ALT:
+					mod = ModifierKeys.Alt;
+					break;
+				case SDL.SDL_Keymod.KMOD_CTRL:
+					mod = ModifierKeys.Control;
+					break;
+				case SDL.SDL_Keymod.KMOD_SHIFT:
+					mod = ModifierKeys.Shift;
+					break;
+				case SDL.SDL_Keymod.KMOD_GUI:
+					mod = ModifierKeys.Command;
+					break;
+				default:
+					mod = ModifierKeys.None;
+					break;
+			}
+
+			switch (s.sym) {
+				case SDL.SDL_Keycode.SDLK_SPACE:
+					k = Key.Space;
+					break;
+				case SDL.SDL_Keycode.SDLK_KP_SPACE:
+					k = Key.NumPadSpace;
+					break;
+				case SDL.SDL_Keycode.SDLK_TAB:
+					k = Key.Tab;
+					break;
+				case SDL.SDL_Keycode.SDLK_KP_TAB:
+					k = Key.NumPadTab;
+					break;
+				case SDL.SDL_Keycode.SDLK_RETURN2:
+				case SDL.SDL_Keycode.SDLK_RETURN:
+					k = Key.Return;
+					break;
+				default:
+					k = Key.a;
+					break;
+			}
 		}
 	}
 }
