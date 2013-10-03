@@ -214,6 +214,29 @@ namespace Xwt.Sdl
 			return ret;
 		}
 
+		internal override bool FireKeyDown (Key k, char ch, ModifierKeys mods, bool rep, uint timestamp)
+		{
+			if (Sensitive && mods == ModifierKeys.None && (k == Key.Space || k == Key.Return)) {
+				clicked = true;
+				Invalidate ();
+				return true;
+			}
+
+			return base.FireKeyDown (k, ch, mods, rep, timestamp);
+		}
+
+		internal override bool FireKeyUp (Key k, char ch, ModifierKeys mods, bool rep, uint timestamp)
+		{
+			if (clicked) {
+				clicked = false;
+				EventSink.OnClicked ();
+				Invalidate ();
+				return true;
+			}
+
+			return base.FireKeyUp (k, ch, mods, rep, timestamp);
+		}
+
 		public override object Font {
 			set {
 				base.Font = value;
