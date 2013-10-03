@@ -31,24 +31,44 @@ namespace Xwt.Sdl.Tests
 {
 	class MyCanvas : Canvas
 	{
+		public double XX;
+
 		public MyCanvas()
 		{
+			CanGetFocus = false;
 			base.BackgroundColor = Colors.LightSteelBlue;
+		}
+
+		protected override void OnMouseScrolled (MouseScrolledEventArgs args)
+		{
+			const double steps = 20;
+			var w = Size.Width;
+			if (args.Direction == ScrollDirection.Down) {
+				XX -= w / steps;
+				if (XX < 0)
+					XX = 0;
+			} else {
+				XX += w / steps;
+				if (XX >= w)
+					XX = w - 1;
+			}
+			QueueDraw ();
 		}
 
 		protected override void OnDraw (Context ctx, Rectangle dirtyRect)
 		{
-			ctx.MoveTo (dirtyRect.X, dirtyRect.Y);
+			var b = Bounds;
+			ctx.MoveTo (b.X, b.Y);
 			ctx.SetColor (Colors.Black);
 
 			using (var tl = new TextLayout (this)) {
 				tl.Text = "hello";
-				ctx.DrawTextLayout (tl, dirtyRect.X, dirtyRect.Y);
+				ctx.DrawTextLayout (tl, b.X, b.Y);
 			}
 			ctx.SetLineWidth (4);
-			ctx.LineTo (dirtyRect.Right, dirtyRect.Bottom/8);
-			ctx.MoveTo (0, 0);
 			ctx.LineTo (dirtyRect.Right, dirtyRect.Bottom);
+			ctx.MoveTo (0, 0);
+			ctx.LineTo (XX % Size.Width, b.Bottom);
 			//ctx.RelLineTo (-120, -150);
 			//ctx.ClosePath ();
 			//ctx.Fill ();
@@ -88,10 +108,14 @@ namespace Xwt.Sdl.Tests
 			butt.Label = "Button Test Caption";
 			butt.Cursor = CursorType.Hand;
 			butt.Image = Image.FromFile ("./ts.png");
-			butt.Clicked += (sender, e) => {GC.Collect ();};
+			butt.Clicked+=(sender, e) => {(sender as Button).WidthRequest=200;};
 			mw.Content = c;
 
 			c.AddChild (butt, 30, 120);
+
+			butt = new Button ();
+			butt.Label = "Hey ho";
+			c.AddChild (butt, 10, 90);
 
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";
