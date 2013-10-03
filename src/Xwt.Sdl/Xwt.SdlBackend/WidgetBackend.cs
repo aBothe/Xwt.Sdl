@@ -393,10 +393,15 @@ namespace Xwt.Sdl
 		{
 			minWidth = width;
 			minHeight = height;
+
+			SetSizeRequest (this.width, this.height);
 		}
 
 		public void SetSizeRequest (double w, double h)
 		{
+			var oldWidth = width;
+			var oldHeight = height;
+
 			if (w >= 0) {
 				this.width = Math.Max (w, minWidth);
 
@@ -410,7 +415,9 @@ namespace Xwt.Sdl
 				if (currentHeightConstraint.IsConstrained && h > currentHeightConstraint.AvailableSize)
 					width = currentHeightConstraint.AvailableSize;
 			}
-			OnWidgetResized ();
+
+			if(width != oldWidth || height != oldHeight)
+				OnWidgetResized ();
 		}
 
 		public void SetFocus ()
