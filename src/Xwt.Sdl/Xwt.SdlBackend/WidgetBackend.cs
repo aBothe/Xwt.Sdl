@@ -270,7 +270,6 @@ namespace Xwt.Sdl
 			if(cursorSet)
 				SetSysCursor (CursorType.Arrow);
 			this.eventSink.OnMouseExited ();
-			Invalidate ();
 		}
 
 		readonly ButtonEventArgs buttonEA = new ButtonEventArgs();
