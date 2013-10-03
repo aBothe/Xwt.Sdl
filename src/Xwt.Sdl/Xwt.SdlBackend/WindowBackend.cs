@@ -36,7 +36,7 @@ namespace Xwt.Sdl
 		#region Properties
 		internal static Dictionary<uint, WeakReference> windowCache = new Dictionary<uint, WeakReference>();
 		IntPtr window;
-		SDL.SDL_Surface windowSurface;
+		Cairo.ImageSurface drawingSurface;
 
 		uint id;
 		public uint WindowId {get{return id;}}
@@ -70,7 +70,12 @@ namespace Xwt.Sdl
 		#region Extension
 		void UpdateViewPort()
 		{
-			windowSurface = SDL_.SDL_GetWindowSurface (window);
+			var windowSurface = SDL_.SDL_GetWindowSurface (window);
+
+			if (drawingSurface != null)
+				drawingSurface.Dispose ();
+
+			drawingSurface = new Cairo.ImageSurface (windowSurface.pixels, Cairo.Format.RGB24, windowSurface.w, windowSurface.h, windowSurface.pitch);
 		}
 
 		public WidgetBackend GetWidgetAt(double x, double y)
@@ -326,23 +331,21 @@ namespace Xwt.Sdl
 				return false;
 			redraw = false;
 
-			using (var cairoSurface = new Cairo.ImageSurface (windowSurface.pixels, Cairo.Format.RGB24, windowSurface.w, windowSurface.h, windowSurface.pitch))
-			using(var cctxt = new Cairo.Context (cairoSurface))
-			{
-				var ctxt = new CairoBackend.CairoContextBackend (1, cctxt, cairoSurface);
-				cctxt.SetSourceRGB (1, 1, 1);
-				cctxt.Rectangle (0, 0, Width, Height);
-				cctxt.Fill ();
+
+			using (var drawingContext = new Cairo.Context (drawingSurface)) {
+				var ctxt = new CairoBackend.CairoContextBackend (1, drawingContext, drawingSurface);
+
+				if (clearBackground || invalidatedRegion.X <= padding.X || invalidatedRegion.Y <= padding.Y) {
+					drawingContext.SetSourceRGB (1, 1, 1);
+					drawingContext.Paint ();
+					clearBackground = false;
+				}
 
 				if (menu != null)
 					menu.Draw (ctxt, Width);
 
 				if (child != null) {
-					child.Draw (ctxt, new Rectangle (
-						padding.Left, 
-						padding.Top + menuHeight, 
-						Width - padding.Right, 
-						Height - menuHeight - padding.Bottom));
+					child.Draw (ctxt, invalidatedRegion);
 				}
 				SDL.SDL_UpdateWindowSurface (window);
 			}
