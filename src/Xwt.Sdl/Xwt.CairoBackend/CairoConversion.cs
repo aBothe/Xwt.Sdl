@@ -45,6 +45,16 @@ namespace Xwt.CairoBackend
 			return new Cairo.Color (col.Red, col.Green, col.Blue, col.Alpha);
 		}
 
+		public static void SetColor(this Cairo.Context c, Color col)
+		{
+			c.SetSourceRGBA (col.Red, col.Green, col.Blue, col.Alpha);
+		}
+
+		public static void AddColorStop(this Cairo.LinearGradient grad, double offset, Color col)
+		{
+			grad.AddColorStop(offset, ToCairoColor(col));
+		}
+
 		internal static void SelectFont(this Cairo.Context c, InternalFontDescription f)
 		{
 			Cairo.FontSlant slant;
