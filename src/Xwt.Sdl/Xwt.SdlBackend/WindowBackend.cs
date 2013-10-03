@@ -98,7 +98,7 @@ namespace Xwt.Sdl
 
 		void FocusWidget(WidgetBackend w)
 		{
-			if (focusedWidget != w) {
+			if (focusedWidget != w && (w == null || (w.Sensitive && w.CanGetFocus))) {
 				if (focusedWidget != null)
 					focusedWidget.FireLostFocus ();
 
