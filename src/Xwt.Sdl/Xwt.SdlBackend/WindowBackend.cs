@@ -325,12 +325,15 @@ namespace Xwt.Sdl
 			redraw = true;
 		}
 
+		System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 		internal bool Draw()
 		{
 			if (!redraw)
 				return false;
 			redraw = false;
 
+			if(System.Diagnostics.Debugger.IsAttached)
+				sw.Restart ();
 
 			using (var drawingContext = new Cairo.Context (drawingSurface)) {
 				var ctxt = new CairoBackend.CairoContextBackend (1, drawingContext, drawingSurface);
@@ -350,6 +353,10 @@ namespace Xwt.Sdl
 				SDL.SDL_UpdateWindowSurface (window);
 			}
 
+			if (System.Diagnostics.Debugger.IsAttached) {
+				sw.Stop ();
+				Console.WriteLine (string.Format ("{0}ms needed for drawing within {1}", sw.Elapsed.TotalMilliseconds, invalidatedRegion));
+			}
 			return true;
 		}
 
