@@ -441,7 +441,7 @@ namespace Xwt.Sdl
 		{
 			this.eventSink = eventSink;
 
-			window = SDL.SDL_CreateWindow (null, 0, 0, 400, 300, SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE/* | SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL*/);
+			window = SDL.SDL_CreateWindow (null, 0, 0, 400, 300, SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
 
 			if(window == IntPtr.Zero)
 				throw new SdlException ();

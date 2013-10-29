@@ -60,6 +60,11 @@ namespace Xwt.Sdl
 		public Color ButtonLabelColor = Colors.Black;
 		public Color ButtonInsensitiveLabelColor = new Color(0.5,0.5,0.5);
 		#endregion
+
+		#region Label styles
+		public double LabelYPadding = 3;
+		public double LabelXPadding = 4;
+		#endregion
 	}
 }
 

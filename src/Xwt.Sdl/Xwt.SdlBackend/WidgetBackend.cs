@@ -363,14 +363,16 @@ namespace Xwt.Sdl
 		/// the upper left corner of the widget's window.</param>
 		public virtual void Draw(CairoContextBackend c,Rectangle dirtyRect)
 		{
-			c.Context.SetColor (backgroundColor);
+			if (backgroundColor.HasValue) {
+				c.Context.SetColor (backgroundColor.Value);
 
-			double absX, absY;
-			GetAbsoluteLocation (out absX, out absY);
+				double absX, absY;
+				GetAbsoluteLocation (out absX, out absY);
 
-			c.Context.Rectangle (Math.Max(absX, dirtyRect.X), Math.Max(absY, dirtyRect.Y), 
-				Math.Min(width, dirtyRect.Width), Math.Min(height, dirtyRect.Height));
-			c.Context.Fill ();
+				c.Context.Rectangle (Math.Max (absX, dirtyRect.X), Math.Max (absY, dirtyRect.Y), 
+					Math.Min (width, dirtyRect.Width), Math.Min (height, dirtyRect.Height));
+				c.Context.Fill ();
+			}
 		}
 
 		#endregion
@@ -553,9 +555,9 @@ namespace Xwt.Sdl
 			}
 		}
 
-		Color backgroundColor=Colors.White;
+		Color? backgroundColor;
 		public Color BackgroundColor {
-			get { return backgroundColor;}
+			get { return backgroundColor.Value;}
 			set { backgroundColor = value; Invalidate ();}
 		}
 

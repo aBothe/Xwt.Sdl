@@ -103,12 +103,13 @@ namespace Xwt.Sdl.Tests
 
 			mw.MainMenu = new Menu ();
 			var c = new MyCanvas ();
+			var labelT = new Label ("Hi derppp") { BackgroundColor = Colors.Red };
 
 			var butt = new Button();
 			butt.Label = "Button Test Caption";
 			butt.Cursor = CursorType.Hand;
 			butt.Image = Image.FromFile ("./ts.png");
-			butt.Clicked+=(sender, e) => {(sender as Button).WidthRequest=200;};
+			butt.Clicked+=(sender, e) => {(sender as Button).WidthRequest=200; labelT.Text = "##############";};
 			mw.Content = c;
 
 			c.AddChild (butt, 30, 120);
@@ -116,6 +117,8 @@ namespace Xwt.Sdl.Tests
 			butt = new Button ();
 			butt.Label = "Hey ho";
 			c.AddChild (butt, 10, 90);
+			butt.ExpandHorizontal = true;
+			c.AddChild (labelT,100,50);
 
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";
