@@ -39,7 +39,7 @@ namespace Xwt.CairoBackend
 		{
 			var fd = new FontDescription ();
 
-			fd.Family = "sans";//ft.FontFamily.Name;
+			fd.Family = ft.FontFamily.Name;
 			fd.AbsoluteSize = Pango.Scale.PangoScale * ft.Size;
 
 			if (ft.Bold) {
