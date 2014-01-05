@@ -385,6 +385,12 @@ namespace Xwt.Sdl
 
 		#region IWindowBackend implementation
 
+		public bool Close ()
+		{
+			Dispose ();
+			return true;
+		}
+
 		public void SetChild (IWidgetBackend child)
 		{
 			this.child = child as WidgetBackend;

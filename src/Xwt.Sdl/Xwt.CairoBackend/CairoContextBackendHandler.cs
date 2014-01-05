@@ -92,11 +92,17 @@ namespace Xwt.CairoBackend
 	{
 		public override bool DisposeHandleOnUiThread {
 			get {
-				return false;
+				return true;
 			}
 		}
 
 		#region IContextBackendHandler implementation
+
+		public override double GetScaleFactor (object backend)
+		{
+			CairoContextBackend gc = (CairoContextBackend)backend;
+			return gc.ScaleFactor;
+		}
 
 		public override void Save (object backend)
 		{
@@ -160,7 +166,7 @@ namespace Xwt.CairoBackend
 			Cairo.Context ctx = gtkc.Context;
 			var alpha = gtkc.GlobalAlpha * gtkc.PatternAlpha;
 
-			if (alpha == 1)
+			if (alpha == 1.0)
 				ctx.Fill ();
 			else {
 				ctx.Save ();
