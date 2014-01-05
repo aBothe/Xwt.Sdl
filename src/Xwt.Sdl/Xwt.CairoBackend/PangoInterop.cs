@@ -38,7 +38,7 @@ namespace Xwt.CairoBackend
 		internal const string LIBGLIB         = "libglib-2.0-0.dll";
 		internal const string LIBGDK          = "libgdk-win32-2.0-0.dll";
 		internal const string LIBGOBJECT      = "libgobject-2.0-0.dll";
-		internal const string LIBPANGO        = "libpango-1.0-0.dll";
+		internal const string LIBPANGO        = "/usr/lib/libpango-1.0.so";//"libpango-1.0-0.dll";
 		internal const string LIBPANGOCAIRO   = "libpangocairo-1.0-0.dll";
 	}
 

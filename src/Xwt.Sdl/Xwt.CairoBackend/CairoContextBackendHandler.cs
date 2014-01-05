@@ -284,18 +284,12 @@ namespace Xwt.CairoBackend
 		
 		public override void DrawTextLayout (object backend, TextLayout layout, double x, double y)
 		{
-			var c = (backend as CairoContextBackend);
-
-			CairoConversion.SelectFont (c.Context, layout.Font);
-			c.Context.SetFontSize (layout.Font.Size);
-			c.Context.MoveTo (x+c.GlobalXOffset, y+c.GlobalYOffset+ c.Context.TextExtents(layout.Text).Height);
-			c.Context.ShowText (layout.Text);
-			c.Context.MoveTo (x+c.GlobalXOffset, y+c.GlobalYOffset);
-
-			/*var be = (GtkTextLayoutBackendHandler.PangoBackend)Toolkit.GetBackend (layout);
+			var be = (Xwt.CairoBackend.CairoTextLayoutBackendHandler.PangoBackend)layout.GetBackend();
 			var pl = be.Layout;
 			CairoContextBackend ctx = (CairoContextBackend)backend;
-			ctx.Context.MoveTo (x, y);
+
+			ctx.Context.MoveTo (x+ctx.GlobalXOffset, y+ctx.GlobalYOffset);
+
 			if (layout.Height <= 0) {
 				Pango.CairoHelper.ShowLayout (ctx.Context, pl);
 			} else {
@@ -313,7 +307,9 @@ namespace Xwt.CairoBackend
 					ctx.Context.MoveTo (x, y + h);
 					Pango.CairoHelper.ShowLayoutLine (ctx.Context, line);
 				}
-			}*/
+			}
+
+			ctx.Context.MoveTo (x+ctx.GlobalXOffset, y+ctx.GlobalYOffset);
 		}
 
 		public override void DrawImage (object backend, ImageDescription img, double x, double y)
