@@ -35,14 +35,23 @@ namespace Xwt.Sdl
 		#region Properties
 		ButtonStyle style;
 		ButtonType type;
-		string label;
+		Label label;
+		public Size LabelSize
+		{
+			get{
+				if (label == null)
+					return new Size ();
+
+				return (label.GetBackend () as LabelBackend).GetPreferredSize (SizeConstraint.Unconstrained, SizeConstraint.Unconstrained);
+			}
+		}
+
 		bool mnemonic;
 		ImageDescription image;
 		ContentPosition pos;
 		public new IButtonEventSink EventSink {get{return base.EventSink as IButtonEventSink;}}
 
 		bool clicked;
-		float v,w;
 		#endregion
 
 		protected override void SensitivityChanged ()
@@ -127,13 +136,7 @@ namespace Xwt.Sdl
 				c.Context.Stroke ();
 			}
 
-			CairoBackend.CairoConversion.SelectFont (c.Context, FontBackend);
-
-			Cairo.TextExtents labelExt;
-			if (label != null)
-				labelExt = c.Context.TextExtents (label);
-			else
-				labelExt = new Cairo.TextExtents ();
+			var labelSize = LabelSize;
 
 			double imageWidth;
 
@@ -145,10 +148,10 @@ namespace Xwt.Sdl
 				imageWidth = (double)imgSurf.Width;
 
 				var imgY = Y + Height / 2.0 - imgSurf.Height / 2;
-				if (string.IsNullOrEmpty (label))
+				if (label == null)
 					c.Context.SetSource (imgSurf, X + Width / 2 - imageWidth / 2, imgY);
 				else {
-					var contentWidth = labelExt.Width + imageToLabelSpace + imageWidth;
+					var contentWidth = labelSize.Width + imageToLabelSpace + imageWidth;
 					if (contentWidth < Width)
 						c.Context.SetSource (imgSurf, X + Width / 2 - contentWidth / 2, imgY);
 					else
@@ -170,25 +173,25 @@ namespace Xwt.Sdl
 
 				double movX;
 
-				if (imageWidth != 0)
+				if (imageWidth > 0)
 					imageWidth += imageToLabelSpace;
 
-				if (labelExt.Width + imageWidth < Width)
-					movX = Width / 2.0 + (-labelExt.Width + imageWidth) / 2;
+				if (labelSize.Width + imageWidth < Width)
+					movX = Width / 2.0 + (-labelSize.Width + imageWidth) / 2;
 				else
 					movX = xPadding + imageWidth;
 
-				c.Context.MoveTo (X+movX,	Y + Height / 2.0d + labelExt.Height / 2.5d);
-				c.Context.ShowText (label);
+				c.Context.MoveTo (X+movX,	Y + Height / 2.0d + labelSize.Height / 2.5d);
+				(label.GetBackend() as LabelBackend).Draw (c, dirtyRect);
 			}
 		}
 
 		protected override Size GetPreferredSize (Cairo.Context c, double maxX, double maxY)
 		{
-			var ext = string.IsNullOrEmpty(label) ? new Cairo.TextExtents() : c.TextExtents (label);
+			var ext = LabelSize;
 			var imgSz = image.Size;
 			var x = ext.Width + imgSz.Width + cornerRadius/2;
-			if (!string.IsNullOrEmpty (label) && imgSz.Width > 0)
+			if (label != null && imgSz.Width > 0)
 				x += imageToLabelSpace;
 			var y = Math.Max(ext.Height, imgSz.Height);
 			return new Size (x + xPadding, y + yPadding + cornerRadius/2);
@@ -267,9 +270,18 @@ namespace Xwt.Sdl
 			Invalidate ();
 		}
 
-		public void SetContent (string label, bool useMnemonic, ImageDescription image, ContentPosition position)
+		public void SetContent (string text, bool useMnemonic, ImageDescription image, ContentPosition position)
 		{
-			this.label = label;
+			if (string.IsNullOrEmpty (text)) {
+				if (label != null) {
+					label.Dispose ();
+					label = null;
+				}
+			} else if (label != null)
+				label.Text = text;
+			else
+				label = new Label (text);
+
 			this.mnemonic = useMnemonic;
 			this.image = image;
 			this.pos = position;

@@ -38,9 +38,9 @@
     <Reference Include="Mono.Cairo" />
     <Reference Include="System.Drawing" />
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
-      <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -63,6 +63,7 @@
     <Compile Include="Xwt.CairoBackend\CairoTextLayoutBackendHandler.cs" />
     <Compile Include="Xwt.SdlBackend\WidgetStyles.cs" />
     <Compile Include="Xwt.SdlBackend\LabelBackend.cs" />
+    <Compile Include="Xwt.CairoBackend\PangoInterop.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

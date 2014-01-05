@@ -32,80 +32,179 @@ namespace Xwt.CairoBackend
 {
 	public class CairoTextLayoutBackendHandler : TextLayoutBackendHandler
 	{
-		public override bool DisposeHandleOnUiThread {
-			get {
-				return false;
+		static Cairo.Context SharedContext;
+
+		public double Heigth = -1;
+
+		internal class PangoBackend : IDisposable
+		{
+			Pango.Layout layout;
+			public Pango.Layout Layout {
+				get {
+					if (hasUnassignedAttributes) {
+						attributes.AssignTo (layout);
+						hasUnassignedAttributes = false;
+					}
+					return layout;
+				}
+				set {
+					layout = value;
+				}
+			}
+
+			FastPangoAttrList attributes;
+			bool hasUnassignedAttributes = false;
+			public FastPangoAttrList Attributes {
+				get {
+					if (attributes == null)
+						attributes = new FastPangoAttrList ();
+					hasUnassignedAttributes = true;
+					return attributes;
+				}
+				private set {
+					attributes = value;
+				}
+			}
+
+			string text;
+			public string Text {
+				get {
+					return text;
+				}
+				set {
+					text = value;
+					indexer = null;
+					if (attributes != null) {
+						attributes.Dispose ();
+						attributes = null;
+					}
+				}
+			}
+
+			TextIndexer indexer;
+			public TextIndexer TextIndexer {
+				get {
+					if (indexer == null)
+						indexer = new TextIndexer (Text);
+					return indexer;
+				}
+			}
+
+			public void ClearAttributes ()
+			{
+				if (attributes != null) {
+					attributes.Dispose ();
+					attributes = new FastPangoAttrList ();
+					hasUnassignedAttributes = true;
+				}
+			}
+
+			public void Dispose ()
+			{
+				if (layout != null) {
+					layout.Dispose ();
+					layout = null;
+				}
+				if (attributes != null) {
+					attributes.Dispose ();
+					attributes = null;
+				}
 			}
 		}
 
-		#region implemented abstract members of TextLayoutBackendHandler
+		static CairoTextLayoutBackendHandler ()
+		{
+			using (Cairo.Surface sf = new Cairo.ImageSurface (Cairo.Format.ARGB32, 1, 1)) {
+				SharedContext = new Cairo.Context (sf);
+			}
+		}
+
+		public static void DisposeResources ()
+		{
+			((IDisposable)SharedContext).Dispose ();
+		}
 
 		public override object Create ()
 		{
-			var surf = new ImageSurface (Format.A1, 0, 0);
-			var c = new Cairo.Context (surf);
-			return new CairoContextBackend (1,c, surf, true);
-		}
-
-		public override void Dispose (object backend)
-		{
-			(backend as CairoContextBackend).Dispose ();
-		}
-
-		public override void SetWidth (object backend, double value)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override void SetHeight (object backend, double value)
-		{
-			throw new NotImplementedException ();
+			return new PangoBackend {
+				Layout = Pango.CairoHelper.CreateLayout (SharedContext)
+			};
 		}
 
 		public override void SetText (object backend, string text)
 		{
-			(backend as CairoContextBackend).Text = text;
+			var tl = (PangoBackend) backend;
+			tl.Layout.SetText (text);
+			tl.Text = text;
 		}
 
-		public override void SetFont (object backend, Font font)
+		public override void SetFont (object backend, Xwt.Drawing.Font font)
 		{
-			CairoConversion.SelectFont ((backend as CairoContextBackend).Context, font);
+			var tl = (PangoBackend)backend;
+			tl.Layout.FontDescription = (Pango.FontDescription)Toolkit.GetBackend (font);
 		}
 
-		public override void SetTrimming (object backend, Xwt.Drawing.TextTrimming textTrimming)
+		public override void SetWidth (object backend, double value)
 		{
-			throw new NotImplementedException ();
+			var tl = (PangoBackend) backend;
+			tl.Layout.Width = (int) (value * Pango.Scale.PangoScale);
+		}
+
+		public override void SetHeight (object backend, double value)
+		{
+			this.Heigth = value;
+		}
+
+		public override void SetTrimming (object backend, TextTrimming textTrimming)
+		{
+			var tl = (PangoBackend)backend;
+			if (textTrimming == TextTrimming.WordElipsis)
+				tl.Layout.Ellipsize = Pango.EllipsizeMode.End;
+			if (textTrimming == TextTrimming.Word)
+				tl.Layout.Ellipsize = Pango.EllipsizeMode.None;
+
 		}
 
 		public override Size GetSize (object backend)
 		{
-			var c = backend as CairoContextBackend;
-			var ext = c.Context.TextExtents (c.Text);
-
-			return new Size (ext.Width, ext.Height);
-		}
-
-		public override int GetIndexFromCoordinates (object backend, double x, double y)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override Point GetCoordinateFromIndex (object backend, int index)
-		{
-			throw new NotImplementedException ();
+			var tl = (PangoBackend)backend;
+			int w, h;
+			tl.Layout.GetPixelSize (out w, out h);
+			return new Size ((double)w, (double)h);
 		}
 
 		public override void AddAttribute (object backend, TextAttribute attribute)
 		{
-			throw new NotImplementedException ();
+			var tl = (PangoBackend) backend;
+			tl.Attributes.AddAttribute (tl.TextIndexer, attribute);
 		}
 
 		public override void ClearAttributes (object backend)
 		{
-			throw new NotImplementedException ();
+			var tl = (PangoBackend) backend;
+			tl.ClearAttributes ();
 		}
 
-		#endregion
+		public override int GetIndexFromCoordinates (object backend, double x, double y)
+		{
+			var tl = (PangoBackend) backend;
+			int index, trailing;
+			tl.Layout.XyToIndex ((int)x, (int)y, out index, out trailing);
+			return tl.TextIndexer.ByteIndexToIndex (index);
+		}
+
+		public override Point GetCoordinateFromIndex (object backend, int index)
+		{
+			var tl = (PangoBackend) backend;
+			var pos = tl.Layout.IndexToPos (tl.TextIndexer.IndexToByteIndex (index));
+			return new Point (pos.X / Pango.Scale.PangoScale, pos.Y / Pango.Scale.PangoScale);
+		}
+
+		public override void Dispose (object backend)
+		{
+			var tl = (IDisposable) backend;
+			tl.Dispose ();
+		}
 	}
 }
 

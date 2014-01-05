@@ -55,30 +55,15 @@ namespace Xwt.CairoBackend
 			grad.AddColorStop(offset, ToCairoColor(col));
 		}
 
-		internal static void SelectFont(this Cairo.Context c, InternalFontDescription f)
+		public static void SelectFont (this Cairo.Context ctx, Font font)
 		{
 			Cairo.FontSlant slant;
-			switch (f.Style) {
+			switch (font.Style) {
 				case FontStyle.Oblique: slant = Cairo.FontSlant.Oblique; break;
 				case FontStyle.Italic: slant = Cairo.FontSlant.Italic; break;
 				default: slant = Cairo.FontSlant.Normal; break;
 			}
 
-			Cairo.FontWeight w = f.Weight >= FontWeight.Bold ? Cairo.FontWeight.Bold : Cairo.FontWeight.Normal;
-
-			c.SelectFontFace (f.Family, slant, w);
-			c.SetFontSize (f.Scale);
-		}
-		
-		public static void SelectFont (this Cairo.Context ctx, Font font)
-		{
-			Cairo.FontSlant slant;
-			switch (font.Style) {
-			case FontStyle.Oblique: slant = Cairo.FontSlant.Oblique; break;
-			case FontStyle.Italic: slant = Cairo.FontSlant.Italic; break;
-			default: slant = Cairo.FontSlant.Normal; break;
-			}
-			
 			Cairo.FontWeight w = font.Weight >= FontWeight.Bold ? Cairo.FontWeight.Bold : Cairo.FontWeight.Normal;
 
 			ctx.SelectFontFace (font.Family, slant, w);

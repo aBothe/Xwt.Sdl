@@ -447,7 +447,6 @@ namespace Xwt.Sdl
 		{
 			using (var surf = new Cairo.ImageSurface (Cairo.Format.A1, 0, 0))
 			using (var c = new Cairo.Context (surf)) {
-				c.SelectFont (FontBackend);
 				return GetPreferredSize (c, 
 					widthConstraint.IsConstrained ? widthConstraint.AvailableSize : double.MaxValue, 
 					heightConstraint.IsConstrained ? heightConstraint.AvailableSize : double.MaxValue);
@@ -543,14 +542,14 @@ namespace Xwt.Sdl
 			}
 		}
 
-		internal InternalFontDescription FontBackend {get{return customFont ?? CairoFontBackendHandler.SystemDefaultFont;}}
-		InternalFontDescription customFont;
+		internal Pango.FontDescription FontBackend {get{return customFont ?? CairoFontBackendHandler.SystemDefaultFont;}}
+		Pango.FontDescription customFont;
 		public virtual object Font {
 			get {
 				return FontBackend;
 			}
 			set {
-				customFont = value as InternalFontDescription;
+				customFont = value as Pango.FontDescription;
 				Invalidate ();
 			}
 		}

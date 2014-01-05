@@ -28,64 +28,41 @@ using Xwt.Backends;
 using Xwt.Drawing;
 using Cairo;
 using System.Collections.Generic;
+using Pango;
+using System.Globalization;
 
 namespace Xwt.CairoBackend
 {
-	class InternalFontDescription
-	{
-		public string Family;
-		public Xwt.Drawing.FontWeight Weight;
-		public FontSlant Slant;
-		public FontStyle Style;
-		public double Scale;
-		public FontStretch Stretch;
-
-		public InternalFontDescription Clone()
-		{
-			return new InternalFontDescription{ 
-				Family = Family, 
-				Scale = Scale, 
-				Style = Style,
-				Weight = Weight,
-				Stretch = Stretch,
-				Slant = Slant
-			};
-		}
-	}
-
 	public class CairoFontBackendHandler : FontBackendHandler
 	{
-		internal static InternalFontDescription ToFontDescription(System.Drawing.Font ft)
+		internal static FontDescription ToFontDescription(System.Drawing.Font ft)
 		{
-			var fd = new InternalFontDescription ();
+			var fd = new FontDescription ();
 
-			fd.Family = ft.FontFamily.Name;
-			fd.Scale = (double)ft.Size;
+			fd.Family = "sans";//ft.FontFamily.Name;
+			fd.AbsoluteSize = Pango.Scale.PangoScale * ft.Size;
 
 			if (ft.Bold) {
-				fd.Slant |= FontSlant.Oblique;
-				fd.Style |= FontStyle.Oblique;
+				fd.Style = fd.Style | Style.Oblique;
 			}
 
 			if (ft.Italic) {
-				fd.Slant |= FontSlant.Italic;
-				fd.Style |= FontStyle.Italic;
+				fd.Style = fd.Style | Style.Italic;
 			}
 
 			// TODO: Font weights?
-
+			Console.WriteLine (fd);
 			return fd;
 		}
 
-		#region implemented abstract members of FontBackendHandler
-		static InternalFontDescription sysFont;
-		internal static InternalFontDescription SystemDefaultFont
+		static FontDescription sysFont;
+		internal static FontDescription SystemDefaultFont
 		{
 			get{ 
 				if(sysFont != null)
 					return sysFont;
 
-				return ToFontDescription (System.Drawing.SystemFonts.CaptionFont);
+				return sysFont = ToFontDescription (System.Drawing.SystemFonts.CaptionFont);
 			}
 		}
 
@@ -102,80 +79,84 @@ namespace Xwt.CairoBackend
 
 		public override object Create (string fontName, double size, FontStyle style, Xwt.Drawing.FontWeight weight, FontStretch stretch)
 		{
-			return new InternalFontDescription{ Family = fontName, Scale = size, Style = style, Weight = weight, Stretch = stretch };
+			return FontDescription.FromString (fontName + ", " + style + " " + weight + " " + stretch + " " + size.ToString (CultureInfo.InvariantCulture));
 		}
-
+			
 		public override object Copy (object handle)
 		{
-			return copy(handle);
-		}
-
-		static InternalFontDescription copy (object handle)
-		{
-			return (handle as InternalFontDescription).Clone ();
+			FontDescription d = (FontDescription) handle;
+			return d.Copy ();
 		}
 
 		public override object SetSize (object handle, double size)
 		{
-			var f = copy (handle);
-			f.Scale = size;
-			return f;
+			FontDescription d = (FontDescription) handle;
+			d = d.Copy ();
+			d.Size = (int) (size * Pango.Scale.PangoScale);
+			return d;
 		}
 
 		public override object SetFamily (object handle, string family)
 		{
-			var f = copy (handle);
-			f.Family = family;
-			return f;
+			FontDescription fd = (FontDescription) handle;
+			fd = fd.Copy ();
+			fd.Family = family;
+			return fd;
 		}
 
 		public override object SetStyle (object handle, FontStyle style)
 		{
-			var f = copy (handle);
-			f.Style = style;
-			return f;
+			FontDescription fd = (FontDescription) handle;
+			fd = fd.Copy ();
+			fd.Style = (Pango.Style)(int)style;
+			return fd;
 		}
 
 		public override object SetWeight (object handle, Xwt.Drawing.FontWeight weight)
 		{
-			var f = copy (handle);
-			f.Weight = weight;
-			return f;
+			FontDescription fd = (FontDescription) handle;
+			fd = fd.Copy ();
+			fd.Weight = (Pango.Weight)(int)weight;
+			return fd;
 		}
 
 		public override object SetStretch (object handle, FontStretch stretch)
 		{
-			var f = copy (handle);
-			f.Stretch = stretch;
-			return f;
+			FontDescription fd = (FontDescription) handle;
+			fd = fd.Copy ();
+			fd.Stretch = (Pango.Stretch)(int)stretch;
+			return fd;
 		}
 
 		public override double GetSize (object handle)
 		{
-			return (handle as InternalFontDescription).Scale;
+			FontDescription fd = (FontDescription) handle;
+			return (double)fd.Size / (double) Pango.Scale.PangoScale;
 		}
 
 		public override string GetFamily (object handle)
 		{
-			return (handle as InternalFontDescription).Family;
+			FontDescription fd = (FontDescription) handle;
+			return fd.Family;
 		}
 
 		public override FontStyle GetStyle (object handle)
 		{
-			return (handle as InternalFontDescription).Style;
+			FontDescription fd = (FontDescription) handle;
+			return (FontStyle)(int)fd.Style;
 		}
 
 		public override Xwt.Drawing.FontWeight GetWeight (object handle)
 		{
-			return (handle as InternalFontDescription).Weight;
+			FontDescription fd = (FontDescription) handle;
+			return (Xwt.Drawing.FontWeight)(int)fd.Weight;
 		}
 
 		public override FontStretch GetStretch (object handle)
 		{
-			return (handle as InternalFontDescription).Stretch;
+			FontDescription fd = (FontDescription) handle;
+			return (FontStretch)(int)fd.Stretch;
 		}
-
-		#endregion
 	}
 }
 
