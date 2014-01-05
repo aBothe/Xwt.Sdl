@@ -51,7 +51,7 @@ namespace Xwt.CairoBackend
 			}
 
 			// TODO: Font weights?
-			Console.WriteLine (fd);
+
 			return fd;
 		}
 
