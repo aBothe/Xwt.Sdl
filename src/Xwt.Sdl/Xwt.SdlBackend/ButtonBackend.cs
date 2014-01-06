@@ -181,8 +181,10 @@ namespace Xwt.Sdl
 				else
 					movX = xPadding + imageWidth;
 
-				c.Context.MoveTo (X+movX,	Y + Height / 2.0d + labelSize.Height / 2.5d);
-				(label.GetBackend() as LabelBackend).Draw (c, dirtyRect);
+				var labelBack = label.GetBackend () as LabelBackend;
+
+				labelBack.SetRelativePosition (movX, Height / 2d - labelSize.Height / 2d, false);
+				labelBack.Draw (c, dirtyRect);
 			}
 		}
 
@@ -279,8 +281,12 @@ namespace Xwt.Sdl
 				}
 			} else if (label != null)
 				label.Text = text;
-			else
+			else {
 				label = new Label (text);
+				var back = label.GetBackend () as LabelBackend;
+				back.Parent = this;
+				back.havePadding = false;
+			}
 
 			this.mnemonic = useMnemonic;
 			this.image = image;

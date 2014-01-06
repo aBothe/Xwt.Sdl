@@ -320,6 +320,15 @@ namespace Xwt.Sdl
 			OnWidgetResized ();
 		}
 
+		internal virtual void SetRelativePosition(double x, double y, bool invalidate = true)
+		{
+			this.x = x;
+			this.y = y;
+
+			if(invalidate)
+				OnWidgetResized ();
+		}
+
 		public virtual IEnumerable<WidgetBackend> Children {get{ return null; }}
 
 		public virtual WidgetBackend GetChildAt(double x, double y)

@@ -34,6 +34,7 @@ namespace Xwt.Sdl
 	public class LabelBackend : WidgetBackend,ILabelBackend
 	{
 		#region Properties
+		public bool havePadding = true;
 
 		string text;
 		public string Text {
@@ -46,7 +47,7 @@ namespace Xwt.Sdl
 			}
 		}
 
-		Xwt.Drawing.Color textCol;
+		Xwt.Drawing.Color textCol = Xwt.Drawing.Colors.Black;
 		public Xwt.Drawing.Color TextColor {
 			get {
 				return textCol;
@@ -152,11 +153,21 @@ namespace Xwt.Sdl
 		public override void Draw (CairoContextBackend c, Rectangle dirtyRect)
 		{
 			base.Draw (c, dirtyRect);
+			var st = WidgetStyles.Instance;
+
+			double X, Y;
+			GetAbsoluteLocation (out X, out Y);
 
 			using (var lay = CreateLayout(c.Context)) {
-				int w, h;
-				lay.GetPixelSize (out w, out h);
-				c.Context.RelMoveTo (0, -h);
+				c.Context.SetColor (TextColor);
+				//lay.Width = (int)((Width+1) * Pango.Scale.PangoScale);
+				//int w, h;	lay.GetPixelSize (out w, out h);
+				if (havePadding) {
+					X += st.LabelXPadding;
+					Y += st.LabelYPadding;
+				}
+				c.Context.MoveTo (X, Y);
+
 				CairoHelper.ShowLayout (c.Context, lay);
 			}
 		}
@@ -167,7 +178,9 @@ namespace Xwt.Sdl
 			using(var lay = CreateLayout(fontExtentContext)){
 				int w, h;
 				lay.GetPixelSize (out w, out h);
-				return new Size (Math.Min(maxWidth, w+st.LabelXPadding), Math.Min(maxHeight, h+st.LabelYPadding));
+				return new Size (
+					Math.Min(maxWidth, w+(havePadding ? st.LabelXPadding*2 : 0)), 
+					Math.Min(maxHeight, h+(havePadding ? st.LabelYPadding*2 : 0)));
 			}
 		}
 			

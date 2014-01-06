@@ -58,7 +58,6 @@ namespace Xwt.Sdl.Tests
 		protected override void OnDraw (Context ctx, Rectangle dirtyRect)
 		{
 			var b = Bounds;
-			ctx.MoveTo (b.X, b.Y);
 			ctx.SetColor (Colors.Black);
 
 			using (var tl = new TextLayout (this)) {
