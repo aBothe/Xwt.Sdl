@@ -254,6 +254,8 @@ namespace Xwt.Sdl
 		public override object Font {
 			set {
 				base.Font = value;
+				if (label != null)
+					label.Font = Frontend.Font;
 				UpdateWidgetPreferredSize ();
 			}
 		}
@@ -286,6 +288,7 @@ namespace Xwt.Sdl
 				var back = label.GetBackend () as LabelBackend;
 				back.Parent = this;
 				back.havePadding = false;
+				back.Font = Font;
 			}
 
 			this.mnemonic = useMnemonic;

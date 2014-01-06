@@ -105,6 +105,7 @@ namespace Xwt.Sdl.Tests
 			var labelT = new Label ("Hi derppp") { BackgroundColor = Colors.Red };
 
 			var butt = new Button();
+			butt.Font = butt.Font.WithWeight (FontWeight.Bold);
 			butt.Label = "Button Test Caption";
 			butt.Cursor = CursorType.Hand;
 			butt.Image = Image.FromFile ("./ts.png");
