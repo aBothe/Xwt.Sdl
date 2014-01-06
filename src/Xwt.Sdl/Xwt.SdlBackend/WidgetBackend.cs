@@ -78,7 +78,7 @@ namespace Xwt.Sdl
 		bool sensitive = true;
 
 		double minWidth, minHeight;
-		double x,y, width, height;
+		protected double x,y, width, height;
 		protected SizeConstraint currentWidthConstraint, currentHeightConstraint;
 
 		public Rectangle Bounds
@@ -462,7 +462,7 @@ namespace Xwt.Sdl
 			}
 		}
 
-		protected virtual Size GetPreferredSize(Cairo.Context fontExtentContext,double maxWidth, double maxHeight) { return Size.Zero; }
+		public virtual Size GetPreferredSize(Cairo.Context fontExtentContext,double maxWidth, double maxHeight) { return Size.Zero; }
 
 		public void DragStart (DragStartData data)
 		{

@@ -69,7 +69,7 @@ namespace Xwt.Sdl
 			}
 		}
 
-		EllipsizeMode ellipsize;
+		EllipsizeMode ellipsize = EllipsizeMode.End;
 		public EllipsizeMode Ellipsize {
 			get {
 				return ellipsize;
@@ -160,8 +160,9 @@ namespace Xwt.Sdl
 
 			using (var lay = CreateLayout(c.Context)) {
 				c.Context.SetColor (TextColor);
-				//lay.Width = (int)((Width+1) * Pango.Scale.PangoScale);
-				//int w, h;	lay.GetPixelSize (out w, out h);
+
+				lay.Width = (int)((Width - (havePadding ? st.LabelXPadding*2 : 0)) * Pango.Scale.PangoScale);
+
 				if (havePadding) {
 					X += st.LabelXPadding;
 					Y += st.LabelYPadding;
@@ -172,15 +173,15 @@ namespace Xwt.Sdl
 			}
 		}
 
-		protected override Size GetPreferredSize (Cairo.Context fontExtentContext, double maxWidth, double maxHeight)
+		public override Size GetPreferredSize (Cairo.Context fontExtentContext, double maxWidth, double maxHeight)
 		{
 			var st = WidgetStyles.Instance;
 			using(var lay = CreateLayout(fontExtentContext)){
 				int w, h;
 				lay.GetPixelSize (out w, out h);
 				return new Size (
-					Math.Min(maxWidth, w+(havePadding ? st.LabelXPadding*2 : 0)), 
-					Math.Min(maxHeight, h+(havePadding ? st.LabelYPadding*2 : 0)));
+					width = Math.Min(maxWidth, w+(havePadding ? st.LabelXPadding*2 : 0)), 
+					height = Math.Min(maxHeight, h+(havePadding ? st.LabelYPadding*2 : 0)));
 			}
 		}
 			

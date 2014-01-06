@@ -39,10 +39,7 @@ namespace Xwt.Sdl
 		public Size LabelSize
 		{
 			get{
-				if (label == null)
-					return new Size ();
-
-				return (label.GetBackend () as LabelBackend).GetPreferredSize (SizeConstraint.Unconstrained, SizeConstraint.Unconstrained);
+				return label != null ? label.Size : new Size();
 			}
 		}
 
@@ -185,9 +182,9 @@ namespace Xwt.Sdl
 			}
 		}
 
-		protected override Size GetPreferredSize (Cairo.Context c, double maxX, double maxY)
+		public override Size GetPreferredSize (Cairo.Context c, double maxX, double maxY)
 		{
-			var ext = LabelSize;
+			var ext = label != null ? (label.GetBackend () as LabelBackend).GetPreferredSize(c,maxX, maxY) : new Size();
 			var imgSz = image.Size;
 			var x = ext.Width + imgSz.Width + cornerRadius/2;
 			if (label != null && imgSz.Width > 0)
