@@ -47,7 +47,7 @@ namespace Xwt.Sdl
 			}
 		}
 
-		Xwt.Drawing.Color textCol = Xwt.Drawing.Colors.Black;
+		internal Xwt.Drawing.Color textCol = Xwt.Drawing.Colors.Black;
 		public Xwt.Drawing.Color TextColor {
 			get {
 				return textCol;

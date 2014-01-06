@@ -166,11 +166,6 @@ namespace Xwt.Sdl
 
 			// Label
 			if (label != null) {
-				if (!Sensitive)
-					c.Context.SetColor(style.ButtonInsensitiveLabelColor);
-				else
-					c.Context.SetColor(style.ButtonLabelColor);
-
 				double movX;
 
 				if (imageWidth > 0)
@@ -182,6 +177,8 @@ namespace Xwt.Sdl
 					movX = xPadding + imageWidth;
 
 				var labelBack = label.GetBackend () as LabelBackend;
+
+				labelBack.textCol = Sensitive ? style.ButtonLabelColor : style.ButtonInsensitiveLabelColor;
 
 				labelBack.SetRelativePosition (movX, Height / 2d - labelSize.Height / 2d, false);
 				labelBack.Draw (c, dirtyRect);
