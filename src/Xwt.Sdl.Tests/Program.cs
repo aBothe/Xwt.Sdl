@@ -102,7 +102,17 @@ namespace Xwt.Sdl.Tests
 
 			mw.MainMenu = new Menu ();
 			var c = new MyCanvas ();
+			mw.Content = c;
+
+			var box = new VBox ();
+			box.WidthRequest = 130;
+			box.HeightRequest = 400;
+			box.BackgroundColor = Colors.GreenYellow;
+			c.AddChild (box);
+
 			var labelT = new Label ("Hi derppp") { BackgroundColor = Colors.Red };
+
+			box.PackStart (labelT);
 
 			var butt = new Button();
 			butt.Font = butt.Font.WithWeight (FontWeight.Bold);
@@ -110,15 +120,14 @@ namespace Xwt.Sdl.Tests
 			butt.Cursor = CursorType.Hand;
 			butt.Image = Image.FromFile ("./ts.png");
 			butt.Clicked+=(sender, e) => {(sender as Button).WidthRequest=200; labelT.Text = "##############";};
-			mw.Content = c;
 
-			c.AddChild (butt, 30, 120);
+			box.PackEnd (butt);
 
 			butt = new Button ();
 			butt.Label = "Hey ho";
-			c.AddChild (butt, 10, 90);
 			butt.ExpandHorizontal = true;
-			c.AddChild (labelT,100,50);
+
+			box.PackEnd (butt);
 
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";
@@ -127,7 +136,8 @@ namespace Xwt.Sdl.Tests
 			mw.CloseRequested+=
 				(sender, a) => Application.Exit();
 			mw.Show();
-
+			box.Surface.Reallocate ();
+			Console.WriteLine (c.GetChildBounds(box));
 			/*
 			var mw2 = new Window ();
 			bool bb=true;

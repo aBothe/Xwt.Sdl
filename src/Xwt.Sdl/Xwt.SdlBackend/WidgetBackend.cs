@@ -456,9 +456,16 @@ namespace Xwt.Sdl
 		{
 			using (var surf = new Cairo.ImageSurface (Cairo.Format.A1, 0, 0))
 			using (var c = new Cairo.Context (surf)) {
-				return GetPreferredSize (c, 
+				var sz = GetPreferredSize (c, 
 					widthConstraint.IsConstrained ? widthConstraint.AvailableSize : double.MaxValue, 
 					heightConstraint.IsConstrained ? heightConstraint.AvailableSize : double.MaxValue);
+
+				if (frontend.ExpandHorizontal)
+					sz.Width = Parent.Width;
+				if(frontend.ExpandVertical)
+					sz.Width = Parent.Height;
+
+				return sz;
 			}
 		}
 
@@ -502,12 +509,15 @@ namespace Xwt.Sdl
 		protected virtual void SensitivityChanged() {}
 		public bool Sensitive {
 			get {
-				return sensitive;
+				WindowBackend w;
+				return sensitive && (w = ParentWindow) != null && w.Sensitive;
 			}
 			set {
-				sensitive = value;
-				SensitivityChanged();
-				Invalidate ();
+				if (sensitive != value) {
+					sensitive = value;
+					SensitivityChanged();
+					Invalidate ();
+				}
 			}
 		}
 

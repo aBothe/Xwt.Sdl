@@ -34,6 +34,7 @@ namespace Xwt.Sdl
 	public class LabelBackend : WidgetBackend,ILabelBackend
 	{
 		#region Properties
+		protected new ILabelEventSink EventSink {get{ return base.EventSink as ILabelEventSink; }}
 		public bool havePadding = true;
 
 		string text;

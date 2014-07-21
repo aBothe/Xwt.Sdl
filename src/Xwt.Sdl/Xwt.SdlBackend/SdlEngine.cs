@@ -50,7 +50,7 @@ namespace Xwt.Sdl
 			RegisterBackend<ICustomWidgetBackend, CustomWidgetBackend> ();
 			RegisterBackend<IWindowBackend, WindowBackend> ();
 			RegisterBackend<ILabelBackend, LabelBackend> ();
-			//RegisterBackend<IBoxBackend, BoxBackend> ();
+			RegisterBackend<IBoxBackend, BoxBackend> ();
 			RegisterBackend<IButtonBackend, ButtonBackend> ();
 			/*RegisterBackend<INotebookBackend, NotebookBackend> ();
 			RegisterBackend<ITreeViewBackend, TreeViewBackend> ();
@@ -192,7 +192,7 @@ namespace Xwt.Sdl
 
 		public override bool HandlesSizeNegotiation {
 			get {
-				return base.HandlesSizeNegotiation;
+				return false;
 			}
 		}
 
@@ -214,15 +214,10 @@ namespace Xwt.Sdl
 
 		public override bool HasNativeParent (Widget w)
 		{
-			return true;
+			return false;
 		}
 
 		#region Drawing
-		public override object GetBackendForContext (object nativeContext)
-		{
-			return base.GetBackendForContext (nativeContext);
-		}
-
 		public override object GetBackendForImage (object nativeImage)
 		{
 			return base.GetBackendForImage (nativeImage);

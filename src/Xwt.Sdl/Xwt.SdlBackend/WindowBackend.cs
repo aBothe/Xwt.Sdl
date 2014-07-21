@@ -65,6 +65,7 @@ namespace Xwt.Sdl
 		internal static WindowBackend WindowHoveredByMouse;
 		bool focused;
 		public bool HasFocus {get{return focused;}}
+		bool sensitive = true;
 		#endregion
 
 		#region Extension
@@ -116,7 +117,7 @@ namespace Xwt.Sdl
 
 		void HandleMouseButtonEvent(SDL.SDL_MouseButtonEvent ev)
 		{
-			if (focusedWidget == null)
+			if (focusedWidget == null || !Sensitive)
 				return;
 
 			bool isButtonDownEvt = ev.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN;
@@ -147,6 +148,8 @@ namespace Xwt.Sdl
 
 		void HandleKeyEvent(SDL.SDL_KeyboardEvent ev)
 		{
+			if (!Sensitive)
+				return;
 			Key k;
 			ModifierKeys mods;
 
@@ -186,7 +189,7 @@ namespace Xwt.Sdl
 					HandleMouseButtonEvent (ev.button);
 					return;
 				case SDL.SDL_EventType.SDL_MOUSEMOTION:
-					if (!focused)
+					if (!focused || !Sensitive)
 						return;
 
 					int x = ev.motion.x, y = ev.motion.y;
@@ -214,7 +217,7 @@ namespace Xwt.Sdl
 						w = w.Parent;
 					return;
 				case SDL.SDL_EventType.SDL_MOUSEWHEEL:
-					if(hoveredWidget!=null)
+					if(hoveredWidget!=null && Sensitive)
 					{
 						ScrollDirection dir;
 						if(ev.wheel.y > 0)
@@ -576,6 +579,15 @@ namespace Xwt.Sdl
 		public object Screen {
 			get {
 				throw new NotImplementedException ();
+			}
+		}
+
+		public bool Sensitive
+		{
+			get{ return sensitive; }
+			set{ 
+				sensitive = value;
+				this.Invalidate ();
 			}
 		}
 
