@@ -180,7 +180,7 @@ namespace Xwt.Sdl
 
 		public override object GetNativeWidget (Widget w)
 		{
-			throw new NotImplementedException ();
+			return w.GetBackend ();
 		}
 
 

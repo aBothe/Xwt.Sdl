@@ -41,20 +41,6 @@ namespace Xwt.Sdl
 			}
 		}
 
-		public override Size GetPreferredSize (Cairo.Context fontExtentContext, double maxWidth, double maxHeight)
-		{
-			return new Size (400,500);
-
-			return base.GetPreferredSize (fontExtentContext, maxWidth, maxHeight);
-		}
-
-		internal override void OnWidgetResized ()
-		{
-			//Frontend.Surface.Reallocate ();
-
-			base.OnWidgetResized ();
-		}
-
 		#region IBoxBackend implementation
 
 		public void Add (IWidgetBackend widget)
@@ -63,15 +49,15 @@ namespace Xwt.Sdl
 			if (w == null)
 				throw new ArgumentNullException ("widget");
 			w.Parent = this;
-		
-			OnWidgetResized ();
 		}
 
 		public void Remove (IWidgetBackend widget)
 		{
 			var w = widget as WidgetBackend;
 			if (w != null) {
-				OnWidgetResized ();
+				w.Parent = null;
+				if(w.Visible)
+					Invalidate (w.Bounds, false);
 			}
 		}
 
@@ -90,8 +76,10 @@ namespace Xwt.Sdl
 		{
 			base.Draw (c, dirtyRect);
 
-			foreach (var w in widgets) {
-				w.Draw (c, dirtyRect);
+			foreach (var w in Children) {
+				var bds = w.AbsoluteBounds;
+				if(bds.IntersectsWith(dirtyRect))
+					w.Draw (c, bds.Intersect(dirtyRect));
 			}
 		}
 	}

@@ -74,7 +74,7 @@ namespace Xwt.Sdl
 		bool trackMouseMoved = false;
 
 		bool focused;
-		bool visible;
+		bool visible = true;
 		bool sensitive = true;
 
 		double minWidth, minHeight;
@@ -504,8 +504,8 @@ namespace Xwt.Sdl
 				return visible;
 			}
 			set {
-				visible = value;
-				Invalidate ();
+				if (visible != (value = visible))
+					Invalidate ();
 			}
 		}
 
