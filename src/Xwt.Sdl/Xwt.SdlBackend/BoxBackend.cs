@@ -32,11 +32,12 @@ namespace Xwt.Sdl
 {
 	public class BoxBackend : WidgetBackend,IBoxBackend
 	{
-		readonly List<WidgetBackend> widgets = new List<WidgetBackend>();
+		public Box BoxFrontend {get{ return Frontend as Box; }}
 
 		public override IEnumerable<WidgetBackend> Children {
 			get {
-				return widgets;
+				foreach (var w in BoxFrontend.Children)
+					yield return w.GetBackend () as WidgetBackend;
 			}
 		}
 
@@ -62,8 +63,7 @@ namespace Xwt.Sdl
 			if (w == null)
 				throw new ArgumentNullException ("widget");
 			w.Parent = this;
-			widgets.Add (w);
-
+		
 			OnWidgetResized ();
 		}
 
@@ -71,8 +71,6 @@ namespace Xwt.Sdl
 		{
 			var w = widget as WidgetBackend;
 			if (w != null) {
-				widgets.Remove (w);
-
 				OnWidgetResized ();
 			}
 		}

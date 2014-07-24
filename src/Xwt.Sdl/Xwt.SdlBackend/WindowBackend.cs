@@ -42,13 +42,14 @@ namespace Xwt.Sdl
 		public uint WindowId {get{return id;}}
 		public IWindowFrameEventSink eventSink;
 
-		double menuHeight=0;
 		int oldWidth;
 		int oldHeight;
 		int Width;
 		int Height;
+		// http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
 		/// <summary>
-		/// http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
+		/// A region that is marked to be redrawn on the next application event cycle.
+		/// Must always contain absolute window coordinates reaching from x|y>=0 to heidght|width &lt;= Window's height|width.
 		/// </summary>
 		Rectangle invalidatedRegion;
 		bool redraw;
@@ -56,6 +57,7 @@ namespace Xwt.Sdl
 		Rectangle padding;
 		WidgetBackend child;
 		MenuBackend menu;
+		internal double menuHeight {get{ return menu == null ? 0.0 : menu.Height; }}
 
 		/// <summary>
 		/// Focused widget to which keyboard & mouse events are redirected.
@@ -194,7 +196,7 @@ namespace Xwt.Sdl
 
 					int x = ev.motion.x, y = ev.motion.y;
 
-					if (menu != null && y <= menu.Height) {
+					if (menu != null && y <= menuHeight) {
 						if (hoveredWidget != null) {
 							hoveredWidget.FireMouseLeave ();
 							hoveredWidget = null;
@@ -308,25 +310,21 @@ namespace Xwt.Sdl
 
 		public void Invalidate(Rectangle region)
 		{
-			if (redraw) {
-				if (region.X < invalidatedRegion.X) {
-					invalidatedRegion.Width += invalidatedRegion.X - region.X;
-					invalidatedRegion.X = region.X;
-				}
-				if (region.Y < invalidatedRegion.Y) {
-					invalidatedRegion.Height += invalidatedRegion.Y - region.Y;
-					invalidatedRegion.Y = region.Y;
-				}
-
-				if (region.Right > invalidatedRegion.Right)
-					invalidatedRegion.Width += region.Right - invalidatedRegion.Right;
-				if (region.Bottom > invalidatedRegion.Bottom)
-					invalidatedRegion.Height += region.Bottom - invalidatedRegion.Bottom;
-			}
-			else
-				invalidatedRegion = region;
+			invalidatedRegion = redraw ? invalidatedRegion.Union (region) : region;
 			redraw = true;
+
+			if (invalidatedRegion.Left < 0)
+				invalidatedRegion.Left = 0.0;
+			if (invalidatedRegion.Top < 0)
+				invalidatedRegion.Top = 0.0;
+
+			if (invalidatedRegion.Right > Width)
+				invalidatedRegion.Right = Width;
+			if (invalidatedRegion.Bottom > Height)
+				invalidatedRegion.Bottom = Height;
 		}
+
+
 
 		System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 		internal bool Draw()
@@ -341,7 +339,8 @@ namespace Xwt.Sdl
 			using (var drawingContext = new Cairo.Context (drawingSurface)) {
 				var ctxt = new CairoBackend.CairoContextBackend (1, drawingContext, drawingSurface);
 
-				if (clearBackground || invalidatedRegion.X <= padding.X || invalidatedRegion.Y <= padding.Y) {
+				var childRect = child != null ? child.AbsoluteBounds : new Rectangle();
+				if (clearBackground || child == null ||	invalidatedRegion.Contains(childRect)) {
 					drawingContext.SetSourceRGB (1, 1, 1);
 					drawingContext.Paint ();
 					clearBackground = false;
@@ -351,7 +350,7 @@ namespace Xwt.Sdl
 					menu.Draw (ctxt, Width);
 
 				if (child != null) {
-					child.Draw (ctxt, invalidatedRegion);
+					child.Draw (ctxt, childRect.Intersect(invalidatedRegion));
 				}
 				SDL.SDL_UpdateWindowSurface (window);
 			}
@@ -405,7 +404,6 @@ namespace Xwt.Sdl
 		public void SetMainMenu (IMenuBackend menu)
 		{
 			this.menu = menu as MenuBackend;
-			menuHeight = menu == null ? 0 : (int)this.menu.Height;
 			UpdateChildBounds ();
 			Invalidate ();
 		}
@@ -419,10 +417,7 @@ namespace Xwt.Sdl
 
 		public void GetMetrics (out Size minSize, out Size decorationSize)
 		{
-			minSize = new Size(padding.Right, padding.Bottom);
-
-			if(menu != null)
-				minSize.Height+=menu.Height;
+			minSize = new Size(padding.Right, padding.Bottom + menuHeight);
 
 			decorationSize = new Size ();
 		}

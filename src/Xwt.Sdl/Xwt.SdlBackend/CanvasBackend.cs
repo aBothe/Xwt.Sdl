@@ -33,12 +33,15 @@ namespace Xwt.Sdl
 {
 	public class CanvasBackend : WidgetBackend, ICanvasBackend
 	{
-		List<WidgetBackend> children = new List<WidgetBackend>();
+		public Canvas CanvasFrontend {get{ return Frontend as Canvas; }}
+
 		public override IEnumerable<WidgetBackend> Children {
 			get {
-				return children;
+				foreach (var w in CanvasFrontend.Children)
+					yield return w.GetBackend () as WidgetBackend;
 			}
 		}
+
 		public new ICanvasEventSink EventSink {get{return base.EventSink as ICanvasEventSink; }}
 
 		public override void Draw (CairoContextBackend c,Rectangle dirtyRect)
@@ -56,12 +59,16 @@ namespace Xwt.Sdl
 				Math.Max (0d, dirtyRect.Y - absY), 
 				Math.Min (Width, dirtyRect.Width),
 				Math.Min (Height, dirtyRect.Height)));
+
+			c.GlobalXOffset = 0;
+			c.GlobalYOffset = 0;
 			
 			// Draw child widgets
-			foreach (var ch in children)
-				if(!((dirtyRect.Left >= (absX+ch.X+ch.Width)) || (dirtyRect.Right <= (absX+ch.X)) ||
-					(dirtyRect.Top >= (absY+ch.Y+ch.Height)) || (dirtyRect.Bottom <= (absY+ch.Y))))
-					ch.Draw (c, dirtyRect);
+			foreach (var ch in Children){
+				var childRect = ch.AbsoluteBounds;
+				if(childRect.IntersectsWith(dirtyRect))
+					ch.Draw (c, childRect.Intersect(dirtyRect));
+			}
 		}
 
 		#region ICanvasBackend implementation
@@ -81,7 +88,7 @@ namespace Xwt.Sdl
 			var w = widget as WidgetBackend;
 			w.Parent = this;
 			w.OnBoundsChanged (bounds.X, bounds.Y, bounds.Width, bounds.Height);
-			children.Add (w);
+
 			Invalidate (bounds);
 		}
 
@@ -90,10 +97,9 @@ namespace Xwt.Sdl
 			(widget as WidgetBackend).OnBoundsChanged (bounds.X, bounds.Y, bounds.Width, bounds.Height);
 		}
 
-		public void RemoveChild (IWidgetBackend widget)
+		public void RemoveChild(IWidgetBackend w)
 		{
-			var w = widget as WidgetBackend;
-			children.Remove (w);
+			Invalidate ();
 		}
 
 		#endregion

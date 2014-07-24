@@ -86,6 +86,15 @@ namespace Xwt.Sdl
 			get{return new Rectangle (x, y, width, height);}
 		}
 
+		public Rectangle AbsoluteBounds
+		{
+			get{ 
+				double absX, absY;
+				GetAbsoluteLocation (out absX, out absY);
+				return new Rectangle (absX, absY, width, height); 
+			}
+		}
+
 /// <summary>
 		/// Horizontal distance to the parent widget's left border.
 		/// </summary>
@@ -346,21 +355,20 @@ namespace Xwt.Sdl
 		/// </summary>
 		public void Invalidate()
 		{
-			double x, y;
-			GetAbsoluteLocation (out x, out y);
 			var pw = ParentWindow;
 			if(pw != null)
-				pw.Invalidate (new Rectangle(x, y, width, height));
+				pw.Invalidate (AbsoluteBounds);
 		}
 
-		public void Invalidate(Rectangle rect)
+		public void Invalidate(Rectangle rect, bool isAbsolute = false)
 		{
-			double x, y;
-			GetAbsoluteLocation (out x, out y);
+			double x=0, y=0;
+			if(!isAbsolute)
+				GetAbsoluteLocation (out x, out y);
 
 			var pw = ParentWindow;
 			if(pw != null)
-				pw.Invalidate (rect.Offset(x,y));
+				pw.Invalidate (isAbsolute ? rect : rect.Offset(x,y));
 		}
 
 		/// <summary>
@@ -368,18 +376,13 @@ namespace Xwt.Sdl
 		/// </summary>
 		/// <param name="c">Drawing context</param>
 		/// <param name="dirtyRect">The previously invalidated area that needs to be redrawn. 
-		/// Consists of absolute coordinates, i.e. (0,0) represents 
-		/// the upper left corner of the widget's window.</param>
-		public virtual void Draw(CairoContextBackend c,Rectangle dirtyRect)
+		/// Contains at least the upper left absolut widget coordinates.</param>
+		public virtual void Draw(CairoContextBackend c,Rectangle rect)
 		{
 			if (backgroundColor.HasValue) {
 				c.Context.SetColor (backgroundColor.Value);
 
-				double absX, absY;
-				GetAbsoluteLocation (out absX, out absY);
-
-				c.Context.Rectangle (Math.Max (absX, dirtyRect.X), Math.Max (absY, dirtyRect.Y), 
-					Math.Min (width, dirtyRect.Width), Math.Min (height, dirtyRect.Height));
+				c.Context.Rectangle (rect.X, rect.Y, rect.Width, rect.Height);
 				c.Context.Fill ();
 			}
 		}
