@@ -60,18 +60,21 @@ namespace Xwt.Sdl.Tests
 			var b = Bounds;
 			ctx.SetColor (Colors.Black);
 
+			/*
 			using (var tl = new TextLayout (this)) {
 				tl.Text = "hello";
 				ctx.DrawTextLayout (tl, b.X, b.Y);
-			}
+			}*/
 			ctx.SetLineWidth (4);
+			ctx.MoveTo (dirtyRect.Left, dirtyRect.Top);
 			ctx.LineTo (dirtyRect.Right, dirtyRect.Bottom);
-			ctx.MoveTo (0, 0);
-			ctx.LineTo (XX % Size.Width, b.Bottom);
+			ctx.Stroke ();
+			//ctx.MoveTo (0, 0);
+			//ctx.LineTo (dirtyRect.Right, dirtyRect.Bottom);
 			//ctx.RelLineTo (-120, -150);
 			//ctx.ClosePath ();
 			//ctx.Fill ();
-			ctx.Stroke ();
+			//ctx.Stroke ();
 
 			//ctx.NewPath ();
 			/*
@@ -92,34 +95,38 @@ namespace Xwt.Sdl.Tests
 	{
 		public static void Main (string[] args)
 		{
-			if (true)
+			if (false)
 				Application.Initialize ("Xwt.Sdl.SdlEngine, Xwt.Sdl");
 			else
 				Application.Initialize (ToolkitType.Gtk);
 
 			var mw = new Window();
+
+			var tabs = new Notebook ();//tabs.TabOrientation = NotebookTabOrientation.Left;
+			mw.Content = tabs;
 			//mw.Size = new Size (100, 150);
 
 			mw.MainMenu = new Menu ();
 			var c = new MyCanvas ();
-			mw.Content = c;
+			tabs.Add (c, "Tab 1 #######################");
 
 			var box = new VBox ();
-			box.WidthRequest = 130;
-			box.HeightRequest = 400;
-			box.BackgroundColor = Colors.GreenYellow;
+			box.WidthRequest = 150;
+			box.HeightRequest = 200;
+			//box.BackgroundColor = Colors.GreenYellow;
 			c.AddChild (box);
 
-			var labelT = new Label ("Hi derppp") { BackgroundColor = Colors.Red };
-
-			box.PackStart (labelT);
+			var labelT = new Label ("Hi derppp") { BackgroundColor = Colors.Red };	box.PackStart (labelT);
 
 			var butt = new Button();
 			butt.Font = butt.Font.WithWeight (FontWeight.Bold);
-			butt.Label = "Button Test Caption";
+			butt.Label = "B";
 			butt.Cursor = CursorType.Hand;
 			butt.Image = Image.FromFile ("./ts.png");
-			butt.Clicked+=(sender, e) => {(sender as Button).WidthRequest=200; labelT.Text = "##############";};
+			butt.Clicked+=(sender, e) => {
+				(sender as Button).WidthRequest=40; 
+				labelT.Text = "######################";
+			};
 
 			box.PackEnd (butt);
 
@@ -129,6 +136,10 @@ namespace Xwt.Sdl.Tests
 
 			box.PackEnd (butt);
 
+			butt = new Button ();
+			butt.Label = "Tab 2 Button";
+			tabs.Add (butt, "Tabz 2");
+
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";
 			c.MouseExited += (sender, e) =>  mw.Title = "------";
@@ -136,15 +147,9 @@ namespace Xwt.Sdl.Tests
 			mw.CloseRequested+=
 				(sender, a) => Application.Exit();
 			mw.Show();
-			box.Surface.Reallocate ();
-			Console.WriteLine (c.GetChildBounds(box));
-			/*
-			var mw2 = new Window ();
-			bool bb=true;
-			mw2.Size = new Size (500, 100);
-			mw2.Title = "Shallow";
-			mw2.Show ();
-			*/
+
+
+
 			Application.Run ();
 		}
 	}

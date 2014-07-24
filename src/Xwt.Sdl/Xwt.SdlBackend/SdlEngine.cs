@@ -52,8 +52,8 @@ namespace Xwt.Sdl
 			RegisterBackend<ILabelBackend, LabelBackend> ();
 			RegisterBackend<IBoxBackend, BoxBackend> ();
 			RegisterBackend<IButtonBackend, ButtonBackend> ();
-			/*RegisterBackend<INotebookBackend, NotebookBackend> ();
-			RegisterBackend<ITreeViewBackend, TreeViewBackend> ();
+			RegisterBackend<INotebookBackend, NotebookBackend> ();
+			/*RegisterBackend<ITreeViewBackend, TreeViewBackend> ();
 			RegisterBackend<ITreeStoreBackend, TreeStoreBackend> ();
 			RegisterBackend<IListViewBackend, ListViewBackend> ();
 			RegisterBackend<IListStoreBackend, ListStoreBackend> ();*/
