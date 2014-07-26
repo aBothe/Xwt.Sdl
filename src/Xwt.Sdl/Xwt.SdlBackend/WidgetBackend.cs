@@ -195,20 +195,23 @@ namespace Xwt.Sdl
 		internal virtual void FireLostFocus()
 		{
 			focused = false;
-			this.eventSink.OnLostFocus ();
+			if(eventSink != null)
+				this.eventSink.OnLostFocus ();
 			Invalidate ();
 		}
 
 		internal virtual void FireGainedFocus()
 		{
 			focused = true;
-			this.eventSink.OnGotFocus ();
+			if(eventSink != null)
+				this.eventSink.OnGotFocus ();
 			Invalidate ();
 		}
 
 		internal virtual void OnWidgetResized()
 		{
-			this.eventSink.OnBoundsChanged ();
+			if(eventSink != null)
+				this.eventSink.OnBoundsChanged ();
 			Invalidate ();
 		}
 
@@ -224,7 +227,8 @@ namespace Xwt.Sdl
 			MouseEntered = true;
 			if(cursorSet)
 				SetSysCursor (cursor);
-			eventSink.OnMouseEntered ();
+			if(eventSink != null)
+				eventSink.OnMouseEntered ();
 		}
 
 		static IntPtr oldCursor;
@@ -266,7 +270,7 @@ namespace Xwt.Sdl
 		internal virtual bool FireMouseMoved(uint timestamp, int x, int y)
 		{
 			MouseMovedEventArgs mouseMovedEA;
-			if (trackMouseMoved) {
+			if (trackMouseMoved && eventSink != null) {
 				eventSink.OnMouseMoved (mouseMovedEA = new MouseMovedEventArgs((long)timestamp, (double)x,(double)y));
 				return mouseMovedEA.Handled;
 			}
@@ -278,7 +282,8 @@ namespace Xwt.Sdl
 			MouseEntered = false;
 			if(cursorSet)
 				SetSysCursor (CursorType.Arrow);
-			this.eventSink.OnMouseExited ();
+			if (eventSink != null)
+				this.eventSink.OnMouseExited ();
 		}
 
 		readonly ButtonEventArgs buttonEA = new ButtonEventArgs();
@@ -290,10 +295,12 @@ namespace Xwt.Sdl
 			buttonEA.Button = butt;
 			buttonEA.MultiplePress = multiplePress;
 
-			if (down)
-				this.eventSink.OnButtonPressed (buttonEA);
-			else
-				this.eventSink.OnButtonReleased (buttonEA);
+			if (eventSink != null) {
+				if (down)
+					this.eventSink.OnButtonPressed (buttonEA);
+				else
+					this.eventSink.OnButtonReleased (buttonEA);
+			}
 
 			return buttonEA.Handled;
 		}
@@ -301,21 +308,24 @@ namespace Xwt.Sdl
 		internal virtual bool FireMouseWheel(uint timestamp, int x, int y, ScrollDirection dir)
 		{
 			var mouseScrolledEA = new MouseScrolledEventArgs ((long)timestamp, (double)x-this.x, (double)y-this.y, dir);
-			eventSink.OnMouseScrolled (mouseScrolledEA);
+			if (eventSink != null)
+				eventSink.OnMouseScrolled (mouseScrolledEA);
 			return mouseScrolledEA.Handled;
 		}
 
 		internal virtual bool FireKeyDown(Key k, char ch, ModifierKeys mods, bool rep, uint timestamp)
 		{
 			var ea = new KeyEventArgs(k, mods, rep, (long)timestamp);
-			this.eventSink.OnKeyPressed(ea);
+			if (eventSink != null)
+				this.eventSink.OnKeyPressed(ea);
 			return ea.Handled;
 		}
 
 		internal virtual bool FireKeyUp(Key k, char ch, ModifierKeys mods, bool rep, uint timestamp)
 		{
 			var ea = new KeyEventArgs(k, mods, rep, (long)timestamp);
-			this.eventSink.OnKeyPressed(ea);
+			if (eventSink != null)
+				this.eventSink.OnKeyPressed(ea);
 			return ea.Handled;
 		}
 
@@ -463,10 +473,12 @@ namespace Xwt.Sdl
 					widthConstraint.IsConstrained ? widthConstraint.AvailableSize : double.MaxValue, 
 					heightConstraint.IsConstrained ? heightConstraint.AvailableSize : double.MaxValue);
 
-				if (frontend.ExpandHorizontal)
-					sz.Width = Parent.Width;
-				if(frontend.ExpandVertical)
-					sz.Width = Parent.Height;
+				if (frontend != null) {
+					if (frontend.ExpandHorizontal)
+						sz.Width = Parent.Width;
+					if (frontend.ExpandVertical)
+						sz.Width = Parent.Height;
+				}
 
 				return sz;
 			}

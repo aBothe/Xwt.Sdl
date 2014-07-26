@@ -65,6 +65,13 @@ namespace Xwt.Sdl
 		public double LabelYPadding = 3;
 		public double LabelXPadding = 4;
 		#endregion
+
+		#region Notebook Styles
+		public Color NotebookBorderColor = new Color(0.6,0.6,0.6,1);
+		public Rectangle NotebookTabHeaderPadding = new Rectangle(3,2,3,2);
+		public double NotebookChildPadding = 3;
+		public double NotebookTabHeadDistance = 3;
+		#endregion
 	}
 }
 

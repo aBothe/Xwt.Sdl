@@ -95,17 +95,26 @@ namespace Xwt.Sdl.Tests
 	{
 		public static void Main (string[] args)
 		{
-			if (false)
+			if (true)
 				Application.Initialize ("Xwt.Sdl.SdlEngine, Xwt.Sdl");
 			else
 				Application.Initialize (ToolkitType.Gtk);
 
 			var mw = new Window();
 
+			Button butt;
+
 			var tabs = new Notebook ();//tabs.TabOrientation = NotebookTabOrientation.Left;
+			tabs.WidthRequest = 500;
+			tabs.HeightRequest = 300;
 			mw.Content = tabs;
+
+			butt = new Button ();
+			butt.Label = "Tab 2 Button";
+			tabs.Add (butt, "Tabz 2");
 			//mw.Size = new Size (100, 150);
 
+			/*
 			mw.MainMenu = new Menu ();
 			var c = new MyCanvas ();
 			tabs.Add (c, "Tab 1 #######################");
@@ -118,7 +127,7 @@ namespace Xwt.Sdl.Tests
 
 			var labelT = new Label ("Hi derppp") { BackgroundColor = Colors.Red };	box.PackStart (labelT);
 
-			var butt = new Button();
+			butt = new Button();
 			butt.Font = butt.Font.WithWeight (FontWeight.Bold);
 			butt.Label = "B";
 			butt.Cursor = CursorType.Hand;
@@ -136,13 +145,11 @@ namespace Xwt.Sdl.Tests
 
 			box.PackEnd (butt);
 
-			butt = new Button ();
-			butt.Label = "Tab 2 Button";
-			tabs.Add (butt, "Tabz 2");
+
 
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";
-			c.MouseExited += (sender, e) =>  mw.Title = "------";
+			c.MouseExited += (sender, e) =>  mw.Title = "------";*/
 			mw.Title = "SDL2 Test!";
 			mw.CloseRequested+=
 				(sender, a) => Application.Exit();
