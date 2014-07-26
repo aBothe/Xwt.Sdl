@@ -40,6 +40,7 @@ namespace Xwt.Sdl
 		public INotebookEventSink NotebookEventSink {get{ return EventSink as INotebookEventSink; }}
 
 		readonly List<TabHead> TabHeaders = new List<TabHead>();
+		public WidgetBackend CurrentChildWidget {get{ return Notebook.Tabs.Count == 0 || CurrentTab < 0 ? null : Notebook.Tabs [CurrentTab].Child.GetBackend() as WidgetBackend; } } 
 		#endregion
 
 		class TabHead : WidgetBackend
@@ -54,6 +55,7 @@ namespace Xwt.Sdl
 				Parent = noteBook;
 				var ll = (HeadLabel.GetBackend() as LabelBackend);
 				ll.Parent = this;
+				Text = tab.Label;
 			}
 
 			public string Text
@@ -139,6 +141,7 @@ namespace Xwt.Sdl
 						}
 					}
 
+					c.Context.LineWidth = 1;
 					c.Context.SetColor (ws.NotebookBorderColor);
 					c.Context.Stroke ();
 				}
@@ -165,6 +168,8 @@ namespace Xwt.Sdl
 
 		public void Add (IWidgetBackend widget, NotebookTab tab)
 		{
+			if (widget is WidgetBackend)
+				(widget as WidgetBackend).Parent = this;
 			TabHeaders.Add (new TabHead(this, tab));
 			RealignTabHeaders ();
 			Invalidate ();
@@ -183,7 +188,11 @@ namespace Xwt.Sdl
 
 		public void UpdateLabel (NotebookTab tab, string hint)
 		{
-			Invalidate ();
+			foreach (var th in TabHeaders)
+				if (th.Tab == tab) {
+					th.Text = tab.Label;
+					return;
+				}
 		}
 
 		public int CurrentTab {
@@ -218,10 +227,36 @@ namespace Xwt.Sdl
 
 		public void UpdateChildPlacement (IWidgetBackend childBackend)
 		{
+			if (childBackend is WidgetBackend)
+				(childBackend as WidgetBackend).Parent = this;
 			Invalidate ();
 		}
 
 		#endregion
+
+		public override IEnumerable<WidgetBackend> Children {
+			get {
+				foreach (var ch in Notebook.Tabs)
+					if(ch.Child != null)
+						yield return ch.Child.GetBackend() as WidgetBackend;
+
+				foreach (var tab in TabHeaders)
+					yield return tab;
+			}
+		}
+
+		public override WidgetBackend GetChildAt (double x, double y)
+		{
+			var w = CurrentChildWidget;
+			if (w != null && w.AbsoluteBounds.Contains (x, y))
+				return w;
+
+			foreach (var tab in TabHeaders)
+				if (tab.AbsoluteBounds.Contains (x, y))
+					return tab;
+
+			return null;
+		}
 
 		Rectangle CalculateChildArea()
 		{
@@ -229,7 +264,7 @@ namespace Xwt.Sdl
 			var ws = WidgetStyles.Instance;
 
 			foreach (var tab in this.TabHeaders) {
-				var sz = tab.Size;
+				var sz = tab.GetPreferredSize(SizeConstraint.Unconstrained, SizeConstraint.Unconstrained);
 				if (sz.Width > maxTabW)
 					maxTabW = sz.Width;
 				if (sz.Height > maxTabH)
@@ -240,7 +275,7 @@ namespace Xwt.Sdl
 
 			switch (TabOrientation) {
 				default:
-					y += maxTabH;
+					y += maxTabH - 1;
 					w = Width - ws.NotebookChildPadding - ws.NotebookChildPadding;
 					h = Height - maxTabH - ws.NotebookChildPadding - ws.NotebookChildPadding;
 					break;
@@ -249,7 +284,7 @@ namespace Xwt.Sdl
 					h = Height - maxTabH - ws.NotebookChildPadding - ws.NotebookChildPadding;
 					break;
 				case NotebookTabOrientation.Left:
-					x += maxTabW;
+					x += maxTabW - 1;
 					w = Width - ws.NotebookChildPadding - ws.NotebookChildPadding - maxTabW;
 					h = Height - ws.NotebookChildPadding - ws.NotebookChildPadding;
 					break;
@@ -269,7 +304,8 @@ namespace Xwt.Sdl
 			// Realign children
 			var chArea = CalculateChildArea();
 			foreach (var tab in Notebook.Tabs)
-				(tab.Child.GetBackend () as WidgetBackend).OnBoundsChanged (chArea.X, chArea.Y, chArea.Width, chArea.Height);
+				if(tab.Child != null)
+					(tab.Child.GetBackend () as WidgetBackend).OnBoundsChanged (chArea.X, chArea.Y, chArea.Width, chArea.Height);
 
 			RealignTabHeaders ();
 		}
@@ -302,11 +338,12 @@ namespace Xwt.Sdl
 					if (totalWidth > Width) {
 						double avg = Width / TabHeaders.Count;
 						foreach (var tab in TabHeaders) {
-							tab.OnBoundsChanged (x, y, avg - ws.NotebookTabHeadDistance, sizes[tab].Height);
+							tab.OnBoundsChanged (x, y, avg - ws.NotebookTabHeadDistance, sizes [tab].Height);
 							x += avg;
 						}
+						return;
 					}
-					return;
+					break;
 				case NotebookTabOrientation.Left:
 				case NotebookTabOrientation.Right:
 					x = TabOrientation == NotebookTabOrientation.Right ? (Width - maxTabW) : 0;
@@ -316,22 +353,23 @@ namespace Xwt.Sdl
 						double avg = Height / TabHeaders.Count;
 
 						foreach (var tab in TabHeaders) {
-							tab.OnBoundsChanged (x, y, sizes[tab].Width, avg - ws.NotebookTabHeadDistance);
+							tab.OnBoundsChanged (x, y, sizes [tab].Width, avg - ws.NotebookTabHeadDistance);
 							y += avg;
 						}
+						return;
 					}
-					return;
+					break;
 			}
 
 			bool vert = (TabOrientation & (NotebookTabOrientation.Left | NotebookTabOrientation.Right)) != 0;
 
 			foreach (var tab in TabHeaders) {
-				if (vert)
-					y += ws.NotebookTabHeadDistance;
-				else
-					x += ws.NotebookTabHeadDistance;
-
 				tab.OnBoundsChanged (x,y, sizes[tab].Width, sizes[tab].Height);
+
+				if (vert)
+					y += ws.NotebookTabHeadDistance + sizes[tab].Height;
+				else
+					x += ws.NotebookTabHeadDistance + sizes[tab].Width;
 			}
 		}
 
@@ -339,14 +377,11 @@ namespace Xwt.Sdl
 		{
 			base.Draw (c, dirtyRect);
 
-			WidgetBackend w;
-			var children = Notebook.Tabs;
-			if (children.Count == 0 || CurrentTab < 0)
+			var w = CurrentChildWidget;
+			if (w == null)
 				return;
 
 			// Optionally only draw the child item incrementally
-			w = children [currentTab].Child.GetBackend() as WidgetBackend;
-
 			var absBounds = w.AbsoluteBounds;
 			if (absBounds.Contains (dirtyRect)) {
 				// Presumes that no current-tab change has been done before -- this would invalidate the entire widget area
@@ -360,7 +395,7 @@ namespace Xwt.Sdl
 
 				c.Context.NewPath ();
 				c.Context.Rectangle (
-					w.X - ws.NotebookChildPadding, w.Y - ws.NotebookChildPadding, 
+					absBounds.X - ws.NotebookChildPadding, absBounds.Y - ws.NotebookChildPadding, 
 					w.Width + 2*ws.NotebookChildPadding, w.Height + 2*ws.NotebookChildPadding);
 
 				// Background
@@ -368,11 +403,9 @@ namespace Xwt.Sdl
 				c.Context.FillPreserve ();
 
 				// Border
-				c.Context.SetColor (ws.ButtonBorderColor);
+				c.Context.LineWidth = 1;
+				c.Context.SetColor (ws.NotebookBorderColor);
 				c.Context.Stroke ();
-
-				// Child
-				w.Draw (c, absBounds.Intersect (dirtyRect));
 			}
 
 			// Draw tabs
@@ -385,6 +418,9 @@ namespace Xwt.Sdl
 				// Current
 				TabHeaders[currentTab].Draw (c, TabHeaders[currentTab].AbsoluteBounds.Intersect (dirtyRect));
 			}
+
+			// Child
+			w.Draw (c, absBounds.Intersect (dirtyRect));
 		}
 	}
 }
