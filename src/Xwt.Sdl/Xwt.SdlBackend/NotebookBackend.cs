@@ -48,6 +48,10 @@ namespace Xwt.Sdl
 			readonly Label HeadLabel = new Label();
 			public NotebookBackend noteBook{get{return Parent as NotebookBackend;}}
 			public readonly NotebookTab Tab;
+			public bool IsCurrent
+			{
+				get{ return Tab == noteBook.Notebook.CurrentTab; }
+			}
 
 			public TabHead(NotebookBackend noteBook, NotebookTab tab)
 			{
@@ -78,12 +82,24 @@ namespace Xwt.Sdl
 				ext.Width += xPad;
 				ext.Height += yPad;
 
+				if (IsCurrent) {
+					switch (this.noteBook.TabOrientation) {
+						case NotebookTabOrientation.Top:
+						case NotebookTabOrientation.Bottom:
+							ext.Height += 2;
+							break;
+						default:
+							ext.Width += 2;
+							break;
+					}
+				}
+
 				return ext;
 			}
 
 			public override void Draw (CairoContextBackend c, Rectangle rect)
 			{
-				bool isCurrent = Tab == noteBook.Notebook.CurrentTab;
+				bool isCurrent = IsCurrent;
 				var ws = WidgetStyles.Instance;
 
 				double absX, absY;
@@ -93,15 +109,15 @@ namespace Xwt.Sdl
 				{
 					c.Context.NewPath ();
 
-					c.Context.MoveTo (absX, absY);
-					c.Context.RelLineTo (Width, 0);
-					c.Context.RelLineTo (0, Height);
-					c.Context.RelLineTo (-Width, 0);
-					c.Context.RelLineTo (0, -Height);
+					c.Context.Rectangle (absX, absY, Width, Height);
 
-					if (isCurrent)
+					if(!Sensitive)
+						c.Context.SetColor (new Color (ws.ButtonInsensitiveGrey,ws.ButtonInsensitiveGrey,ws.ButtonInsensitiveGrey));
+					else if (isCurrent)
 						c.Context.SetColor (new Color (ws.ButtonDefaultGrey,ws.ButtonDefaultGrey,ws.ButtonDefaultGrey));
-					else
+					else if(MouseEntered)
+						c.Context.SetColor (new Color (ws.ButtonHoveredGrey,ws.ButtonHoveredGrey,ws.ButtonHoveredGrey));
+					else	
 						c.Context.SetColor (new Color (ws.ButtonClickedGrey,ws.ButtonClickedGrey,ws.ButtonClickedGrey));
 
 					c.Context.Fill ();
@@ -110,35 +126,31 @@ namespace Xwt.Sdl
 				// Border
 				{
 					c.Context.NewPath ();
-					if (!isCurrent) {
-						c.Context.Rectangle (absX, absY, Width, Height);
-					} else {
-						switch (noteBook.TabOrientation) {
-							default: // omit bottom border
-								c.Context.MoveTo (absX, absY + Height);
-								c.Context.RelLineTo (0.0, -Height);
-								c.Context.RelLineTo (Width, 0);
-								c.Context.RelLineTo (0, Height);
-								break;
-							case NotebookTabOrientation.Bottom:
-								c.Context.MoveTo (absX, absY);
-								c.Context.RelLineTo (0.0, Height);
-								c.Context.RelLineTo (Width, 0);
-								c.Context.RelLineTo (0, -Height);
-								break;
-							case NotebookTabOrientation.Left:
-								c.Context.MoveTo (absX + Width, absY);
-								c.Context.RelLineTo (-Width, 0);
-								c.Context.RelLineTo (0, Height);
-								c.Context.RelLineTo (Width, 0);
-								break;
-							case NotebookTabOrientation.Right:
-								c.Context.MoveTo (absX, absY);
-								c.Context.RelLineTo (Width, 0);
-								c.Context.RelLineTo (0, Height);
-								c.Context.RelLineTo (-Width, 0);
-								break;
-						}
+					switch (noteBook.TabOrientation) {
+						default: // omit bottom border
+							c.Context.MoveTo (absX, absY + Height);
+							c.Context.RelLineTo (0.0, -Height);
+							c.Context.RelLineTo (Width, 0);
+							c.Context.RelLineTo (0, Height);
+							break;
+						case NotebookTabOrientation.Bottom:
+							c.Context.MoveTo (absX, absY);
+							c.Context.RelLineTo (0.0, Height);
+							c.Context.RelLineTo (Width, 0);
+							c.Context.RelLineTo (0, -Height);
+							break;
+						case NotebookTabOrientation.Left:
+							c.Context.MoveTo (absX + Width, absY);
+							c.Context.RelLineTo (-Width, 0);
+							c.Context.RelLineTo (0, Height);
+							c.Context.RelLineTo (Width, 0);
+							break;
+						case NotebookTabOrientation.Right:
+							c.Context.MoveTo (absX, absY);
+							c.Context.RelLineTo (Width, 0);
+							c.Context.RelLineTo (0, Height);
+							c.Context.RelLineTo (-Width, 0);
+							break;
 					}
 
 					c.Context.LineWidth = 1;
@@ -162,6 +174,29 @@ namespace Xwt.Sdl
 					ws.NotebookTabHeaderPadding.Left, ws.NotebookTabHeaderPadding.Top, 
 					Math.Max(0.0, width - ws.NotebookTabHeaderPadding.Right), Math.Max(0.0, height - ws.NotebookTabHeaderPadding.Bottom));
 			}
+
+			#region Events
+			internal override bool FireMouseButton (bool down, PointerButton butt, int x, int y, int multiplePress = 1)
+			{
+				if (down) {
+					noteBook.Notebook.CurrentTab = Tab;
+					return true;
+				}
+				return base.FireMouseButton (down, butt, x, y, multiplePress);
+			}
+
+			internal override void FireMouseEnter ()
+			{
+				base.FireMouseEnter ();
+				Invalidate ();
+			}
+
+			internal override void FireMouseLeave ()
+			{
+				base.FireMouseLeave ();
+				Invalidate ();
+			}
+			#endregion
 		}
 
 		#region INotebookBackend implementation
@@ -206,6 +241,7 @@ namespace Xwt.Sdl
 					value = 0;
 				if (currentTab != (currentTab = value)) {
 					NotebookEventSink.OnCurrentTabChanged ();
+					RealignTabHeaders ();
 					Invalidate ();
 				}
 			}
@@ -248,11 +284,11 @@ namespace Xwt.Sdl
 		public override WidgetBackend GetChildAt (double x, double y)
 		{
 			var w = CurrentChildWidget;
-			if (w != null && w.AbsoluteBounds.Contains (x, y))
+			if (w != null && w.Bounds.Contains (x, y))
 				return w;
 
 			foreach (var tab in TabHeaders)
-				if (tab.AbsoluteBounds.Contains (x, y))
+				if (tab.Bounds.Contains (x, y))
 					return tab;
 
 			return null;
@@ -338,7 +374,7 @@ namespace Xwt.Sdl
 					if (totalWidth > Width) {
 						double avg = Width / TabHeaders.Count;
 						foreach (var tab in TabHeaders) {
-							tab.OnBoundsChanged (x, y, avg - ws.NotebookTabHeadDistance, sizes [tab].Height);
+							tab.OnBoundsChanged (x, y + (TabOrientation == NotebookTabOrientation.Bottom && tab.Tab == Notebook.CurrentTab ? -2.0 : 0.0), avg - ws.NotebookTabHeadDistance, sizes [tab].Height);
 							x += avg;
 						}
 						return;
@@ -400,35 +436,41 @@ namespace Xwt.Sdl
 				return;
 			}
 
+			// Inactive tabs
+			for (int i = 0; i < TabHeaders.Count; i++) {
+				if (i != currentTab) {
+					var absB = TabHeaders [i].AbsoluteBounds;
+					TabHeaders [i].Draw (c, absB.Intersect (dirtyRect));
+					if (absB.Contains (dirtyRect))
+						return;
+				}
+			}
+
 			// Draw content area
 			{
 				var ws = WidgetStyles.Instance;
+				var contentRect = absBounds.Inflate (ws.NotebookChildPadding, ws.NotebookChildPadding);
 
 				c.Context.NewPath ();
-				c.Context.Rectangle (
-					absBounds.X - ws.NotebookChildPadding, absBounds.Y - ws.NotebookChildPadding, 
-					w.Width + 2*ws.NotebookChildPadding, w.Height + 2*ws.NotebookChildPadding);
 
-				// Background
-				c.Context.SetColor (new Color (ws.ButtonDefaultGrey,ws.ButtonDefaultGrey,ws.ButtonDefaultGrey));
-				c.Context.FillPreserve ();
+				c.Context.Rectangle (contentRect.X, contentRect.Y, contentRect.Width, contentRect.Height);
 
 				// Border
 				c.Context.LineWidth = 1;
 				c.Context.SetColor (ws.NotebookBorderColor);
 				c.Context.Stroke ();
+
+				contentRect = contentRect.Inflate (-1, -1).Intersect(dirtyRect);
+
+				c.Context.Rectangle (contentRect.X, contentRect.Y, contentRect.Width, contentRect.Height);
+
+				// Background
+				c.Context.SetColor (new Color (ws.ButtonDefaultGrey,ws.ButtonDefaultGrey,ws.ButtonDefaultGrey));
+				c.Context.Fill ();
 			}
 
-			// Draw tabs
-			{
-				// Inactive ones
-				for (int i=0; i < TabHeaders.Count; i++)
-					if(i != currentTab)
-						TabHeaders[i].Draw (c, TabHeaders[i].AbsoluteBounds.Intersect (dirtyRect));
-
-				// Current
-				TabHeaders[currentTab].Draw (c, TabHeaders[currentTab].AbsoluteBounds.Intersect (dirtyRect));
-			}
+			// Draw current tab
+			TabHeaders[currentTab].Draw (c, TabHeaders[currentTab].AbsoluteBounds.Intersect (dirtyRect));
 
 			// Child
 			w.Draw (c, absBounds.Intersect (dirtyRect));

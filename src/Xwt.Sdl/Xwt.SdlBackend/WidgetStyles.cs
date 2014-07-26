@@ -67,7 +67,7 @@ namespace Xwt.Sdl
 		#endregion
 
 		#region Notebook Styles
-		public Color NotebookBorderColor = new Color(0.6,0.6,0.6,1);
+		public Color NotebookBorderColor = new Color(0.3,0.3,0.3,1);
 		public Rectangle NotebookTabHeaderPadding = new Rectangle(3,2,3,2);
 		public double NotebookChildPadding = 3;
 		public double NotebookTabHeadDistance = 3;

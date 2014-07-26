@@ -350,6 +350,12 @@ namespace Xwt.Sdl
 
 		public virtual IEnumerable<WidgetBackend> Children {get{ return null; }}
 
+		/// <summary>
+		/// Important for redirecting window events to the topmost widget.
+		/// </summary>
+		/// <returns>The <see cref="Xwt.Sdl.WidgetBackend"/>.</returns>
+		/// <param name="x">The x coordinate, relative to the widget's x location.</param>
+		/// <param name="y">The y coordinate, relative to the widget's y location</param>
 		public virtual WidgetBackend GetChildAt(double x, double y)
 		{
 			var children = Children;
