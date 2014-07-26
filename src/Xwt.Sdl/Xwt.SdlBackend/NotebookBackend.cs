@@ -122,9 +122,9 @@ namespace Xwt.Sdl
 								break;
 							case NotebookTabOrientation.Bottom:
 								c.Context.MoveTo (absX, absY);
-								c.Context.RelLineTo (0.0, -Height);
+								c.Context.RelLineTo (0.0, Height);
 								c.Context.RelLineTo (Width, 0);
-								c.Context.RelLineTo (0, Height);
+								c.Context.RelLineTo (0, -Height);
 								break;
 							case NotebookTabOrientation.Left:
 								c.Context.MoveTo (absX + Width, absY);
@@ -353,7 +353,7 @@ namespace Xwt.Sdl
 						double avg = Height / TabHeaders.Count;
 
 						foreach (var tab in TabHeaders) {
-							tab.OnBoundsChanged (x, y, sizes [tab].Width, avg - ws.NotebookTabHeadDistance);
+							tab.OnBoundsChanged (x + (TabOrientation == NotebookTabOrientation.Left ? (maxTabW-sizes[tab].Width) : 0), y, sizes [tab].Width, avg - ws.NotebookTabHeadDistance);
 							y += avg;
 						}
 						return;
@@ -361,15 +361,26 @@ namespace Xwt.Sdl
 					break;
 			}
 
-			bool vert = (TabOrientation & (NotebookTabOrientation.Left | NotebookTabOrientation.Right)) != 0;
-
-			foreach (var tab in TabHeaders) {
-				tab.OnBoundsChanged (x,y, sizes[tab].Width, sizes[tab].Height);
-
-				if (vert)
-					y += ws.NotebookTabHeadDistance + sizes[tab].Height;
-				else
-					x += ws.NotebookTabHeadDistance + sizes[tab].Width;
+			switch (TabOrientation) {
+				case NotebookTabOrientation.Top:
+				case NotebookTabOrientation.Bottom:
+					foreach (var tab in TabHeaders) {
+						tab.OnBoundsChanged (x, y, sizes [tab].Width, sizes [tab].Height);
+						x += ws.NotebookTabHeadDistance + sizes [tab].Width;
+					}
+					break;
+				case NotebookTabOrientation.Left:
+					foreach (var tab in TabHeaders) {
+						tab.OnBoundsChanged (x + maxTabW-sizes[tab].Width, y, sizes [tab].Width, sizes [tab].Height);
+						y += ws.NotebookTabHeadDistance + sizes[tab].Height;
+					}
+					break;
+				case NotebookTabOrientation.Right:
+					foreach (var tab in TabHeaders) {
+						tab.OnBoundsChanged (x, y, sizes [tab].Width, sizes [tab].Height);
+						y += ws.NotebookTabHeadDistance + sizes[tab].Height;
+					}
+					break;
 			}
 		}
 
