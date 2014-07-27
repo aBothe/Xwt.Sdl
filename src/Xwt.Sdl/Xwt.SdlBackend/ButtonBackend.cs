@@ -133,22 +133,18 @@ namespace Xwt.Sdl
 				c.Context.Stroke ();
 			}
 
-			var labelSize = LabelSize;
-
-			double imageWidth;
-
 			// Image
 			if (!image.IsNull) {
 				var imgBck = image.Backend as System.Drawing.Bitmap;
 				var data = imgBck.LockBits (new System.Drawing.Rectangle (0, 0, imgBck.Width, imgBck.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 				var imgSurf = new Cairo.ImageSurface (data.Scan0, Cairo.Format.Argb32, data.Width, data.Height, data.Stride);
-				imageWidth = (double)imgSurf.Width;
+				var imageWidth = (double)imgSurf.Width;
 
 				var imgY = Y + Height / 2.0 - imgSurf.Height / 2;
 				if (label == null)
 					c.Context.SetSource (imgSurf, X + Width / 2 - imageWidth / 2, imgY);
 				else {
-					var contentWidth = labelSize.Width + imageToLabelSpace + imageWidth;
+					var contentWidth = (label != null ? (label.GetBackend() as LabelBackend).Width : 0) + imageToLabelSpace + imageWidth;
 					if (contentWidth < Width)
 						c.Context.SetSource (imgSurf, X + Width / 2 - contentWidth / 2, imgY);
 					else
@@ -158,26 +154,13 @@ namespace Xwt.Sdl
 
 				imgSurf.Dispose ();
 				imgBck.UnlockBits (data);
-			} else
-				imageWidth = 0;
+			}
 
 			// Label
 			if (label != null) {
-				double movX;
-
-				if (imageWidth > 0)
-					imageWidth += imageToLabelSpace;
-
-				if (labelSize.Width + imageWidth < Width)
-					movX = Width / 2.0 + (-labelSize.Width + imageWidth) / 2;
-				else
-					movX = xPadding + imageWidth;
-
 				var labelBack = label.GetBackend () as LabelBackend;
 
 				labelBack.textCol = Sensitive ? style.ButtonLabelColor : style.ButtonInsensitiveLabelColor;
-
-				labelBack.SetRelativePosition (movX, Height / 2d - labelSize.Height / 2d, false);
 				labelBack.Draw (c, dirtyRect);
 			}
 		}
@@ -191,6 +174,30 @@ namespace Xwt.Sdl
 				x += imageToLabelSpace;
 			var y = Math.Max(ext.Height, imgSz.Height);
 			return new Size (x + xPadding, y + yPadding + cornerRadius/2);
+		}
+
+		internal override void OnBoundsChanged (double x, double y, double width, double height)
+		{
+			base.OnBoundsChanged (x, y, width, height);
+
+			if (label != null) {
+				var ll = (label.GetBackend () as LabelBackend);
+				var imageWidth = image.IsNull ? 0.0 : (image.Size.Width + imageToLabelSpace);
+
+				var labelSize = ll.GetPreferredSize (
+					SizeConstraint.WithSize (width - imageWidth - 2 * cornerRadius), 
+					SizeConstraint.WithSize (height - 2* cornerRadius));
+
+				double movX;
+				if (labelSize.Width + imageWidth < Width)
+					movX = Width / 2.0 + (-labelSize.Width + imageWidth) / 2;
+				else
+					movX = xPadding + imageWidth;
+
+				ll.OnBoundsChanged(movX, Height / 2d - labelSize.Height / 2d, 
+					Math.Max(0.0, Math.Min(labelSize.Width, Width - imageWidth)),
+					Math.Max(0.0, Math.Min(labelSize.Height, Height - 2 * cornerRadius)));
+			}
 		}
 
 		internal override void FireMouseEnter ()

@@ -475,15 +475,15 @@ namespace Xwt.Sdl
 		{
 			using (var surf = new Cairo.ImageSurface (Cairo.Format.A1, 0, 0))
 			using (var c = new Cairo.Context (surf)) {
-				var sz = GetPreferredSize (c, 
-					widthConstraint.IsConstrained ? widthConstraint.AvailableSize : double.MaxValue, 
-					heightConstraint.IsConstrained ? heightConstraint.AvailableSize : double.MaxValue);
+				double	xmax = widthConstraint.IsConstrained ? widthConstraint.AvailableSize : double.MaxValue,
+						ymax = heightConstraint.IsConstrained ? heightConstraint.AvailableSize : double.MaxValue;
+				var sz = GetPreferredSize (c, xmax,ymax);
 
 				if (frontend != null) {
 					if (frontend.ExpandHorizontal)
-						sz.Width = Parent.Width;
+						sz.Width = Math.Min(xmax, Parent.Width);
 					if (frontend.ExpandVertical)
-						sz.Width = Parent.Height;
+						sz.Height = Math.Min(ymax, Parent.Height);
 				}
 
 				return sz;
