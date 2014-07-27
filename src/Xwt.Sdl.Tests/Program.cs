@@ -109,13 +109,15 @@ namespace Xwt.Sdl.Tests
 			tabs.HeightRequest = 300;
 			mw.Content = tabs;
 
+			tabs.Add (null, "Tab 3");
+
 			butt = new Button ();
 			butt.Label = "Tab 2 Button";
 			tabs.Add (butt, "Tabz 2");
 			//mw.Size = new Size (100, 150);
 
-			/*
-			mw.MainMenu = new Menu ();
+
+			//mw.MainMenu = new Menu ();
 			var c = new MyCanvas ();
 			tabs.Add (c, "Tab 1 #######################");
 
@@ -149,7 +151,9 @@ namespace Xwt.Sdl.Tests
 
 			c.MouseMoved += (sender, e) => mw.Title = string.Format("x={0}\ty={1}",e.X, e.Y);
 			//c.MouseEntered += (sender, e) => mw.Title = "Canvas";
-			c.MouseExited += (sender, e) =>  mw.Title = "------";*/
+			c.MouseExited += (sender, e) =>  mw.Title = "------";
+
+
 			mw.Title = "SDL2 Test!";
 			mw.CloseRequested+=
 				(sender, a) => Application.Exit();

@@ -179,10 +179,7 @@ namespace Xwt.Sdl
 					break;
 
 				case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
-					if (hoveredWidget == null || hoveredWidget.CanGetFocus) {
-						// TODO: Define 'focus' rules
-						FocusWidget (hoveredWidget);
-					}
+					FocusWidget (hoveredWidget);
 
 					HandleMouseButtonEvent (ev.button);
 					return;

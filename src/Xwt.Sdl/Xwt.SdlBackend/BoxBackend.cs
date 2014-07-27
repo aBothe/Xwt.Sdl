@@ -33,6 +33,7 @@ namespace Xwt.Sdl
 	public class BoxBackend : WidgetBackend,IBoxBackend
 	{
 		public Box BoxFrontend {get{ return Frontend as Box; }}
+		protected override bool WidgetSupportsFocusing { get { return false; } }
 
 		public override IEnumerable<WidgetBackend> Children {
 			get {

@@ -425,12 +425,10 @@ namespace Xwt.Sdl
 			base.Draw (c, dirtyRect);
 
 			var w = CurrentChildWidget;
-			if (w == null)
-				return;
 
 			// Optionally only draw the child item incrementally
-			var absBounds = w.AbsoluteBounds;
-			if (absBounds.Contains (dirtyRect)) {
+			var absBounds = w != null ? w.AbsoluteBounds : CalculateChildArea().Offset(AbsoluteLocation);
+			if (w != null && absBounds.Contains (dirtyRect)) {
 				// Presumes that no current-tab change has been done before -- this would invalidate the entire widget area
 				w.Draw (c, dirtyRect);
 				return;
@@ -473,7 +471,8 @@ namespace Xwt.Sdl
 			TabHeaders[currentTab].Draw (c, TabHeaders[currentTab].AbsoluteBounds.Intersect (dirtyRect));
 
 			// Child
-			w.Draw (c, absBounds.Intersect (dirtyRect));
+			if(w != null)
+				w.Draw (c, absBounds.Intersect (dirtyRect));
 		}
 	}
 }
