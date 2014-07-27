@@ -67,6 +67,7 @@
     <Compile Include="Xwt.SdlBackend\BoxBackend.cs" />
     <Compile Include="Xwt.SdlBackend\NotebookBackend.cs" />
     <Compile Include="Xwt.SdlBackend\ListViewBackend.cs" />
+    <Compile Include="Xwt.SdlBackend\ListBoxBackend.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
