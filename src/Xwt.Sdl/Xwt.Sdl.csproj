@@ -66,6 +66,7 @@
     <Compile Include="Xwt.CairoBackend\PangoInterop.cs" />
     <Compile Include="Xwt.SdlBackend\BoxBackend.cs" />
     <Compile Include="Xwt.SdlBackend\NotebookBackend.cs" />
+    <Compile Include="Xwt.SdlBackend\ListViewBackend.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

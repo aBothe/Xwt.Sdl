@@ -54,9 +54,9 @@ namespace Xwt.Sdl
 			RegisterBackend<IButtonBackend, ButtonBackend> ();
 			RegisterBackend<INotebookBackend, NotebookBackend> ();
 			/*RegisterBackend<ITreeViewBackend, TreeViewBackend> ();
-			RegisterBackend<ITreeStoreBackend, TreeStoreBackend> ();
+			RegisterBackend<ITreeStoreBackend, TreeStoreBackend> ();*/
 			RegisterBackend<IListViewBackend, ListViewBackend> ();
-			RegisterBackend<IListStoreBackend, ListStoreBackend> ();*/
+			//RegisterBackend<IListStoreBackend, ListStoreBackend> (); -- xwt brings a custom implementation
 			RegisterBackend<ICanvasBackend, CanvasBackend> ();
 			RegisterBackend<ImageBackendHandler, ImageHandler> ();
 			RegisterBackend<Xwt.Backends.ContextBackendHandler, CairoBackend.CairoContextBackendHandler> ();
