@@ -339,9 +339,14 @@ namespace Xwt.Sdl
 
 			// Realign children
 			var chArea = CalculateChildArea();
+			var widthConstraint = SizeConstraint.WithSize (chArea.Width);
+			var heightConstraint = SizeConstraint.WithSize (chArea.Height);
 			foreach (var tab in Notebook.Tabs)
-				if(tab.Child != null)
-					(tab.Child.GetBackend () as WidgetBackend).OnBoundsChanged (chArea.X, chArea.Y, chArea.Width, chArea.Height);
+				if (tab.Child != null) {
+					var w = tab.Child.GetBackend () as WidgetBackend;
+					var sz = w.GetPreferredSize (widthConstraint, heightConstraint);
+					w.OnBoundsChanged (chArea.X, chArea.Y, sz.Width, sz.Height);
+				}
 
 			RealignTabHeaders ();
 		}

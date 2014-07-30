@@ -457,7 +457,7 @@ namespace Xwt.Sdl
 			}
 
 			if(width != oldWidth || height != oldHeight)
-				OnWidgetResized ();
+				OnBoundsChanged (x,y, width, height);
 		}
 
 		public void SetFocus ()

@@ -15,20 +15,20 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG;STANDALONE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>STANDALONE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -68,10 +68,15 @@
     <Compile Include="Xwt.SdlBackend\NotebookBackend.cs" />
     <Compile Include="Xwt.SdlBackend\ListViewBackend.cs" />
     <Compile Include="Xwt.SdlBackend\ListBoxBackend.cs" />
+    <Compile Include="Xwt.SdlBackend\TextEditor\TextEntryBackend.cs" />
+    <Compile Include="Xwt.SdlBackend\TextEditor\TextEntryBuffer.cs" />
+    <Compile Include="Xwt.SdlBackend\TextEditor\ScrollViewBackend.cs" />
+    <Compile Include="Xwt.SdlBackend\ScrollBarBackend.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Xwt.SdlBackend\" />
+    <Folder Include="Xwt.SdlBackend\TextEditor\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\ext\SDL2#.dll.config">

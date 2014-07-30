@@ -109,7 +109,17 @@ namespace Xwt.Sdl.Tests
 			tabs.HeightRequest = 300;
 			mw.Content = tabs;
 
-			tabs.Add (null, "Tab 3");
+			var scroll = new VScrollbar ();
+			scroll.PageSize = 10;
+			scroll.LowerValue = 0;
+			scroll.UpperValue = 100;
+			//scroll.PageIncrement = 10;
+			//scroll.StepIncrement = 10;
+			scroll.Value = 30;
+			scroll.ValueChanged += (sender, e) => tabs.CurrentTab.Label = scroll.Value.ToString();
+
+			tabs.Add (scroll,"Scroll!");
+			//tabs.Add (new TextEntry { Text = "My Text\nNew line\nTHird line", MultiLine = true, ExpandVertical = true }, "Tab 3");
 
 			butt = new Button ();
 			butt.Label = "Tab 2 Button";

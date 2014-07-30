@@ -72,6 +72,22 @@ namespace Xwt.Sdl
 		public double NotebookChildPadding = 3;
 		public double NotebookTabHeadDistance = 3;
 		#endregion
+
+		#region Text Entry
+		public Color TextEntryBorderColor = new Color(0.6,0.6,0.6,1);
+		public Rectangle TextEntryPadding = new Rectangle(2,2,2,2);
+		public double TextEntryLineDistance = 1.0;
+		public Color TextEntrySelectionFore = Colors.White;
+		public Color TextEntrySelectionBack = Colors.LightSkyBlue;
+		#endregion
+
+		#region Scrollbar
+		public double ScrollbarWidth = 16;
+		public double ScrollbarPadding = 2;
+		public Color ScrollbarBackground = new Color(0.9,0.9,0.9);
+		public Color ScrollbarHoveredColor = new Color(0.7,0.7,0.7);
+		public Color ScrollbarColor = new Color(0.6,0.6,0.6);
+		#endregion
 	}
 }
 

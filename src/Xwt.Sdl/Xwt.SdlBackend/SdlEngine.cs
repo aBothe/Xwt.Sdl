@@ -68,13 +68,13 @@ namespace Xwt.Sdl
 			/*RegisterBackend<IMenuItemBackend, MenuItemBackend> ();
 			RegisterBackend<ICheckBoxMenuItemBackend, CheckBoxMenuItemBackend> ();
 			RegisterBackend<IRadioButtonMenuItemBackend, RadioButtonMenuItemBackend> ();
-			RegisterBackend<ISeparatorMenuItemBackend, SeparatorMenuItemBackend> ();
+			RegisterBackend<ISeparatorMenuItemBackend, SeparatorMenuItemBackend> ();*/
 			RegisterBackend<IScrollViewBackend, ScrollViewBackend> ();
-			RegisterBackend<IComboBoxBackend, ComboBoxBackend> ();
+			/*RegisterBackend<IComboBoxBackend, ComboBoxBackend> ();
 			RegisterBackend<IDesignerSurfaceBackend, DesignerSurfaceBackend> ();
-			RegisterBackend<IMenuButtonBackend, MenuButtonBackend> ();
+			RegisterBackend<IMenuButtonBackend, MenuButtonBackend> ();*/
 			RegisterBackend<ITextEntryBackend, TextEntryBackend> ();
-			RegisterBackend<IToggleButtonBackend, ToggleButtonBackend> ();
+			/*RegisterBackend<IToggleButtonBackend, ToggleButtonBackend> ();
 			RegisterBackend<IImageViewBackend, ImageViewBackend> ();
 			RegisterBackend<IAlertDialogBackend, AlertDialogBackend> ();
 			RegisterBackend<ICheckBoxBackend, CheckBoxBackend> ();
@@ -84,15 +84,15 @@ namespace Xwt.Sdl
 			RegisterBackend<IComboBoxEntryBackend, ComboBoxEntryBackend> ();
 			RegisterBackend<ClipboardBackend, GtkClipboardBackend> ();
 			RegisterBackend<ImagePatternBackendHandler, GtkImagePatternBackendHandler> ();
-			RegisterBackend<ImageBuilderBackendHandler, ImageBuilderBackend> ();
-			RegisterBackend<IScrollAdjustmentBackend, ScrollAdjustmentBackend> ();
-			RegisterBackend<IOpenFileDialogBackend, OpenFileDialogBackend> ();
+			RegisterBackend<ImageBuilderBackendHandler, ImageBuilderBackend> ();*/
+			//RegisterBackend<IScrollAdjustmentBackend, ScrollAdjustmentBackend> (); -- xwt delivers a default implementation already
+			/*RegisterBackend<IOpenFileDialogBackend, OpenFileDialogBackend> ();
 			RegisterBackend<ISaveFileDialogBackend, SaveFileDialogBackend> ();
 			RegisterBackend<ISelectFolderDialogBackend, SelectFolderDialogBackend> ();
 			RegisterBackend<IPanedBackend, PanedBackend> ();
-			RegisterBackend<ISelectColorDialogBackend, SelectColorDialogBackend> ();
+			RegisterBackend<ISelectColorDialogBackend, SelectColorDialogBackend> ();*/
 			RegisterBackend<IListBoxBackend, ListBoxBackend> ();
-			RegisterBackend<IStatusIconBackend, StatusIconBackend> ();
+			/*RegisterBackend<IStatusIconBackend, StatusIconBackend> ();
 			RegisterBackend<IProgressBarBackend, ProgressBarBackend> ();
 			RegisterBackend<IPopoverBackend, PopoverBackend> ();
 			RegisterBackend<ISpinButtonBackend, SpinButtonBackend> ();
@@ -105,9 +105,9 @@ namespace Xwt.Sdl
 			/*RegisterBackend<IEmbeddedWidgetBackend, EmbeddedWidgetBackend> ();
 			RegisterBackend<ISegmentedButtonBackend, SegmentedButtonBackend> ();
 			RegisterBackend<ISliderBackend, SliderBackend> ();
-			RegisterBackend<IRadioButtonBackend, RadioButtonBackend> ();
-			RegisterBackend<IScrollbarBackend, ScrollbarBackend> ();
-			RegisterBackend<IPasswordEntryBackend, PasswordEntryBackend> ();
+			RegisterBackend<IRadioButtonBackend, RadioButtonBackend> ();*/
+			RegisterBackend<IScrollbarBackend, ScrollBarBackend> ();
+			/*RegisterBackend<IPasswordEntryBackend, PasswordEntryBackend> ();
 			*/
 		}
 
