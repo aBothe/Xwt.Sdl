@@ -110,7 +110,7 @@ namespace Xwt.Sdl.Tests
 			mw.Content = tabs;
 
 			var scroll = new VScrollbar ();
-			scroll.PageSize = 10;
+			scroll.PageSize = 50;
 			scroll.LowerValue = 0;
 			scroll.UpperValue = 100;
 			//scroll.PageIncrement = 10;
@@ -122,6 +122,8 @@ namespace Xwt.Sdl.Tests
 			//tabs.Add (new TextEntry { Text = "My Text\nNew line\nTHird line", MultiLine = true, ExpandVertical = true }, "Tab 3");
 
 			butt = new Button ();
+			butt.ExpandHorizontal = true;
+			butt.ExpandVertical = true;
 			butt.Label = "Tab 2 Button";
 			tabs.Add (butt, "Tabz 2");
 			//mw.Size = new Size (100, 150);
@@ -129,6 +131,8 @@ namespace Xwt.Sdl.Tests
 
 			//mw.MainMenu = new Menu ();
 			var c = new MyCanvas ();
+			c.ExpandHorizontal = true;
+			c.ExpandVertical = true;
 			tabs.Add (c, "Tab 1 #######################");
 
 			var box = new VBox ();

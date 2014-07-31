@@ -68,6 +68,18 @@ namespace Xwt.Sdl
 		bool focused;
 		public bool HasFocus {get{return focused;}}
 		bool sensitive = true;
+
+		/// <summary>
+		/// Used for scrolling etc.
+		/// </summary>
+		IInWindowDrag CurrentDragOperation;
+		internal void StartInWindowDrag(IInWindowDrag d)
+		{
+			if (CurrentDragOperation != null) 
+				CurrentDragOperation.Finish ();
+
+			CurrentDragOperation = d;
+		}
 		#endregion
 
 		#region Extension
@@ -119,7 +131,7 @@ namespace Xwt.Sdl
 
 		void HandleMouseButtonEvent(SDL.SDL_MouseButtonEvent ev)
 		{
-			if (focusedWidget == null || !Sensitive)
+			if (!focused || !Sensitive)
 				return;
 
 			bool isButtonDownEvt = ev.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN;
@@ -143,8 +155,15 @@ namespace Xwt.Sdl
 					break;
 			}
 
+			if (!isButtonDownEvt && 
+				CurrentDragOperation != null && 
+				CurrentDragOperation.ReleaseButton == butt) {
+				CurrentDragOperation.Finish ();
+				CurrentDragOperation = null;
+			}
+
 			var w = hoveredWidget;
-			while (w != null && !w.FireMouseButton (isButtonDownEvt, butt, ev.x, ev.y-(int)menuHeight))
+			while (w != null && !w.FireMouseButton (isButtonDownEvt, butt, ev.x, ev.y))
 				w = w.Parent;
 		}
 
@@ -203,6 +222,9 @@ namespace Xwt.Sdl
 						return;
 					}
 
+					if (CurrentDragOperation != null)
+						CurrentDragOperation.MouseMove (x, y);
+
 					w = GetWidgetAt ((double)x, (double)y);
 					if (w != hoveredWidget) {
 						if (hoveredWidget != null)
@@ -212,7 +234,7 @@ namespace Xwt.Sdl
 							hoveredWidget.FireMouseEnter ();
 					}
 
-					while (w != null && !w.FireMouseMoved (ev.motion.timestamp, x-(int)padding.Left, y-(int)menuHeight-(int)padding.Top))
+					while (w != null && !w.FireMouseMoved (ev.motion.timestamp, x, y)) // TODO: Check whether x,y shall be absolute or relative.
 						w = w.Parent;
 					return;
 				case SDL.SDL_EventType.SDL_MOUSEWHEEL:
@@ -235,7 +257,7 @@ namespace Xwt.Sdl
 							w = w.Parent;
 					}
 					return;
-
+				
 				case SDL.SDL_EventType.SDL_WINDOWEVENT:
 					break;
 				default:
@@ -287,10 +309,18 @@ namespace Xwt.Sdl
 					WindowHoveredByMouse = this;
 					break;
 				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_LEAVE:
+					if (CurrentDragOperation != null) {
+						CurrentDragOperation.Finish ();
+						CurrentDragOperation = null;
+					}
 					WindowHoveredByMouse = null;
 					break;
 				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_FOCUS_LOST:
 					focused = false;
+					if (CurrentDragOperation != null) {
+						CurrentDragOperation.Finish ();
+						CurrentDragOperation = null;
+					}
 					break;
 				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_FOCUS_GAINED:
 					focused = true;

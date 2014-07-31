@@ -29,11 +29,16 @@ using Xwt.CairoBackend;
 
 namespace Xwt.Sdl
 {
-	public class ScrollBarBackend : WidgetBackend, IScrollbarBackend, IScrollAdjustmentBackend
+	public class ScrollBarBackend : WidgetBackend, IScrollbarBackend, IScrollAdjustmentBackend, IInWindowDrag
 	{
 		#region Properties
 		Orientation orientation;
 		IScrollAdjustmentEventSink scrollEventSink;
+
+		bool barHovered;
+		bool barClicked;
+		Rectangle barRect = new Rectangle();
+		double barClicked_MouseDistanceToBarBegin;
 
 		double lowerVal;
 		double upperVal;
@@ -71,7 +76,7 @@ namespace Xwt.Sdl
 			this.pageSize = pageSize;
 			this.pageIncrement = pageIncrement;
 			this.stepIncrement = stepIncrement;
-			Value = value; // implies Invalidate()
+			Value = value; // implies UpdateBarRect,Invalidate()
 		}
 
 		public double Value {
@@ -79,10 +84,47 @@ namespace Xwt.Sdl
 				return val;
 			}
 			set {
-				val = value;
+				val = Math.Max(Math.Min(value,upperVal),lowerVal);
 				if (scrollEventSink != null)
 					scrollEventSink.OnValueChanged ();
+
+				UpdateBarRect ();
 				Invalidate ();
+			}
+		}
+
+		double CalcBarLength()
+		{
+			return (orientation == Orientation.Vertical ? Height : Width) * pageSize / (upperVal - lowerVal);
+		}
+
+		double CalcVisualBarBegin()
+		{
+			return (((orientation == Orientation.Vertical ? Height : Width) - CalcBarLength()) * val / (upperVal - lowerVal));
+		}
+
+		void UpdateBarRect()
+		{
+			var ws = WidgetStyles.Instance;
+			double absX, absY;
+			GetAbsoluteLocation (out absX, out absY);
+
+			var BarLength = CalcBarLength();
+			var VisualBarCenter = CalcVisualBarBegin ();
+
+			switch (orientation) {
+				case Orientation.Vertical:
+					barRect.X = absX + ws.ScrollbarPadding;
+					barRect.Y = absY + VisualBarCenter;
+					barRect.Width = Width - ws.ScrollbarPadding * 2.0;
+					barRect.Height = BarLength;
+					break;
+				case Orientation.Horizontal:
+					barRect.X = absX + VisualBarCenter;
+					barRect.Y = absY + ws.ScrollbarPadding;
+					barRect.Width = BarLength;
+					barRect.Height = Height - ws.ScrollbarPadding * 2.0;
+					break;
 			}
 		}
 
@@ -99,7 +141,7 @@ namespace Xwt.Sdl
 		internal override void OnBoundsChanged (double x, double y, double width, double height)
 		{
 			base.OnBoundsChanged (x, y, width, height);
-
+			UpdateBarRect ();
 			Invalidate ();
 		}
 
@@ -111,31 +153,105 @@ namespace Xwt.Sdl
 			// Background
 			base.Draw (c, rect);
 
-			double x, y;
-			GetAbsoluteLocation (out x, out y);
-
 			// Bar
-			var visualValue = ((orientation == Orientation.Vertical ? Height : Width) / (upperVal - lowerVal)) * val;
-			var barLength = ((orientation == Orientation.Vertical ? Height : Width) / (upperVal - lowerVal)) * pageSize;
+			c.Context.Rectangle (barRect.X, barRect.Y, barRect.Width, barRect.Height);
+
+			c.Context.SetColor (barHovered || barClicked ? ws.ScrollbarHoveredColor : ws.ScrollbarColor);
+			c.Context.Fill ();
+		}
+
+
+
+		protected override void SensitivityChanged ()
+		{
+			base.SensitivityChanged ();
+
+			if (!Sensitive)
+				Finish ();
+		}
+
+		internal override void FireMouseLeave ()
+		{
+			base.FireMouseLeave ();
+
+			if (barHovered) {
+				barHovered = false;
+				Invalidate ();
+			}
+		}
+
+		#region IInWindowDrag implementation
+
+		public void MouseMove (int x, int y)
+		{
+			double absX, absY;
+			GetAbsoluteLocation (out absX, out absY);
 
 			switch (orientation) {
 				case Orientation.Vertical:
-					c.Context.Rectangle (x+ws.ScrollbarPadding,y+visualValue-barLength/2,Width-ws.ScrollbarPadding, barLength);
+					Value = (y-absY) * (upperVal - lowerVal) / Height;
 					break;
 				case Orientation.Horizontal:
-
+					Value = (x-absX) * (upperVal - lowerVal) / Width;
 					break;
 			}
 		}
 
+		/// <summary>
+		/// Finishes the drag operation.
+		/// </summary>
+		public void Finish ()
+		{
+			barClicked = false;
+			barHovered = false;
+			Invalidate ();
+		}
+
+		public PointerButton ReleaseButton {			get;			set;		}
+
+		#endregion
+
 		internal override bool FireMouseMoved (uint timestamp, int x, int y)
 		{
+			if (Sensitive) {
+				if (barHovered != (barHovered = barRect.Contains (x, y)))
+					Invalidate ();
+
+				if(barClicked)
+					MouseMove (x, y);
+			}
+
 			return base.FireMouseMoved (timestamp, x, y);
 		}
 
 		internal override bool FireMouseButton (bool down, PointerButton butt, int x, int y, int multiplePress = 1)
 		{
+			if (Sensitive && barHovered) {
+				if (barClicked = down) {
+					ReleaseButton = butt;
+					var win = ParentWindow;
+					if (win != null)
+						win.StartInWindowDrag(this);
+					double absX, absY;
+					GetAbsoluteLocation (out absX, out absY);
+					switch (orientation) {
+						case Orientation.Vertical:
+							barClicked_MouseDistanceToBarBegin = y - absY - barRect.Y;
+							break;
+						case Orientation.Horizontal:
+							barClicked_MouseDistanceToBarBegin = x - absX - barRect.X;
+							break;
+					}
+				}
+				return true;
+			}
+
 			return base.FireMouseButton (down, butt, x, y, multiplePress);
+		}
+
+		internal override bool FireMouseWheel (uint timestamp, int x, int y, ScrollDirection dir)
+		{
+			return base.FireMouseWheel (timestamp, x, y, dir);
 		}
 	}
 }

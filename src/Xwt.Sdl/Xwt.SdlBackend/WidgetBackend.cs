@@ -492,17 +492,17 @@ namespace Xwt.Sdl
 
 		public virtual Size GetPreferredSize(Cairo.Context fontExtentContext,double maxWidth, double maxHeight) { return Size.Zero; }
 
-		public void DragStart (DragStartData data)
+		public virtual void DragStart (DragStartData data)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void SetDragSource (TransferDataType[] types, DragDropAction dragAction)
+		public virtual void SetDragSource (TransferDataType[] types, DragDropAction dragAction)
 		{
 			throw new NotImplementedException ();
 		}
 
-		public void SetDragTarget (TransferDataType[] types, DragDropAction dragAction)
+		public virtual void SetDragTarget (TransferDataType[] types, DragDropAction dragAction)
 		{
 			throw new NotImplementedException ();
 		}

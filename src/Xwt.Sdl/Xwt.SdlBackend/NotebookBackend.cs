@@ -432,7 +432,9 @@ namespace Xwt.Sdl
 			var w = CurrentChildWidget;
 
 			// Optionally only draw the child item incrementally
-			var absBounds = w != null ? w.AbsoluteBounds : CalculateChildArea().Offset(AbsoluteLocation);
+			var chArea = CalculateChildArea().Offset(AbsoluteLocation);
+			var absBounds = w != null ? w.AbsoluteBounds : chArea;
+
 			if (w != null && absBounds.Contains (dirtyRect)) {
 				// Presumes that no current-tab change has been done before -- this would invalidate the entire widget area
 				w.Draw (c, dirtyRect);
@@ -452,7 +454,7 @@ namespace Xwt.Sdl
 			// Draw content area
 			{
 				var ws = WidgetStyles.Instance;
-				var contentRect = absBounds.Inflate (ws.NotebookChildPadding, ws.NotebookChildPadding);
+				var contentRect = chArea.Inflate (ws.NotebookChildPadding, ws.NotebookChildPadding);
 
 				c.Context.NewPath ();
 

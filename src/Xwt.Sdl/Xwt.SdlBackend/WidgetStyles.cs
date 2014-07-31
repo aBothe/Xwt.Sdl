@@ -82,11 +82,11 @@ namespace Xwt.Sdl
 		#endregion
 
 		#region Scrollbar
-		public double ScrollbarWidth = 16;
-		public double ScrollbarPadding = 2;
-		public Color ScrollbarBackground = new Color(0.9,0.9,0.9);
-		public Color ScrollbarHoveredColor = new Color(0.7,0.7,0.7);
-		public Color ScrollbarColor = new Color(0.6,0.6,0.6);
+		public double ScrollbarWidth = 10;
+		public double ScrollbarPadding = 1;
+		public Color ScrollbarBackground = new Color(0.85,0.85,0.85);
+		public Color ScrollbarHoveredColor = new Color(0.75,0.75,0.75);
+		public Color ScrollbarColor = new Color(0.65,0.65,0.65);
 		#endregion
 	}
 }
