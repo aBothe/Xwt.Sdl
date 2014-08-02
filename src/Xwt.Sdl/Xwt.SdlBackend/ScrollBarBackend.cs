@@ -93,15 +93,11 @@ namespace Xwt.Sdl
 			}
 		}
 
-		double CalcBarLength()
-		{
-			return (orientation == Orientation.Vertical ? Height : Width) * pageSize / (upperVal - lowerVal);
-		}
+		double BarLength
+		{ get { return (orientation == Orientation.Vertical ? Height : Width) * pageSize / (upperVal - lowerVal); } }
 
-		double CalcVisualBarBegin()
-		{
-			return (((orientation == Orientation.Vertical ? Height : Width) - CalcBarLength()) * val / (upperVal - lowerVal));
-		}
+		double VisualBarBegin
+		{ get { return (((orientation == Orientation.Vertical ? Height : Width) - BarLength) * val / (upperVal - lowerVal)); } }
 
 		void UpdateBarRect()
 		{
@@ -109,18 +105,15 @@ namespace Xwt.Sdl
 			double absX, absY;
 			GetAbsoluteLocation (out absX, out absY);
 
-			var BarLength = CalcBarLength();
-			var VisualBarCenter = CalcVisualBarBegin ();
-
 			switch (orientation) {
 				case Orientation.Vertical:
 					barRect.X = absX + ws.ScrollbarPadding;
-					barRect.Y = absY + VisualBarCenter;
+					barRect.Y = absY + VisualBarBegin;
 					barRect.Width = Width - ws.ScrollbarPadding * 2.0;
 					barRect.Height = BarLength;
 					break;
 				case Orientation.Horizontal:
-					barRect.X = absX + VisualBarCenter;
+					barRect.X = absX + VisualBarBegin;
 					barRect.Y = absY + ws.ScrollbarPadding;
 					barRect.Width = BarLength;
 					barRect.Height = Height - ws.ScrollbarPadding * 2.0;
@@ -189,10 +182,10 @@ namespace Xwt.Sdl
 
 			switch (orientation) {
 				case Orientation.Vertical:
-					Value = (y-absY) * (upperVal - lowerVal) / Height;
+					Value = (y-absY - barClicked_MouseDistanceToBarBegin) * (upperVal - lowerVal) / (Height-BarLength);
 					break;
 				case Orientation.Horizontal:
-					Value = (x-absX) * (upperVal - lowerVal) / Width;
+					Value = (x-absX - barClicked_MouseDistanceToBarBegin) * (upperVal - lowerVal) / (Width-BarLength);
 					break;
 			}
 		}
@@ -232,14 +225,13 @@ namespace Xwt.Sdl
 					var win = ParentWindow;
 					if (win != null)
 						win.StartInWindowDrag(this);
-					double absX, absY;
-					GetAbsoluteLocation (out absX, out absY);
+
 					switch (orientation) {
 						case Orientation.Vertical:
-							barClicked_MouseDistanceToBarBegin = y - absY - barRect.Y;
+							barClicked_MouseDistanceToBarBegin = y - barRect.Y;
 							break;
 						case Orientation.Horizontal:
-							barClicked_MouseDistanceToBarBegin = x - absX - barRect.X;
+							barClicked_MouseDistanceToBarBegin = x - barRect.X;
 							break;
 					}
 				}
