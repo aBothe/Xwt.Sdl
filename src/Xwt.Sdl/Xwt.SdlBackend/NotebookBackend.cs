@@ -348,7 +348,7 @@ namespace Xwt.Sdl
 				if (tab.Child != null) {
 					var w = tab.Child.GetBackend () as WidgetBackend;
 					var sz = w.GetPreferredSize (widthConstraint, heightConstraint);
-					w.OnBoundsChanged (chArea.X, chArea.Y, sz.Width, sz.Height);
+					w.OnBoundsChanged (chArea.X + (chArea.Width - sz.Width)/2.0 , chArea.Y + (chArea.Height - sz.Height)/2.0, sz.Width, sz.Height);
 				}
 
 			RealignTabHeaders ();
