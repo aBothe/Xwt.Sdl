@@ -243,6 +243,17 @@ namespace Xwt.Sdl
 
 		internal override bool FireMouseWheel (uint timestamp, int x, int y, ScrollDirection dir)
 		{
+			switch (dir) {
+				case ScrollDirection.Down:
+				case ScrollDirection.Right:
+					Value += pageIncrement;
+					break;
+				case ScrollDirection.Up:
+				case ScrollDirection.Left:
+					Value -= pageIncrement;
+					break;
+			}
+
 			return base.FireMouseWheel (timestamp, x, y, dir);
 		}
 	}

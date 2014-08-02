@@ -113,8 +113,8 @@ namespace Xwt.Sdl.Tests
 			scroll.PageSize = 50;
 			scroll.LowerValue = 0;
 			scroll.UpperValue = 100;
-			//scroll.PageIncrement = 10;
-			//scroll.StepIncrement = 10;
+			scroll.PageIncrement = 10;
+			scroll.StepIncrement = 10;
 			scroll.Value = 30;
 			scroll.ValueChanged += (sender, e) => tabs.CurrentTab.Label = scroll.Value.ToString();
 
