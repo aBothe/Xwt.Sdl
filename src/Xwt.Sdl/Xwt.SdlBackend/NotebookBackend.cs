@@ -226,6 +226,9 @@ namespace Xwt.Sdl
 			foreach (var th in TabHeaders)
 				if (th.Tab == tab) {
 					th.Text = tab.Label;
+
+					RealignTabHeaders ();
+					Invalidate ();
 					return;
 				}
 		}
