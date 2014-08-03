@@ -56,6 +56,8 @@ namespace Xwt.Sdl
 		{
 			this.child = c as WidgetBackend;
 			child.Parent = this;
+
+			RealignEverything ();
 		}
 
 		public void SetChildSize (Size size)
@@ -71,13 +73,19 @@ namespace Xwt.Sdl
 			}
 			set {
 				if (showBorder != (showBorder = value))
-					Invalidate ();
+					RealignEverything ();
 			}
 		}
 
 		public Rectangle VisibleRect {
 			get {
-				throw new NotImplementedException ();
+				// Use the child viewport and the h/v-scroll values to calculate the top left child-related corner. Width and Height are easily derivable from this.
+				double childX, childY;
+
+				childX = 0;
+				childY = 0;
+
+				return new Rectangle (childX, childY, child.Width, child.Height);
 			}
 		}
 
