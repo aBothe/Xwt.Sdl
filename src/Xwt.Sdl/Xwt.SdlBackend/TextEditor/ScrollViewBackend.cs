@@ -30,26 +30,46 @@ namespace Xwt.Sdl
 {
 	public class ScrollViewBackend : WidgetBackend, IScrollViewBackend
 	{
+		#region Properties
+		WidgetBackend child;
+		Size childSize;
+		readonly ScrollBarBackend VScrollBar, HScrollbar;
+		ScrollPolicy vScrollPolicy, hScrollPolicy;
+		bool showBorder = false;
+
+		#endregion
+
 		public ScrollViewBackend ()
 		{
+			VScrollBar = new ScrollBarBackend ();
+			HScrollbar = new ScrollBarBackend ();
+
+			VScrollBar.Initialize (Orientation.Vertical);
+			HScrollbar.Initialize (Orientation.Horizontal);
+
+			VScrollBar.Parent = this;
+			HScrollbar.Parent = this;
 		}
 
-		public void SetChild (IWidgetBackend child)
+		public void SetChild (IWidgetBackend c)
 		{
-			throw new NotImplementedException ();
+			this.child = c as WidgetBackend;
+			child.Parent = this;
 		}
 
 		public void SetChildSize (Size size)
 		{
-			throw new NotImplementedException ();
+			childSize = size;
+
 		}
 
 		public bool BorderVisible {
 			get {
-				throw new NotImplementedException ();
+				return showBorder;
 			}
 			set {
-				throw new NotImplementedException ();
+				if (showBorder != (showBorder = value))
+					Invalidate ();
 			}
 		}
 
@@ -61,35 +81,69 @@ namespace Xwt.Sdl
 
 		public IScrollControlBackend CreateVerticalScrollControl ()
 		{
-			throw new NotImplementedException ();
+			return VScrollBar;
 		}
 
 		public IScrollControlBackend CreateHorizontalScrollControl ()
 		{
-			throw new NotImplementedException ();
+			return HScrollbar;
 		}
 
 		public ScrollPolicy VerticalScrollPolicy {
 			get {
-				throw new NotImplementedException ();
+				return vScrollPolicy;
 			}
 			set {
-				throw new NotImplementedException ();
+				if (vScrollPolicy != (vScrollPolicy = value))
+					return;
+
+				UpdateScrollbarPositions();
 			}
 		}
 
 		public ScrollPolicy HorizontalScrollPolicy {
 			get {
-				throw new NotImplementedException ();
+				return hScrollPolicy;
 			}
 			set {
-				throw new NotImplementedException ();
+				if (hScrollPolicy != (hScrollPolicy = value))
+					return;
+
+				UpdateScrollbarPositions();
 			}
 		}
 
 		public void UpdateChildPlacement (IWidgetBackend childBackend)
 		{
 			throw new NotImplementedException ();
+		}
+
+
+
+
+		public override WidgetBackend GetChildAt (double x, double y)
+		{
+			return base.GetChildAt (x, y);
+		}
+
+		public override Size GetPreferredSize (Cairo.Context fontExtentContext, double maxWidth, double maxHeight)
+		{
+			return base.GetPreferredSize (fontExtentContext, maxWidth, maxHeight);
+		}
+
+		internal override void OnBoundsChanged (double x, double y, double width, double height)
+		{
+			base.OnBoundsChanged (x, y, width, height);
+		}
+
+
+		void UpdateScrollbarPositions()
+		{
+
+		}
+
+		void UpdateAdjustments(){
+
 		}
 	}
 }

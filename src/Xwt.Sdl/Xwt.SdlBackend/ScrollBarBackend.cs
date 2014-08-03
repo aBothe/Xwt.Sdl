@@ -29,11 +29,12 @@ using Xwt.CairoBackend;
 
 namespace Xwt.Sdl
 {
-	public class ScrollBarBackend : WidgetBackend, IScrollbarBackend, IScrollAdjustmentBackend, IInWindowDrag
+	public class ScrollBarBackend : WidgetBackend, IScrollbarBackend, IScrollAdjustmentBackend, IScrollControlBackend, IInWindowDrag
 	{
 		#region Properties
 		Orientation orientation;
 		IScrollAdjustmentEventSink scrollEventSink;
+		IScrollControlEventSink scrollCtrlEventSink;
 
 		bool barHovered;
 		bool barClicked;
@@ -46,6 +47,36 @@ namespace Xwt.Sdl
 		double pageSize;
 		double pageIncrement;
 		double stepIncrement;
+
+		public double LowerValue {
+			get {
+				return lowerVal;
+			}
+		}
+
+		public double UpperValue {
+			get {
+				return upperVal;
+			}
+		}
+
+		public double PageSize {
+			get {
+				return pageSize;
+			}
+		}
+
+		public double PageIncrement {
+			get {
+				return pageIncrement;
+			}
+		}
+
+		public double StepIncrement {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
 		#endregion
 
 		public ScrollBarBackend()
@@ -69,6 +100,11 @@ namespace Xwt.Sdl
 			this.scrollEventSink = eventSink;
 		}
 
+		public void Initialize (IScrollControlEventSink eventSink)
+		{
+			this.scrollCtrlEventSink = eventSink;
+		}
+
 		public void SetRange (double lowerValue, double upperValue, double pageSize, double pageIncrement, double stepIncrement, double value)
 		{
 			this.lowerVal = lowerValue;
@@ -87,6 +123,8 @@ namespace Xwt.Sdl
 				val = Math.Max(Math.Min(value,upperVal),lowerVal);
 				if (scrollEventSink != null)
 					scrollEventSink.OnValueChanged ();
+				if (scrollCtrlEventSink != null)
+					scrollCtrlEventSink.OnValueChanged ();
 
 				UpdateBarRect ();
 				Invalidate ();
@@ -243,18 +281,19 @@ namespace Xwt.Sdl
 
 		internal override bool FireMouseWheel (uint timestamp, int x, int y, ScrollDirection dir)
 		{
+			if (base.FireMouseWheel (timestamp, x, y, dir))
+				return true;
+
 			switch (dir) {
 				case ScrollDirection.Down:
 				case ScrollDirection.Right:
 					Value += pageIncrement;
-					break;
+					return false;
 				case ScrollDirection.Up:
 				case ScrollDirection.Left:
 					Value -= pageIncrement;
-					break;
+					return false;
 			}
-
-			return base.FireMouseWheel (timestamp, x, y, dir);
 		}
 	}
 }
