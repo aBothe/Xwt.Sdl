@@ -91,6 +91,27 @@ namespace Xwt.Sdl.Tests
 		}
 	}
 
+	class MyOtherCanvas : Canvas
+	{
+		public MyOtherCanvas()
+		{
+			BackgroundColor = Colors.Green;
+			WidthRequest = 900;
+			HeightRequest = 1200;
+		}
+
+		protected override void OnDraw (Context ctx, Rectangle dirtyRect)
+		{
+			base.OnDraw (ctx, dirtyRect);
+		}
+
+		protected override bool SupportsCustomScrolling {
+			get {
+				return false;
+			}
+		}
+	}
+
 	class MainClass
 	{
 		public static void Main (string[] args)
@@ -109,6 +130,10 @@ namespace Xwt.Sdl.Tests
 			tabs.HeightRequest = 300;
 			mw.Content = tabs;
 
+			var myOtherCanvas = new MyOtherCanvas ();
+			var scrollSurrounding = new ScrollView (myOtherCanvas) { VerticalScrollPolicy = ScrollPolicy.Automatic, HorizontalScrollPolicy = ScrollPolicy.Automatic };
+			tabs.Add (scrollSurrounding, "Other canvas");
+
 			var scroll = new VScrollbar ();
 			scroll.PageSize = 50;
 			scroll.LowerValue = 0;
@@ -116,7 +141,7 @@ namespace Xwt.Sdl.Tests
 			scroll.PageIncrement = 10;
 			scroll.StepIncrement = 10;
 			scroll.Value = 30;
-			scroll.ValueChanged += (sender, e) => tabs.CurrentTab.Label = scroll.Value.ToString();
+			scroll.ValueChanged += (sender, e) => tabs.CurrentTab.Label = ((int)scroll.Value).ToString();
 
 			tabs.Add (scroll,"Scroll!");
 			//tabs.Add (new TextEntry { Text = "My Text\nNew line\nTHird line", MultiLine = true, ExpandVertical = true }, "Tab 3");

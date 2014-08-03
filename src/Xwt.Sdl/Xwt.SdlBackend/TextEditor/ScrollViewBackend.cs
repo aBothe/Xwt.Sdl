@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 using System;
 using Xwt.Backends;
+using Xwt.CairoBackend;
 
 namespace Xwt.Sdl
 {
@@ -61,6 +62,7 @@ namespace Xwt.Sdl
 		{
 			childSize = size;
 
+			RealignEverything ();
 		}
 
 		public bool BorderVisible {
@@ -97,7 +99,7 @@ namespace Xwt.Sdl
 				if (vScrollPolicy != (vScrollPolicy = value))
 					return;
 
-				UpdateScrollbarPositions();
+				RealignEverything();
 			}
 		}
 
@@ -109,7 +111,7 @@ namespace Xwt.Sdl
 				if (hScrollPolicy != (hScrollPolicy = value))
 					return;
 
-				UpdateScrollbarPositions();
+				RealignEverything();
 			}
 		}
 
@@ -134,16 +136,55 @@ namespace Xwt.Sdl
 		internal override void OnBoundsChanged (double x, double y, double width, double height)
 		{
 			base.OnBoundsChanged (x, y, width, height);
+
+			RealignEverything ();
 		}
 
 
-		void UpdateScrollbarPositions()
+		void RealignEverything()
 		{
+			// Set the child's size
 
+			// Set the scrollbars' pagesizes
+			// Important: Persist the current scroll values ranging from 0 to 100, except a new child has been set.
+
+			// Show/hide scrollbars
 		}
 
-		void UpdateAdjustments(){
 
+		public override void Draw (CairoContextBackend c, Rectangle dirtyRect)
+		{
+			// Draw child
+			if (child != null) {
+				var absLoc = child.AbsoluteLocation;
+				var childRect = new Rectangle(absLoc, child.Size).Intersect (dirtyRect);
+				if (!dirtyRect.IsEmpty) {
+					/* Problem: Passing the dirtyRect to the draw method will not cause the widget to pay attention to being scrolled through or so.
+					 * Perhaps this could be solved by temporarily adjusting 
+					 * the render context's global x/y offsets and offsetting the dirtyRect 
+					 * by the theoretical distance between the 
+					 * child's upper left corner and the visible upper left corner, so the child will think it's drawing beginning from 0/0.
+					 */
+					double dx, dy;
+
+					dx = 0;
+					dy = 0;
+
+					c.GlobalXOffset += dx;
+					c.GlobalYOffset += dy;
+
+					var theoreticalBegin = VisibleRect.Location;
+
+
+					c.GlobalXOffset -= dx;
+					c.GlobalYOffset -= dy;
+				}
+			}
+
+			// Draw scroll bars if needed
+
+
+			base.Draw (c, dirtyRect);
 		}
 	}
 }

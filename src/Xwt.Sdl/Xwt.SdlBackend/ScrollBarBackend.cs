@@ -289,8 +289,7 @@ namespace Xwt.Sdl
 				case ScrollDirection.Right:
 					Value += pageIncrement;
 					return false;
-				case ScrollDirection.Up:
-				case ScrollDirection.Left:
+				default:
 					Value -= pageIncrement;
 					return false;
 			}
