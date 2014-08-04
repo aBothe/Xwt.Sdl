@@ -51,8 +51,8 @@ namespace Xwt.Sdl
 			// Draw actual content
 			double absX, absY;
 			GetAbsoluteLocation (out absX, out absY);
-			c.GlobalXOffset = absX;
-			c.GlobalYOffset = absY;
+			c.GlobalXOffset += absX;
+			c.GlobalYOffset += absY;
 
 			EventSink.OnDraw (c,new Rectangle (
 				Math.Max (0d, dirtyRect.X - absX),
@@ -60,8 +60,8 @@ namespace Xwt.Sdl
 				Math.Min (Width, dirtyRect.Width),
 				Math.Min (Height, dirtyRect.Height)));
 
-			c.GlobalXOffset = 0;
-			c.GlobalYOffset = 0;
+			c.GlobalXOffset -= absX;
+			c.GlobalYOffset -= absY;
 			
 			// Draw child widgets
 			foreach (var ch in Children){

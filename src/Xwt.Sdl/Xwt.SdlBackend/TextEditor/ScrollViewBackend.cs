@@ -54,8 +54,12 @@ namespace Xwt.Sdl
 
 		public void SetChild (IWidgetBackend c)
 		{
+			if (c == null)
+				return;
+
 			this.child = c as WidgetBackend;
-			child.Parent = this;
+			if(c != null)
+				child.Parent = this;
 
 			RealignEverything ();
 		}
