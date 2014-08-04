@@ -166,11 +166,15 @@ namespace Xwt.Sdl
 
 		public override void Draw (CairoContextBackend c, Rectangle dirtyRect)
 		{
+			base.Draw (c, dirtyRect);
+
+			Rectangle absRect;
+
 			// Draw child
 			if (child != null) {
 				var absLoc = child.AbsoluteLocation;
-				var childRect = new Rectangle(absLoc, child.Size).Intersect (dirtyRect);
-				if (!dirtyRect.IsEmpty) {
+				absRect = new Rectangle(absLoc, child.Size).Intersect (dirtyRect);
+				if (!absRect.IsEmpty) {
 					/* Problem: Passing the dirtyRect to the draw method will not cause the widget to pay attention to being scrolled through or so.
 					 * Perhaps this could be solved by temporarily adjusting 
 					 * the render context's global x/y offsets and offsetting the dirtyRect 
@@ -179,24 +183,33 @@ namespace Xwt.Sdl
 					 */
 					double dx, dy;
 
+					var visRect = VisibleRect;
+
 					dx = 0;
 					dy = 0;
 
-					c.GlobalXOffset += dx;
-					c.GlobalYOffset += dy;
-
-					var theoreticalBegin = VisibleRect.Location;
-
-
 					c.GlobalXOffset -= dx;
 					c.GlobalYOffset -= dy;
+
+					child.Draw (c, visRect.Intersect(dirtyRect.Offset(dx,dy)));
+
+					c.GlobalXOffset += dx;
+					c.GlobalYOffset += dy;
 				}
 			}
 
 			// Draw scroll bars if needed
+			if (VScrollBar.Visible) {
+				absRect = VScrollBar.AbsoluteBounds.Intersect (dirtyRect);
+				if (!absRect.IsEmpty)
+					VScrollBar.Draw (c, dirtyRect);
+			}
 
-
-			base.Draw (c, dirtyRect);
+			if (HScrollbar.Visible) {
+				absRect = HScrollbar.AbsoluteBounds.Intersect (dirtyRect);
+				if (!absRect.IsEmpty)
+					HScrollbar.Draw (c, dirtyRect);
+			}
 		}
 	}
 }
