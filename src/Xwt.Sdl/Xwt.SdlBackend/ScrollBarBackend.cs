@@ -213,6 +213,19 @@ namespace Xwt.Sdl
 
 		#region IInWindowDrag implementation
 
+		public void MouseWheel(int x, int y, ScrollDirection dir)
+		{
+			switch (dir) {
+				case ScrollDirection.Down:
+				case ScrollDirection.Right:
+					Value += pageIncrement;
+					break;
+				default:
+					Value -= pageIncrement;
+					break;
+			}
+		}
+
 		public void MouseMove (int x, int y)
 		{
 			double absX, absY;
@@ -284,15 +297,8 @@ namespace Xwt.Sdl
 			if (base.FireMouseWheel (timestamp, x, y, dir))
 				return true;
 
-			switch (dir) {
-				case ScrollDirection.Down:
-				case ScrollDirection.Right:
-					Value += pageIncrement;
-					return false;
-				default:
-					Value -= pageIncrement;
-					return false;
-			}
+			MouseWheel (x, y, dir);
+			return false;
 		}
 	}
 }

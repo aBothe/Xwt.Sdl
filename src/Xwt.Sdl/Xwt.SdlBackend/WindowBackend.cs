@@ -238,24 +238,27 @@ namespace Xwt.Sdl
 						w = w.Parent;
 					return;
 				case SDL.SDL_EventType.SDL_MOUSEWHEEL:
-					if(hoveredWidget!=null && Sensitive)
-					{
-						ScrollDirection dir;
-						if(ev.wheel.y > 0)
-							dir = ScrollDirection.Up;
-						else
-							dir = ScrollDirection.Down;
+					if (!Sensitive)
+						return;
 
-						if(ev.wheel.x > 0)
-							dir |= ScrollDirection.Right;
-						else if(ev.wheel.x < 0)
-							dir |= ScrollDirection.Left;
+					ScrollDirection dir;
+					if(ev.wheel.y > 0)
+						dir = ScrollDirection.Up;
+					else
+						dir = ScrollDirection.Down;
 
-						// TODO: Are X/Y values absolute or relative scroll values?
-						w = hoveredWidget;
-						while (w != null && !w.FireMouseWheel (ev.wheel.timestamp, ev.wheel.x, ev.wheel.y, dir))
-							w = w.Parent;
-					}
+					if(ev.wheel.x > 0)
+						dir |= ScrollDirection.Right;
+					else if(ev.wheel.x < 0)
+						dir |= ScrollDirection.Left;
+
+					if (CurrentDragOperation != null)
+						CurrentDragOperation.MouseWheel (ev.wheel.x, ev.wheel.y, dir);
+						
+					// TODO: Are X/Y values absolute or relative scroll values?
+					w = hoveredWidget;
+					while (w != null && !w.FireMouseWheel (ev.wheel.timestamp, ev.wheel.x, ev.wheel.y, dir))
+						w = w.Parent;
 					return;
 				
 				case SDL.SDL_EventType.SDL_WINDOWEVENT:
