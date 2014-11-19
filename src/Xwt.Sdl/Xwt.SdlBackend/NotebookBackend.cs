@@ -123,41 +123,6 @@ namespace Xwt.Sdl
 					c.Context.Fill ();
 				}
 
-				// Border
-				{
-					c.Context.NewPath ();
-					switch (noteBook.TabOrientation) {
-						default: // omit bottom border
-							c.Context.MoveTo (absX, absY + Height);
-							c.Context.RelLineTo (0.0, -Height);
-							c.Context.RelLineTo (Width, 0);
-							c.Context.RelLineTo (0, Height);
-							break;
-						case NotebookTabOrientation.Bottom:
-							c.Context.MoveTo (absX, absY);
-							c.Context.RelLineTo (0.0, Height);
-							c.Context.RelLineTo (Width, 0);
-							c.Context.RelLineTo (0, -Height);
-							break;
-						case NotebookTabOrientation.Left:
-							c.Context.MoveTo (absX + Width, absY);
-							c.Context.RelLineTo (-Width, 0);
-							c.Context.RelLineTo (0, Height);
-							c.Context.RelLineTo (Width, 0);
-							break;
-						case NotebookTabOrientation.Right:
-							c.Context.MoveTo (absX, absY);
-							c.Context.RelLineTo (Width, 0);
-							c.Context.RelLineTo (0, Height);
-							c.Context.RelLineTo (-Width, 0);
-							break;
-					}
-
-					c.Context.LineWidth = 1;
-					c.Context.SetColor (ws.NotebookBorderColor);
-					c.Context.Stroke ();
-				}
-
 				// Label
 				{
 					var ll = HeadLabel.GetBackend () as LabelBackend;
@@ -457,24 +422,14 @@ namespace Xwt.Sdl
 			// Draw content area
 			{
 				var ws = WidgetStyles.Instance;
-				var contentRect = chArea.Inflate (ws.NotebookChildPadding, ws.NotebookChildPadding);
-
-				c.Context.NewPath ();
-
-				c.Context.Rectangle (contentRect.X, contentRect.Y, contentRect.Width, contentRect.Height);
-
-				// Border
-				c.Context.LineWidth = 1;
-				c.Context.SetColor (ws.NotebookBorderColor);
-				c.Context.Stroke ();
-
-				contentRect = contentRect.Inflate (-1, -1).Intersect(dirtyRect);
-
-				c.Context.Rectangle (contentRect.X, contentRect.Y, contentRect.Width, contentRect.Height);
+				var contentRect = chArea.Inflate (ws.NotebookChildPadding, ws.NotebookChildPadding).Intersect(dirtyRect);
 
 				// Background
-				c.Context.SetColor (new Color (ws.ButtonDefaultGrey,ws.ButtonDefaultGrey,ws.ButtonDefaultGrey));
-				c.Context.Fill ();
+				if (!contentRect.IsEmpty) {
+					c.Context.Rectangle (contentRect.X, contentRect.Y, contentRect.Width, contentRect.Height);
+					c.Context.SetColor (ws.NotebookBackground);
+					c.Context.Fill ();
+				}
 			}
 
 			// Draw current tab
