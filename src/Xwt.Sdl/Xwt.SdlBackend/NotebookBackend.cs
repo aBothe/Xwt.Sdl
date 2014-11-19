@@ -118,7 +118,7 @@ namespace Xwt.Sdl
 					else if(MouseEntered)
 						c.Context.SetColor (new Color (ws.ButtonHoveredGrey,ws.ButtonHoveredGrey,ws.ButtonHoveredGrey));
 					else	
-						c.Context.SetColor (new Color (ws.ButtonClickedGrey,ws.ButtonClickedGrey,ws.ButtonClickedGrey));
+						c.Context.SetColor (ws.NotebookBackground);
 
 					c.Context.Fill ();
 				}
