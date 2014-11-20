@@ -34,7 +34,7 @@ namespace Xwt.Sdl
 		#region Properties
 		WidgetBackend child;
 		Size childSize;
-		readonly ScrollBarBackend VScrollBar, HScrollbar;
+		readonly ScrollBarBackend VScrollbar, HScrollbar;
 		ScrollPolicy vScrollPolicy, hScrollPolicy;
 		bool showBorder = false;
 
@@ -42,13 +42,14 @@ namespace Xwt.Sdl
 
 		public ScrollViewBackend ()
 		{
-			VScrollBar = new ScrollBarBackend ();
+			VScrollbar = new ScrollBarBackend ();
 			HScrollbar = new ScrollBarBackend ();
 
-			VScrollBar.Initialize (Orientation.Vertical);
+			VScrollbar.Initialize (Orientation.Vertical);
 			HScrollbar.Initialize (Orientation.Horizontal);
 
 			VScrollBar.Parent = this;
+			VScrollbar.Parent = this;
 			HScrollbar.Parent = this;
 		}
 
@@ -95,7 +96,7 @@ namespace Xwt.Sdl
 
 		public IScrollControlBackend CreateVerticalScrollControl ()
 		{
-			return VScrollBar;
+			return VScrollbar;
 		}
 
 		public IScrollControlBackend CreateHorizontalScrollControl ()
@@ -199,10 +200,10 @@ namespace Xwt.Sdl
 			}
 
 			// Draw scroll bars if needed
-			if (VScrollBar.Visible) {
-				absRect = VScrollBar.AbsoluteBounds.Intersect (dirtyRect);
+			if (VScrollbar.Visible) {
+				absRect = VScrollbar.AbsoluteBounds.Intersect (dirtyRect);
 				if (!absRect.IsEmpty)
-					VScrollBar.Draw (c, dirtyRect);
+					VScrollbar.Draw (c, dirtyRect);
 			}
 
 			if (HScrollbar.Visible) {
