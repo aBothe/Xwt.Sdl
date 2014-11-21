@@ -29,14 +29,26 @@ using Xwt.CairoBackend;
 
 namespace Xwt.Sdl
 {
-	public class ScrollViewBackend : WidgetBackend, IScrollViewBackend
+	public class ScrollViewBackend : WidgetBackend, IScrollViewBackend, IScrollAdjustmentEventSink
 	{
 		#region Properties
 		WidgetBackend child;
+		public override System.Collections.Generic.IEnumerable<WidgetBackend> Children {
+			get {
+				if(child != null)
+					yield return child;
+				if (VScrollbar.Visible)
+					yield return VScrollbar;
+				if (HScrollbar.Visible)
+					yield return HScrollbar;
+			}
+		}
 		Size childSize;
 		readonly ScrollBarBackend VScrollbar, HScrollbar;
 		ScrollPolicy vScrollPolicy, hScrollPolicy;
 		bool showBorder = false;
+		double VisualChildWidth { get{ return Width - (HScrollbar.Visible ? HScrollbar.Width : 0); } }
+		double VisualChildHeight { get{ return Height - (VScrollbar.Visible ? VScrollbar.Height : 0); } }
 
 		#endregion
 
@@ -48,7 +60,9 @@ namespace Xwt.Sdl
 			VScrollbar.Initialize (Orientation.Vertical);
 			HScrollbar.Initialize (Orientation.Horizontal);
 
-			VScrollBar.Parent = this;
+			VScrollbar.Initialize (this);
+			HScrollbar.Initialize (this);
+
 			VScrollbar.Parent = this;
 			HScrollbar.Parent = this;
 		}
@@ -138,6 +152,14 @@ namespace Xwt.Sdl
 
 		public override WidgetBackend GetChildAt (double x, double y)
 		{
+			if (x <= Width - (VScrollbar.Visible ? WidgetStyles.Instance.ScrollbarWidth:0)) {
+
+			}
+
+			if (y <= Height - (HScrollbar.Visible ? WidgetStyles.Instance.ScrollbarWidth:0)) {
+
+			}
+			//TODO: Offset x,y by scroll positions
 			return base.GetChildAt (x, y);
 		}
 
@@ -145,6 +167,15 @@ namespace Xwt.Sdl
 		{
 			return base.GetPreferredSize (fontExtentContext, maxWidth, maxHeight);
 		}
+
+		#region IScrollAdjustmentEventSink implementation
+
+		public void OnValueChanged ()
+		{
+			Invalidate ();
+		}
+
+		#endregion
 
 		internal override void OnBoundsChanged (double x, double y, double width, double height)
 		{
@@ -154,16 +185,58 @@ namespace Xwt.Sdl
 		}
 
 
+
 		void RealignEverything()
 		{
-			// Set the child's size
+			var scrollBarWidth = WidgetStyles.Instance.ScrollbarWidth;
 
-			// Set the scrollbars' pagesizes
+			var needVSroll = Height > 0 && childSize.Height > (Height - scrollBarWidth);
+			var needHScroll = Width > 0 && childSize.Width > (Width - scrollBarWidth);
+
+			// Set the scrollbars' pagesizes.
 			// Important: Persist the current scroll values ranging from 0 to 100, except a new child has been set.
+			VScrollbar.SetRange (0, 100, needVSroll ? Height / childSize.Height : 100.0, 10, 10, VScrollbar.Value);
+			HScrollbar.SetRange (0, 100, needHScroll ? Width / childSize.Width : 100.0, 10, 10, HScrollbar.Value);
 
 			// Show/hide scrollbars
-		}
+			var vScrollVisiblePreviously = VScrollbar.Visible;
+			var hScrollVisiblePreviously = HScrollbar.Visible;
 
+			switch (VerticalScrollPolicy) {
+				case ScrollPolicy.Always:
+					VScrollbar.Visible = true;
+					break;
+				case ScrollPolicy.Automatic:
+					VScrollbar.Visible = needVSroll;
+					break;
+				case ScrollPolicy.Never:
+					VScrollbar.Visible = false;
+					break;
+			}
+
+			switch (HorizontalScrollPolicy) {
+				case ScrollPolicy.Always:
+					HScrollbar.Visible = true;
+					break;
+				case ScrollPolicy.Automatic:
+					HScrollbar.Visible = needHScroll;
+					break;
+				case ScrollPolicy.Never:
+					HScrollbar.Visible = false;
+					break;
+			}
+
+			// Layout scrollbars
+			if (VScrollbar.Visible) {
+				VScrollbar.OnBoundsChanged (Width - scrollBarWidth, 0, scrollBarWidth, Height - (HScrollbar.Visible ? scrollBarWidth : 0));
+			}
+
+			if (HScrollbar.Visible) {
+				HScrollbar.OnBoundsChanged (0, Height- scrollBarWidth, Width - (VScrollbar.Visible ? scrollBarWidth : 0), scrollBarWidth);
+			}
+
+			Invalidate ();
+		}
 
 		public override void Draw (CairoContextBackend c, Rectangle dirtyRect)
 		{
@@ -174,7 +247,7 @@ namespace Xwt.Sdl
 			// Draw child
 			if (child != null) {
 				var absLoc = child.AbsoluteLocation;
-				absRect = new Rectangle(absLoc, child.Size).Intersect (dirtyRect);
+				absRect = new Rectangle(absLoc, childSize).Intersect (dirtyRect);
 				if (!absRect.IsEmpty) {
 					/* Problem: Passing the dirtyRect to the draw method will not cause the widget to pay attention to being scrolled through or so.
 					 * Perhaps this could be solved by temporarily adjusting 
@@ -186,13 +259,13 @@ namespace Xwt.Sdl
 
 					var visRect = VisibleRect;
 
-					dx = 0;
-					dy = 0;
+					dx = visRect.X;
+					dy = visRect.Y;
 
 					c.GlobalXOffset -= dx;
 					c.GlobalYOffset -= dy;
 
-					child.Draw (c, visRect.Intersect(dirtyRect.Offset(dx,dy)));
+					child.Draw (c, visRect.Intersect(dirtyRect));
 
 					c.GlobalXOffset += dx;
 					c.GlobalYOffset += dy;
