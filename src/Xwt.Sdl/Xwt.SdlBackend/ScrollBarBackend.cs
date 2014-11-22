@@ -215,6 +215,9 @@ namespace Xwt.Sdl
 
 		public void MouseWheel(int x, int y, ScrollDirection dir)
 		{
+			if (!Sensitive)
+				return;
+
 			switch (dir) {
 				case ScrollDirection.Down:
 				case ScrollDirection.Right:
@@ -228,6 +231,9 @@ namespace Xwt.Sdl
 
 		public void MouseMove (int x, int y)
 		{
+			if (!Sensitive)
+				return;
+
 			double absX, absY;
 			GetAbsoluteLocation (out absX, out absY);
 
