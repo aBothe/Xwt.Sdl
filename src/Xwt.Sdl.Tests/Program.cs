@@ -95,14 +95,21 @@ namespace Xwt.Sdl.Tests
 	{
 		public MyOtherCanvas()
 		{
-			BackgroundColor = Colors.Green;
-			WidthRequest = 900;
-			HeightRequest = 1200;
+			//BackgroundColor = Colors.Green;
+			WidthRequest = 1000;
+			HeightRequest = 500;
+			AddChild (new Button ("Hey ho"));
 		}
 
+		double h;
 		protected override void OnDraw (Context ctx, Rectangle dirtyRect)
 		{
-			base.OnDraw (ctx, dirtyRect);
+			ctx.SetColor (Color.FromHsl (h, 1, 0.5));
+			h += 0.01;
+			if (h > 1)
+				h = 0;
+			ctx.Rectangle (dirtyRect);
+			ctx.Stroke ();
 		}
 
 		protected override bool SupportsCustomScrolling {
@@ -131,7 +138,12 @@ namespace Xwt.Sdl.Tests
 			mw.Content = tabs;
 
 			var myOtherCanvas = new MyOtherCanvas ();
-			var scrollSurrounding = new ScrollView (myOtherCanvas) { VerticalScrollPolicy = ScrollPolicy.Automatic, HorizontalScrollPolicy = ScrollPolicy.Automatic };
+			var scrollSurrounding = new ScrollView (myOtherCanvas) { 
+				VerticalScrollPolicy = ScrollPolicy.Automatic, 
+				HorizontalScrollPolicy = ScrollPolicy.Automatic, 
+				ExpandVertical = true,
+				ExpandHorizontal = true 
+			};
 			tabs.Add (scrollSurrounding, "Other canvas");
 
 			var scroll = new VScrollbar ();
