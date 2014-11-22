@@ -47,9 +47,20 @@ namespace Xwt.Sdl
 		readonly ScrollBarBackend VScrollbar, HScrollbar;
 		ScrollPolicy vScrollPolicy, hScrollPolicy;
 		bool showBorder = false;
-		double VisualChildWidth { get{ return Width - (HScrollbar.Visible ? HScrollbar.Width : 0); } }
-		double VisualChildHeight { get{ return Height - (VScrollbar.Visible ? VScrollbar.Height : 0); } }
+		double VisualChildWidth { get{ return Width - (VScrollbar.Visible ? WidgetStyles.Instance.ScrollbarWidth : 0); } }
+		double VisualChildHeight { get{ return Height - (HScrollbar.Visible ? WidgetStyles.Instance.ScrollbarWidth : 0); } }
 
+		public Rectangle VisibleRect
+		{
+			get{
+				double dx, dy;
+
+				dx = (HScrollbar.Value*0.01) * (childSize.Width-VisualChildWidth);
+				dy = (VScrollbar.Value*0.01) * (childSize.Height-VisualChildHeight);
+
+				return new Rectangle(dx,dy,VisualChildWidth, VisualChildHeight);
+			}
+		}
 		#endregion
 
 		public ScrollViewBackend ()
@@ -93,18 +104,6 @@ namespace Xwt.Sdl
 			set {
 				if (showBorder != (showBorder = value))
 					RealignEverything ();
-			}
-		}
-
-		public Rectangle VisibleRect {
-			get {
-				// Use the child viewport and the h/v-scroll values to calculate the top left child-related corner. Width and Height are easily derivable from this.
-				double childX, childY;
-
-				childX = 0;
-				childY = 0;
-
-				return new Rectangle (childX, childY, child.Width, child.Height);
 			}
 		}
 
@@ -152,15 +151,33 @@ namespace Xwt.Sdl
 
 		public override WidgetBackend GetChildAt (double x, double y)
 		{
-			if (x <= Width - (VScrollbar.Visible ? WidgetStyles.Instance.ScrollbarWidth:0)) {
+			var visRect = VisibleRect;
+			bool verticallyAtScrollbar = y >= visRect.Height;
 
+			if (x >= visRect.Width)
+				return verticallyAtScrollbar ? null : VScrollbar;
+
+			if (verticallyAtScrollbar)
+				return HScrollbar;
+
+			if (child == null)
+				return null;
+
+			// Offset x,y by scroll positions
+			x += visRect.X;
+			y += visRect.Y;
+
+			var w = child;
+			while (true) {
+				var ch = w.GetChildAt (x, y);
+				if (ch == w || ch == null)
+					return w;
+				x -= w.X;
+				y -= w.Y;
+				w = ch;
 			}
 
-			if (y <= Height - (HScrollbar.Visible ? WidgetStyles.Instance.ScrollbarWidth:0)) {
-
-			}
-			//TODO: Offset x,y by scroll positions
-			return base.GetChildAt (x, y);
+			return null;
 		}
 
 		public override Size GetPreferredSize (Cairo.Context fontExtentContext, double maxWidth, double maxHeight)
@@ -195,13 +212,10 @@ namespace Xwt.Sdl
 
 			// Set the scrollbars' pagesizes.
 			// Important: Persist the current scroll values ranging from 0 to 100, except a new child has been set.
-			VScrollbar.SetRange (0, 100, needVSroll ? Height / childSize.Height : 100.0, 10, 10, VScrollbar.Value);
-			HScrollbar.SetRange (0, 100, needHScroll ? Width / childSize.Width : 100.0, 10, 10, HScrollbar.Value);
+			VScrollbar.SetRange (0, 100, needVSroll ? 100.0/(childSize.Height/Height) : 100.0, 1, 1, VScrollbar.Value);
+			HScrollbar.SetRange (0, 100, needHScroll ? 100.0/(childSize.Width/Width) : 100.0, 1, 1, HScrollbar.Value);
 
 			// Show/hide scrollbars
-			var vScrollVisiblePreviously = VScrollbar.Visible;
-			var hScrollVisiblePreviously = HScrollbar.Visible;
-
 			switch (VerticalScrollPolicy) {
 				case ScrollPolicy.Always:
 					VScrollbar.Visible = true;
@@ -228,11 +242,13 @@ namespace Xwt.Sdl
 
 			// Layout scrollbars
 			if (VScrollbar.Visible) {
-				VScrollbar.OnBoundsChanged (Width - scrollBarWidth, 0, scrollBarWidth, Height - (HScrollbar.Visible ? scrollBarWidth : 0));
+				VScrollbar.Sensitive = needVSroll;
+				VScrollbar.OnBoundsChanged (Width - scrollBarWidth, 0, scrollBarWidth, VisualChildHeight);
 			}
 
 			if (HScrollbar.Visible) {
-				HScrollbar.OnBoundsChanged (0, Height- scrollBarWidth, Width - (VScrollbar.Visible ? scrollBarWidth : 0), scrollBarWidth);
+				HScrollbar.Sensitive = needHScroll;
+				HScrollbar.OnBoundsChanged (0, Height- scrollBarWidth, VisualChildWidth, scrollBarWidth);
 			}
 
 			Invalidate ();
@@ -255,20 +271,15 @@ namespace Xwt.Sdl
 					 * by the theoretical distance between the 
 					 * child's upper left corner and the visible upper left corner, so the child will think it's drawing beginning from 0/0.
 					 */
-					double dx, dy;
-
 					var visRect = VisibleRect;
 
-					dx = visRect.X;
-					dy = visRect.Y;
+					c.GlobalXOffset -= visRect.X;
+					c.GlobalYOffset -= visRect.Y;
 
-					c.GlobalXOffset -= dx;
-					c.GlobalYOffset -= dy;
+					child.Draw (c, visRect/*.Intersect(dirtyRect.Offset(visRect.X, visRect.Y))*/);
 
-					child.Draw (c, visRect.Intersect(dirtyRect));
-
-					c.GlobalXOffset += dx;
-					c.GlobalYOffset += dy;
+					c.GlobalXOffset += visRect.X;
+					c.GlobalYOffset += visRect.Y;
 				}
 			}
 
@@ -276,13 +287,13 @@ namespace Xwt.Sdl
 			if (VScrollbar.Visible) {
 				absRect = VScrollbar.AbsoluteBounds.Intersect (dirtyRect);
 				if (!absRect.IsEmpty)
-					VScrollbar.Draw (c, dirtyRect);
+					VScrollbar.Draw (c, absRect);
 			}
 
 			if (HScrollbar.Visible) {
 				absRect = HScrollbar.AbsoluteBounds.Intersect (dirtyRect);
 				if (!absRect.IsEmpty)
-					HScrollbar.Draw (c, dirtyRect);
+					HScrollbar.Draw (c, absRect);
 			}
 		}
 	}
