@@ -522,7 +522,7 @@ namespace Xwt.Sdl
 				return visible;
 			}
 			set {
-				if (visible != (value = visible))
+				if (visible != (visible = value))
 					Invalidate ();
 			}
 		}
