@@ -380,6 +380,9 @@ namespace Xwt.Sdl
 					menu.Draw (ctxt, Width);
 
 				if (child != null) {
+					ctxt.Context.Rectangle (invalidatedRegion.X, invalidatedRegion.Y, invalidatedRegion.Width, invalidatedRegion.Height);
+					ctxt.Context.Clip ();
+
 					child.Draw (ctxt, childRect.Intersect(invalidatedRegion));
 				}
 				SDL.SDL_UpdateWindowSurface (window);
