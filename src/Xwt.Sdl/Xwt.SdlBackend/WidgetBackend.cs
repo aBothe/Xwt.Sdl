@@ -81,6 +81,11 @@ namespace Xwt.Sdl
 		protected double x,y, width, height;
 		protected SizeConstraint currentWidthConstraint, currentHeightConstraint;
 
+		/// <summary>
+		/// Used for storing global view offsets e.g. when handling scrolling
+		/// </summary>
+		protected internal double viewPortProxyX, viewPortProxyY;
+
 		public Rectangle Bounds
 		{
 			get{return new Rectangle (x, y, width, height);}
@@ -373,7 +378,7 @@ namespace Xwt.Sdl
 		{
 			var pw = ParentWindow;
 			if(pw != null)
-				pw.Invalidate (AbsoluteBounds);
+				pw.Invalidate (AbsoluteBounds.Offset(viewPortProxyX, viewPortProxyY));
 		}
 
 		public void Invalidate(Rectangle rect, bool isAbsolute = false)
@@ -384,7 +389,7 @@ namespace Xwt.Sdl
 
 			var pw = ParentWindow;
 			if(pw != null)
-				pw.Invalidate (isAbsolute ? rect : rect.Offset(x,y));
+				pw.Invalidate (isAbsolute ? rect.Offset(viewPortProxyX, viewPortProxyY) : rect.Offset(x+viewPortProxyX,y+viewPortProxyY));
 		}
 
 		public void Draw(CairoContextBackend c, Rectangle dirtyRect)
@@ -434,7 +439,7 @@ namespace Xwt.Sdl
 		public Point ConvertToScreenCoordinates (Point widgetCoordinates)
 		{
 			//TODO: Add the client-windowframe offsets and the window coordinates
-			return AbsoluteLocation.Offset (widgetCoordinates);
+			return AbsoluteLocation.Offset(viewPortProxyX, viewPortProxyY).Offset (widgetCoordinates);
 		}
 
 		public void SetMinSize (double width, double height)
