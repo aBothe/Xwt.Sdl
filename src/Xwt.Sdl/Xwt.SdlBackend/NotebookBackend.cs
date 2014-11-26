@@ -102,9 +102,6 @@ namespace Xwt.Sdl
 				bool isCurrent = IsCurrent;
 				var ws = WidgetStyles.Instance;
 
-				double absX, absY;
-				GetAbsoluteLocation (out absX, out absY);
-
 				// Background
 				Color bg;
 				if(!Sensitive)
@@ -395,32 +392,22 @@ namespace Xwt.Sdl
 			base.DrawInternally (c, dirtyRect);
 
 			var w = CurrentChildWidget;
-
-			// Optionally only draw the child item incrementally
-			var chArea = CalculateChildArea().Offset(AbsoluteLocation);
-			var absBounds = w != null ? w.AbsoluteBounds : chArea;
-			Rectangle r;
-
-			if (w != null && absBounds.Contains (dirtyRect)) {
-				// Presumes that no current-tab change has been done before -- this would invalidate the entire widget area
-				w.Draw (c, dirtyRect);
-				return;
-			}
+			var absLoc = AbsoluteLocation;
 
 			// Inactive tabs
-			for (int i = 0; i < TabHeaders.Count; i++) {
-				if (i != currentTab) {
-					r = TabHeaders [i].AbsoluteBounds.Intersect (dirtyRect);
-					if (r.IsEmpty)
-						continue;
-					TabHeaders [i].Draw (c, r);
-				}
+			for (int i = TabHeaders.Count-1; i >= 0; i--) {
+				if (i != currentTab)
+					TabHeaders [i].Draw (c, TabHeaders[i].Bounds.Offset(absLoc).Intersect(dirtyRect));
 			}
 
 			// Draw content area
 			{
 				var ws = WidgetStyles.Instance;
-				var contentRect = chArea.Inflate (ws.NotebookChildPadding, ws.NotebookChildPadding).Intersect(dirtyRect);
+				var contentRect = 
+					CalculateChildArea ()
+					.Offset(absLoc)
+					.Inflate (ws.NotebookChildPadding, ws.NotebookChildPadding)
+					.Intersect(dirtyRect);
 
 				// Background
 				if (!contentRect.IsEmpty) {
@@ -431,13 +418,12 @@ namespace Xwt.Sdl
 			}
 
 			// Draw current tab
-			r = TabHeaders [currentTab].AbsoluteBounds.Intersect (dirtyRect);
-			if(!r.IsEmpty)
-				TabHeaders[currentTab].Draw (c, r);
+			if(currentTab >= 0 && currentTab < TabHeaders.Count)
+				TabHeaders[currentTab].Draw (c, TabHeaders[currentTab].Bounds.Offset(absLoc).Intersect(dirtyRect));
 
 			// Child
-			if(w != null && !(r = absBounds.Intersect (dirtyRect)).IsEmpty)
-				w.Draw (c, r);
+			if(w != null)
+				w.Draw (c, w.Bounds.Offset (absLoc).Intersect(dirtyRect));
 		}
 	}
 }
