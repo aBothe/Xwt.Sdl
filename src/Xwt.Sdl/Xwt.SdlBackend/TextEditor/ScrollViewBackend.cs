@@ -263,10 +263,8 @@ namespace Xwt.Sdl
 			// Draw child
 			if (child != null) {
 				var absLoc = AbsoluteLocation;
-				if( dirtyRect.X >= absLoc.X && 
-					dirtyRect.Y >= absLoc.Y &&
-					dirtyRect.Width >= VisualChildWidth &&
-					dirtyRect.Height >= VisualChildHeight)
+				if( dirtyRect.X >= absLoc.X && dirtyRect.X <= absLoc.X + VisualChildWidth &&
+					dirtyRect.Y >= absLoc.Y && dirtyRect.Y <= absLoc.Y + VisualChildHeight)
 				{
 					var visRect = VisibleRect;
 					/* Problem: Passing the dirtyRect to the draw method will not cause the widget to pay attention to being scrolled through or so.
