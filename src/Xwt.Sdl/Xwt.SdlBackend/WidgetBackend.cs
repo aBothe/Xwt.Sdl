@@ -387,13 +387,21 @@ namespace Xwt.Sdl
 				pw.Invalidate (isAbsolute ? rect : rect.Offset(x,y));
 		}
 
+		public void Draw(CairoContextBackend c, Rectangle dirtyRect)
+		{
+			viewPortProxyX = c.GlobalXOffset;
+			viewPortProxyY = c.GlobalYOffset;
+
+			DrawInternally (c, dirtyRect);
+		}
+
 		/// <summary>
 		/// Draw the widget.
 		/// </summary>
 		/// <param name="c">Drawing context</param>
 		/// <param name="dirtyRect">The previously invalidated area that needs to be redrawn. 
 		/// Contains at least the upper left absolut widget coordinates.</param>
-		public virtual void Draw(CairoContextBackend c,Rectangle rect)
+		protected virtual void DrawInternally(CairoContextBackend c,Rectangle rect)
 		{
 			if (backgroundColor.HasValue) {
 				c.Context.SetColor (backgroundColor.Value);

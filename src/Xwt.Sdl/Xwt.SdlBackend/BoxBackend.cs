@@ -73,9 +73,9 @@ namespace Xwt.Sdl
 
 		#endregion
 
-		public override void Draw (CairoContextBackend c, Rectangle dirtyRect)
+		protected override void DrawInternally (CairoContextBackend c, Rectangle dirtyRect)
 		{
-			base.Draw (c, dirtyRect);
+			base.DrawInternally (c, dirtyRect);
 
 			foreach (var w in Children) {
 				var bds = w.AbsoluteBounds;

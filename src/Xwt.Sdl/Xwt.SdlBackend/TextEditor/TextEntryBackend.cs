@@ -188,10 +188,10 @@ namespace Xwt.Sdl
 			return base.FireMouseMoved (timestamp, x, y);
 		}
 
-		public override void Draw (CairoContextBackend c, Rectangle dirtyRect)
+		protected override void DrawInternally (CairoContextBackend c, Rectangle dirtyRect)
 		{
 			// Draw background
-			base.Draw (c, dirtyRect);
+			base.DrawInternally (c, dirtyRect);
 
 			// Draw border if required and if within dirtyRect
 			if (showFrame) {

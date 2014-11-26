@@ -151,9 +151,9 @@ namespace Xwt.Sdl
 			return lay;
 		}
 
-		public override void Draw (CairoContextBackend c, Rectangle dirtyRect)
+		protected override void DrawInternally (CairoContextBackend c, Rectangle dirtyRect)
 		{
-			base.Draw (c, dirtyRect);
+			base.DrawInternally (c, dirtyRect);
 			var st = WidgetStyles.Instance;
 
 			double X, Y;

@@ -254,9 +254,9 @@ namespace Xwt.Sdl
 			Invalidate ();
 		}
 
-		public override void Draw (CairoContextBackend c, Rectangle dirtyRect)
+		protected override void DrawInternally (CairoContextBackend c, Rectangle dirtyRect)
 		{
-			base.Draw (c, dirtyRect);
+			base.DrawInternally (c, dirtyRect);
 
 			Rectangle absRect;
 

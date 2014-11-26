@@ -97,7 +97,7 @@ namespace Xwt.Sdl
 				return ext;
 			}
 
-			public override void Draw (CairoContextBackend c, Rectangle rect)
+			protected override void DrawInternally (CairoContextBackend c, Rectangle rect)
 			{
 				bool isCurrent = IsCurrent;
 				var ws = WidgetStyles.Instance;
@@ -393,9 +393,9 @@ namespace Xwt.Sdl
 			}
 		}
 
-		public override void Draw (CairoContextBackend c, Rectangle dirtyRect)
+		protected override void DrawInternally (CairoContextBackend c, Rectangle dirtyRect)
 		{
-			base.Draw (c, dirtyRect);
+			base.DrawInternally (c, dirtyRect);
 
 			var w = CurrentChildWidget;
 
