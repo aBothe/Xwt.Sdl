@@ -65,9 +65,7 @@ namespace Xwt.Sdl
 			
 			// Draw child widgets
 			foreach (var ch in Children){
-				var childRect = ch.AbsoluteBounds;
-				if(childRect.IntersectsWith(dirtyRect))
-					ch.Draw (c, childRect.Intersect(dirtyRect));
+				ch.Draw (c, dirtyRect, false);
 			}
 		}
 

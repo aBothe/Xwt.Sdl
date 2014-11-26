@@ -284,17 +284,11 @@ namespace Xwt.Sdl
 			}
 
 			// Draw scroll bars if needed
-			if (VScrollbar.Visible) {
-				absRect = VScrollbar.AbsoluteBounds.Intersect (dirtyRect);
-				if (!absRect.IsEmpty)
-					VScrollbar.Draw (c, absRect);
-			}
+			if (VScrollbar.Visible)
+				VScrollbar.Draw (c, dirtyRect, false);
 
-			if (HScrollbar.Visible) {
-				absRect = HScrollbar.AbsoluteBounds.Intersect (dirtyRect);
-				if (!absRect.IsEmpty)
-					HScrollbar.Draw (c, absRect);
-			}
+			if (HScrollbar.Visible)
+				HScrollbar.Draw (c, dirtyRect, false);
 		}
 	}
 }

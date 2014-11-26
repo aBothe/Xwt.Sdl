@@ -78,9 +78,7 @@ namespace Xwt.Sdl
 			base.DrawInternally (c, dirtyRect);
 
 			foreach (var w in Children) {
-				var bds = w.AbsoluteBounds;
-				if(bds.IntersectsWith(dirtyRect))
-					w.Draw (c, bds.Intersect(dirtyRect));
+				w.Draw (c, dirtyRect, false);
 			}
 		}
 	}

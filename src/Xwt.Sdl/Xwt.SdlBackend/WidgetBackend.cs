@@ -392,12 +392,16 @@ namespace Xwt.Sdl
 				pw.Invalidate (isAbsolute ? rect.Offset(viewPortProxyX, viewPortProxyY) : rect.Offset(x+viewPortProxyX,y+viewPortProxyY));
 		}
 
-		public void Draw(CairoContextBackend c, Rectangle dirtyRect)
+		public void Draw(CairoContextBackend c, Rectangle dirtyRect, bool alreadyIntersectedDirtyRect = true)
 		{
 			viewPortProxyX = c.GlobalXOffset;
 			viewPortProxyY = c.GlobalYOffset;
 
-			DrawInternally (c, dirtyRect);
+			if (!alreadyIntersectedDirtyRect)
+				dirtyRect = AbsoluteBounds.Intersect (dirtyRect);
+
+			if(!dirtyRect.IsEmpty)
+				DrawInternally (c, dirtyRect);
 		}
 
 		/// <summary>
