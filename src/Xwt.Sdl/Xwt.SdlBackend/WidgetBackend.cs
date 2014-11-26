@@ -605,7 +605,10 @@ namespace Xwt.Sdl
 		Color? backgroundColor;
 		public Color BackgroundColor {
 			get { return backgroundColor.Value;}
-			set { backgroundColor = value; Invalidate ();}
+			set { 
+				if(backgroundColor != (backgroundColor = value))
+					Invalidate ();
+			}
 		}
 
 		public string TooltipText {
