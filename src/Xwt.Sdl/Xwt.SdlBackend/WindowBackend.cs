@@ -337,7 +337,9 @@ namespace Xwt.Sdl
 		bool clearBackground = true;
 		public void Invalidate()
 		{
-			Invalidate (Bounds);
+			int w, h;
+			SDL.SDL_GetWindowSize (window, out w, out h);
+			Invalidate (new Rectangle(0,0, w, h));
 			clearBackground = true;
 		}
 
