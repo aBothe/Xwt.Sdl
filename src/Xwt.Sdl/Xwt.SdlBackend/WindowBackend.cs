@@ -52,6 +52,9 @@ namespace Xwt.Sdl
 		/// Must always contain absolute window coordinates reaching from x|y>=0 to heidght|width &lt;= Window's height|width.
 		/// </summary>
 		Rectangle invalidatedRegion;
+		/// <summary>
+		/// Flag which is set to true as soon as any region is getting Invalidate()'d
+		/// </summary>
 		bool redraw;
 
 		Rectangle padding;
