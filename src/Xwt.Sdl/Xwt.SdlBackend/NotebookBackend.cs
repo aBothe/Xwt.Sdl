@@ -106,22 +106,19 @@ namespace Xwt.Sdl
 				GetAbsoluteLocation (out absX, out absY);
 
 				// Background
-				{
-					c.Context.NewPath ();
+				Color bg;
+				if(!Sensitive)
+					bg = new Color (ws.ButtonInsensitiveGrey,ws.ButtonInsensitiveGrey,ws.ButtonInsensitiveGrey);
+				else if (isCurrent)
+					bg = new Color (ws.ButtonDefaultGrey,ws.ButtonDefaultGrey,ws.ButtonDefaultGrey);
+				else if(MouseEntered)
+					bg = new Color (ws.ButtonHoveredGrey,ws.ButtonHoveredGrey,ws.ButtonHoveredGrey);
+				else	
+					bg =  ws.NotebookBackground;
 
-					c.Context.Rectangle (absX, absY, Width, Height);
-
-					if(!Sensitive)
-						c.Context.SetColor (new Color (ws.ButtonInsensitiveGrey,ws.ButtonInsensitiveGrey,ws.ButtonInsensitiveGrey));
-					else if (isCurrent)
-						c.Context.SetColor (new Color (ws.ButtonDefaultGrey,ws.ButtonDefaultGrey,ws.ButtonDefaultGrey));
-					else if(MouseEntered)
-						c.Context.SetColor (new Color (ws.ButtonHoveredGrey,ws.ButtonHoveredGrey,ws.ButtonHoveredGrey));
-					else	
-						c.Context.SetColor (ws.NotebookBackground);
-
-					c.Context.Fill ();
-				}
+				c.Context.SetColor (bg);
+				c.Context.Rectangle (rect.X, rect.Y, rect.Width, rect.Height);
+				c.Context.Fill ();
 
 				// Label
 				{
