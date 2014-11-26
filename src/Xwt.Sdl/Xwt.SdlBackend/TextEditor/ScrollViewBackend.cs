@@ -44,21 +44,22 @@ namespace Xwt.Sdl
 			}
 		}
 		Size childSize;
+		static double scrollbarWidth {get{ return WidgetStyles.Instance.ScrollbarWidth; }}
 		readonly ScrollBarBackend VScrollbar, HScrollbar;
 		ScrollPolicy vScrollPolicy, hScrollPolicy;
 		bool showBorder = false;
-		double VisualChildWidth { get{ return Width - (VScrollbar.Visible ? WidgetStyles.Instance.ScrollbarWidth : 0); } }
-		double VisualChildHeight { get{ return Height - (HScrollbar.Visible ? WidgetStyles.Instance.ScrollbarWidth : 0); } }
+		double VisualChildWidth { get{ return Math.Min(Width, childSize.Width) - (VScrollbar.Visible ? scrollbarWidth : 0); } }
+		double VisualChildHeight { get{ return Math.Min(Height, childSize.Height) - (HScrollbar.Visible ? scrollbarWidth : 0); } }
 
 		public Rectangle VisibleRect
 		{
 			get{
-				double dx, dy;
+				double dx, dy, vx = VisualChildWidth, vy = VisualChildHeight;
 
-				dx = (HScrollbar.Value*0.01) * (childSize.Width-VisualChildWidth);
-				dy = (VScrollbar.Value*0.01) * (childSize.Height-VisualChildHeight);
+				dx = (HScrollbar.Value*0.01) * (childSize.Width-vx);
+				dy = (VScrollbar.Value*0.01) * (childSize.Height-vy);
 
-				return new Rectangle(dx,dy,VisualChildWidth, VisualChildHeight);
+				return new Rectangle(dx,dy,vx, vy);
 			}
 		}
 		#endregion
@@ -151,21 +152,23 @@ namespace Xwt.Sdl
 
 		public override WidgetBackend GetChildAt (double x, double y)
 		{
-			var visRect = VisibleRect;
-			bool verticallyAtScrollbar = y >= visRect.Height;
+			bool verticallyAtScrollbar = y >= Height - scrollbarWidth;
 
-			if (x >= visRect.Width)
+			if (x >= Width - scrollbarWidth)
 				return verticallyAtScrollbar ? null : VScrollbar;
 
 			if (verticallyAtScrollbar)
 				return HScrollbar;
 
-			if (child == null)
+			if (child == null || 
+				x > childSize.Width || 
+				y > childSize.Height)
 				return null;
 
 			// Offset x,y by scroll positions
-			x += visRect.X;
-			y += visRect.Y;
+			var visRect = VisibleRect;
+			x -= visRect.X;
+			y -= visRect.Y;
 
 			var w = child;
 			while (true) {
@@ -205,10 +208,9 @@ namespace Xwt.Sdl
 
 		void RealignEverything()
 		{
-			var scrollBarWidth = WidgetStyles.Instance.ScrollbarWidth;
-
-			var needVSroll = Height > 0 && childSize.Height > (Height - scrollBarWidth);
-			var needHScroll = Width > 0 && childSize.Width > (Width - scrollBarWidth);
+			var scrollbarWidth = ScrollViewBackend.scrollbarWidth;
+			var needVSroll = Height > 0 && childSize.Height > (Height - scrollbarWidth);
+			var needHScroll = Width > 0 && childSize.Width > (Width - scrollbarWidth);
 
 			// Set the scrollbars' pagesizes.
 			// Important: Persist the current scroll values ranging from 0 to 100, except a new child has been set.
@@ -243,12 +245,12 @@ namespace Xwt.Sdl
 			// Layout scrollbars
 			if (VScrollbar.Visible) {
 				VScrollbar.Sensitive = needVSroll;
-				VScrollbar.OnBoundsChanged (Width - scrollBarWidth, 0, scrollBarWidth, VisualChildHeight);
+				VScrollbar.OnBoundsChanged (Width - scrollbarWidth, 0, scrollbarWidth, VisualChildHeight);
 			}
 
 			if (HScrollbar.Visible) {
 				HScrollbar.Sensitive = needHScroll;
-				HScrollbar.OnBoundsChanged (0, Height- scrollBarWidth, VisualChildWidth, scrollBarWidth);
+				HScrollbar.OnBoundsChanged (0, Height- scrollbarWidth, VisualChildWidth, scrollbarWidth);
 			}
 
 			Invalidate ();
@@ -258,25 +260,26 @@ namespace Xwt.Sdl
 		{
 			base.DrawInternally (c, dirtyRect);
 
-			Rectangle absRect;
-
 			// Draw child
 			if (child != null) {
-				var absLoc = child.AbsoluteLocation;
-				absRect = new Rectangle(absLoc, childSize).Intersect (dirtyRect);
-				if (!absRect.IsEmpty) {
+				var absLoc = AbsoluteLocation;
+				if( dirtyRect.X >= absLoc.X && 
+					dirtyRect.Y >= absLoc.Y &&
+					dirtyRect.Width >= VisualChildWidth &&
+					dirtyRect.Height >= VisualChildHeight)
+				{
+					var visRect = VisibleRect;
 					/* Problem: Passing the dirtyRect to the draw method will not cause the widget to pay attention to being scrolled through or so.
 					 * Perhaps this could be solved by temporarily adjusting 
 					 * the render context's global x/y offsets and offsetting the dirtyRect 
 					 * by the theoretical distance between the 
 					 * child's upper left corner and the visible upper left corner, so the child will think it's drawing beginning from 0/0.
 					 */
-					var visRect = VisibleRect;
 
 					c.GlobalXOffset -= visRect.X;
 					c.GlobalYOffset -= visRect.Y;
 
-					child.Draw (c, visRect/*.Intersect(dirtyRect.Offset(visRect.X, visRect.Y))*/);
+					child.Draw (c, visRect.Offset(absLoc.X, absLoc.Y).Intersect(dirtyRect.Offset(visRect.X, visRect.Y)));
 
 					c.GlobalXOffset += visRect.X;
 					c.GlobalYOffset += visRect.Y;
