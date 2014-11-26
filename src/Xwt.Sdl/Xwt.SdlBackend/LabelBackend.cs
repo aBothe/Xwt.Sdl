@@ -162,7 +162,7 @@ namespace Xwt.Sdl
 			using (var lay = CreateLayout(c.Context)) {
 				c.Context.SetColor (TextColor);
 
-				lay.Width = (int)((Width - (havePadding ? st.LabelXPadding*2 : 0)) * Pango.Scale.PangoScale);
+				lay.Width = (int)((Math.Min(Width, dirtyRect.Width) - (havePadding ? st.LabelXPadding*2 : 0)) * Pango.Scale.PangoScale);
 
 				if (havePadding) {
 					X += st.LabelXPadding;
