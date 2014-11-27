@@ -120,7 +120,9 @@ namespace Xwt.Sdl
 				return val;
 			}
 			set {
-				val = Math.Max(Math.Min(value,upperVal),lowerVal);
+				if(val == (val = Math.Max(Math.Min(value,upperVal),lowerVal)))
+					return;
+
 				if (scrollEventSink != null)
 					scrollEventSink.OnValueChanged ();
 				if (scrollCtrlEventSink != null)
@@ -213,10 +215,10 @@ namespace Xwt.Sdl
 
 		#region IInWindowDrag implementation
 
-		public void MouseWheel(int x, int y, ScrollDirection dir)
+		public bool MouseWheel(int x, int y, ScrollDirection dir)
 		{
-			if (!Sensitive)
-				return;
+			if (!Sensitive || val >= upperVal || val <= lowerVal)
+				return false;
 
 			switch (dir) {
 				case ScrollDirection.Down:
@@ -227,6 +229,8 @@ namespace Xwt.Sdl
 					Value -= pageIncrement;
 					break;
 			}
+
+			return true;
 		}
 
 		public void MouseMove (int x, int y)
@@ -300,11 +304,9 @@ namespace Xwt.Sdl
 
 		internal override bool FireMouseWheel (uint timestamp, int x, int y, ScrollDirection dir)
 		{
-			if (base.FireMouseWheel (timestamp, x, y, dir))
-				return true;
-
-			MouseWheel (x, y, dir);
-			return false;
+			return 
+				base.FireMouseWheel (timestamp, x, y, dir) || 
+				MouseWheel (x, y, dir);
 		}
 	}
 }

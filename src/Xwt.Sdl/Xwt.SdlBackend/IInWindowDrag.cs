@@ -29,7 +29,7 @@ namespace Xwt.Sdl
 {
 	public interface IInWindowDrag
 	{
-		void MouseWheel(int x, int y, ScrollDirection dir);
+		bool MouseWheel(int x, int y, ScrollDirection dir);
 		void MouseMove(int x,int y);
 		/// <summary>
 		/// Mouse button that was was pressed (not released yet) and thus caused the drag operation.
