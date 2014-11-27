@@ -147,6 +147,11 @@ namespace Xwt.CairoBackend
 			Context.Rectangle (x+GlobalXOffset, y+GlobalYOffset, width, height);
 		}
 
+		public void Rectangle(Rectangle r)
+		{
+			Context.Rectangle (r.X + GlobalXOffset, r.Y + GlobalYOffset, r.Width, r.Height);
+		}
+
 		public void SetColor (Xwt.Drawing.Color color)
 		{
 			Context.SetSourceRGBA (color.Red, color.Green, color.Blue, color.Alpha * GlobalAlpha);

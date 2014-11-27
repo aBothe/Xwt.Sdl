@@ -415,7 +415,7 @@ namespace Xwt.Sdl
 			if (backgroundColor.HasValue) {
 				c.SetColor (backgroundColor.Value);
 
-				c.Rectangle (rect.X, rect.Y, rect.Width, rect.Height);
+				c.Rectangle (rect);
 				c.Fill ();
 			}
 		}
