@@ -384,14 +384,9 @@ namespace Xwt.Sdl
 				if (menu != null)
 					menu.Draw (ctxt, Width);
 
-				if (child != null) {
-					var inv = invalidatedRegion;
+				if (child != null)
+					child.Draw (ctxt, childRect.Intersect(invalidatedRegion));
 
-					ctxt.Context.Rectangle (inv.X, inv.Y, inv.Width, inv.Height);
-					ctxt.Context.Clip ();
-					invalidatedRegion = new Rectangle();
-					child.Draw (ctxt, childRect.Intersect(inv));
-				}
 				SDL.SDL_UpdateWindowSurface (window);
 			}
 

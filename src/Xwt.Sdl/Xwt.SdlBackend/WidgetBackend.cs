@@ -400,8 +400,13 @@ namespace Xwt.Sdl
 			if (!alreadyIntersectedDirtyRect)
 				dirtyRect = AbsoluteBounds.Intersect (dirtyRect);
 
-			if(!dirtyRect.IsEmpty)
+			if (!dirtyRect.IsEmpty) {
+				c.Save ();
+				c.Rectangle (dirtyRect);
+				c.Context.Clip ();
 				DrawInternally (c, dirtyRect);
+				c.Restore ();
+			}
 		}
 
 		/// <summary>
