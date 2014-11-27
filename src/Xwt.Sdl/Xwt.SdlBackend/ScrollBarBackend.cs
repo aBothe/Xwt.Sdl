@@ -185,10 +185,10 @@ namespace Xwt.Sdl
 			base.DrawInternally (c, rect);
 
 			// Bar
-			c.Context.Rectangle (barRect.X, barRect.Y, barRect.Width, barRect.Height);
+			c.Rectangle (barRect.X, barRect.Y, barRect.Width, barRect.Height);
 
-			c.Context.SetColor (barHovered || barClicked ? ws.ScrollbarHoveredColor : ws.ScrollbarColor);
-			c.Context.Fill ();
+			c.SetColor (barHovered || barClicked ? ws.ScrollbarHoveredColor : ws.ScrollbarColor);
+			c.Fill ();
 		}
 
 

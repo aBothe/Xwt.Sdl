@@ -413,10 +413,10 @@ namespace Xwt.Sdl
 		protected virtual void DrawInternally(CairoContextBackend c,Rectangle rect)
 		{
 			if (backgroundColor.HasValue) {
-				c.Context.SetColor (backgroundColor.Value);
+				c.SetColor (backgroundColor.Value);
 
-				c.Context.Rectangle (rect.X, rect.Y, rect.Width, rect.Height);
-				c.Context.Fill ();
+				c.Rectangle (rect.X, rect.Y, rect.Width, rect.Height);
+				c.Fill ();
 			}
 		}
 

@@ -113,9 +113,9 @@ namespace Xwt.Sdl
 				else	
 					bg =  ws.NotebookBackground;
 
-				c.Context.SetColor (bg);
-				c.Context.Rectangle (rect.X, rect.Y, rect.Width, rect.Height);
-				c.Context.Fill ();
+				c.SetColor (bg);
+				c.Rectangle (rect.X, rect.Y, rect.Width, rect.Height);
+				c.Fill ();
 
 				// Label
 				{
@@ -411,9 +411,9 @@ namespace Xwt.Sdl
 
 				// Background
 				if (!contentRect.IsEmpty) {
-					c.Context.Rectangle (contentRect.X, contentRect.Y, contentRect.Width, contentRect.Height);
-					c.Context.SetColor (ws.NotebookBackground);
-					c.Context.Fill ();
+					c.Rectangle (contentRect.X, contentRect.Y, contentRect.Width, contentRect.Height);
+					c.SetColor (ws.NotebookBackground);
+					c.Fill ();
 				}
 			}
 

@@ -160,7 +160,7 @@ namespace Xwt.Sdl
 			GetAbsoluteLocation (out X, out Y);
 
 			using (var lay = CreateLayout(c.Context)) {
-				c.Context.SetColor (TextColor);
+				c.SetColor (TextColor);
 
 				lay.Width = (int)((Width - (havePadding ? st.LabelXPadding*2 : 0)) * Pango.Scale.PangoScale);
 
@@ -168,7 +168,7 @@ namespace Xwt.Sdl
 					X += st.LabelXPadding;
 					Y += st.LabelYPadding;
 				}
-				c.Context.MoveTo (X, Y);
+				c.MoveTo (X, Y);
 
 				CairoHelper.ShowLayout (c.Context, lay);
 			}

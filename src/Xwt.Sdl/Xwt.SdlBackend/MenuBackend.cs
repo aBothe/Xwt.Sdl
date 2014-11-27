@@ -40,8 +40,8 @@ namespace Xwt.Sdl
 		public void Draw(CairoBackend.CairoContextBackend c,int width)
 		{
 			c.Context.SetSourceRGB (1, 0, 0);
-			c.Context.Rectangle (0, 0, (double)width, (double)Height);
-			c.Context.Fill ();
+			c.Rectangle (0, 0, (double)width, (double)Height);
+			c.Fill ();
 		}
 
 		#region IMenuBackend implementation

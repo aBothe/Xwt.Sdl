@@ -70,31 +70,31 @@ namespace Xwt.Sdl
 
 			// Border
 			{
-				c.Context.MoveTo (X, Y + cornerRadius);
+				c.MoveTo (X, Y + cornerRadius);
 
 				// Top left corner
-				c.Context.Arc (X +cornerRadius, Y + cornerRadius, cornerRadius, -Math.PI, -Math.PI/2);
+				c.Arc (X +cornerRadius, Y + cornerRadius, cornerRadius, -90, -45);
 
 				// top edge
 				c.Context.RelLineTo (Width - (cornerRadius*2), 0);
 
 				// top right corner
-				c.Context.Arc (X + Width -cornerRadius, Y + cornerRadius, cornerRadius, -Math.PI/2, 0);
+				c.Arc (X + Width -cornerRadius, Y + cornerRadius, cornerRadius, -90, 0);
 
 				// left edge
 				c.Context.RelLineTo (0, Height-cornerRadius*2);
 
 				// bottom right corner
-				c.Context.Arc (X + Width -cornerRadius, Y + Height - cornerRadius, cornerRadius, 0, Math.PI/2);
+				c.Arc (X + Width -cornerRadius, Y + Height - cornerRadius, cornerRadius, 0, 90);
 
 				// bottom corner
 				c.Context.RelLineTo (-Width+(cornerRadius*2), 0);
 
 				// bottom left corner
-				c.Context.Arc (X + cornerRadius, Y + Height - cornerRadius, cornerRadius, Math.PI/2, Math.PI);
+				c.Arc (X + cornerRadius, Y + Height - cornerRadius, cornerRadius, 90, 180);
 
 				c.Context.ClosePath ();
-				c.Context.SetColor (style.ButtonBorderColor);
+				c.SetColor (style.ButtonBorderColor);
 				c.Context.LineWidth = style.ButtonBorderLineWidth;
 				c.Context.StrokePreserve ();
 			}
@@ -118,7 +118,7 @@ namespace Xwt.Sdl
 				g.AddColorStop (1, new Cairo.Color (grey, grey, grey));
 
 				c.Context.SetSource (g);
-				c.Context.Fill ();
+				c.Fill ();
 
 				g.Dispose ();
 			}
@@ -126,10 +126,10 @@ namespace Xwt.Sdl
 			// Focus dash border
 			if (HasFocus) {
 				c.Context.LineWidth = 1;
-				c.Context.SetColor (style.FocusDashBorderColor);
+				c.SetColor (style.FocusDashBorderColor);
 				c.Context.SetDash (style.FocusDashLine, 0);
 
-				c.Context.Rectangle (X + xPadding/2, Y + yPadding/2, Width - xPadding, Height - yPadding);
+				c.Rectangle (X + xPadding/2, Y + yPadding/2, Width - xPadding, Height - yPadding);
 				c.Context.Stroke ();
 			}
 

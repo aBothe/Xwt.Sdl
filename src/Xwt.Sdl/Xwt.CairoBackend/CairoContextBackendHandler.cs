@@ -35,6 +35,8 @@ namespace Xwt.CairoBackend
 {
 	public class CairoContextBackend : IDisposable
 	{
+		public const double Degrees = System.Math.PI / 180d;
+		public const double Radiants = 180d / System.Math.PI;
 		public double GlobalAlpha = 1;
 		public Cairo.Context Context;
 		public Cairo.Surface TempSurface;
@@ -86,6 +88,175 @@ namespace Xwt.CairoBackend
 			PatternAlpha = d.PatternAlpha;
 			Text = d.Text;
 		}
+
+		public void Arc (double xc, double yc, double radius, double angle1_deg, double angle2_deg)
+		{
+			Context.Arc (xc+GlobalXOffset, yc+GlobalYOffset, radius, angle1_deg * Degrees, angle2_deg * Degrees);
+		}
+
+		public void ArcNegative (double xc, double yc, double radius, double angle1_deg, double angle2_deg)
+		{
+			Context.ArcNegative (xc+GlobalXOffset, yc+GlobalYOffset, radius, angle1_deg * Degrees, angle2_deg * Degrees);
+		}
+
+		public void CurveTo (double x1, double y1, double x2, double y2, double x3, double y3)
+		{
+			Context.CurveTo (x1+GlobalXOffset, y1+GlobalYOffset, x2+GlobalXOffset, y2+GlobalYOffset, x3+GlobalXOffset, y3+GlobalYOffset);
+		}
+
+		public void Fill ()
+		{
+			var alpha = GlobalAlpha * PatternAlpha;
+
+			if (alpha == 1.0)
+				Context.Fill ();
+			else {
+				Context.Save ();
+				Context.Clip ();
+				Context.PaintWithAlpha (alpha);
+				Context.Restore ();
+			}
+		}
+
+		public void FillPreserve ()
+		{
+			var alpha = GlobalAlpha * PatternAlpha;
+
+			if (alpha == 1)
+				Context.FillPreserve ();
+			else {
+				Context.Save ();
+				Context.ClipPreserve ();
+				Context.PaintWithAlpha (alpha);
+				Context.Restore ();
+			}
+		}
+
+		public void LineTo (double x, double y)
+		{
+			Context.LineTo (x+GlobalXOffset, y+GlobalYOffset);
+		}
+
+		public void MoveTo (double x, double y)
+		{
+			Context.MoveTo (x+GlobalXOffset, y+GlobalYOffset);
+		}
+
+		public void Rectangle (double x, double y, double width, double height)
+		{
+			Context.Rectangle (x+GlobalXOffset, y+GlobalYOffset, width, height);
+		}
+
+		public void SetColor (Xwt.Drawing.Color color)
+		{
+			Context.SetSourceRGBA (color.Red, color.Green, color.Blue, color.Alpha * GlobalAlpha);
+			PatternAlpha = 1;
+		}
+
+		public void SetPattern (object p)
+		{
+			/*if (p is ImagePatternBackend) {
+				cb.PatternAlpha = ((ImagePatternBackend)p).Image.Alpha;
+				p = ((ImagePatternBackend)p).GetPattern (ApplicationContext, ((CairoContextBackend)backend).ScaleFactor);
+			} else*/
+			PatternAlpha = 1;
+
+			if (p != null)
+				Context.SetSource ((Cairo.Pattern) p);
+			else
+				Context.SetSource ((Cairo.Pattern) null);
+		}
+
+		public void DrawTextLayout (TextLayout layout, double x, double y)
+		{
+			var be = (Xwt.CairoBackend.CairoTextLayoutBackendHandler.PangoBackend)layout.GetBackend();
+			var pl = be.Layout;
+
+			Context.MoveTo (x+GlobalXOffset, y+GlobalYOffset);
+
+			if (layout.Height <= 0) {
+				Pango.CairoHelper.ShowLayout (Context, pl);
+			} else {
+				var lc = pl.LineCount;
+				var scale = Pango.Scale.PangoScale;
+				double h = 0;
+				for (int i=0; i<lc; i++) {
+					var line = pl.Lines [i];
+					var ext = new Pango.Rectangle ();
+					var extl = new Pango.Rectangle ();
+					line.GetExtents (ref ext, ref extl);
+					h += (extl.Height / scale);
+					if (h > layout.Height)
+						break;
+					Context.MoveTo (x, y + h);
+					Pango.CairoHelper.ShowLayoutLine (Context, line);
+				}
+			}
+
+			Context.MoveTo (x+GlobalXOffset, y+GlobalYOffset);
+		}
+
+		public void DrawImage (ImageDescription img, double x, double y)
+		{
+			img.Alpha *= GlobalAlpha;/*
+			var pix = (Xwt.GtkBackend.GtkImage) img.Backend;
+
+			pix.Draw (ApplicationContext, ctx.Context, ctx.ScaleFactor, x, y, img);*/
+		}
+
+		public void DrawImage (ImageDescription img, Rectangle srcRect, Rectangle destRect)
+		{
+			Context.Save ();
+			Context.NewPath();
+			Context.Rectangle (destRect.X, destRect.Y, destRect.Width, destRect.Height);
+			Context.Clip ();
+			Context.Translate (destRect.X-srcRect.X, destRect.Y-srcRect.Y);
+			double sx = destRect.Width / srcRect.Width;
+			double sy = destRect.Height / srcRect.Height;
+			Context.Scale (sx, sy);
+			img.Alpha *= GlobalAlpha;
+			/*
+			var pix = (Xwt.GtkBackend.GtkImage) img.Backend;
+			pix.Draw (ApplicationContext, ctx.Context, ctx.ScaleFactor, 0, 0, img);*/
+			Context.Restore ();
+		}
+
+		public void Rotate (double angle_deg)
+		{
+			Context.Rotate (angle_deg * Degrees);
+		}
+
+		public void Scale (double scaleX, double scaleY)
+		{
+			Context.Scale (scaleX, scaleY);
+		}
+
+		public void Translate (double tx, double ty)
+		{
+			Context.Translate (tx, ty);
+		}
+
+		public void ModifyCTM (Matrix m)
+		{
+			var t = new Cairo.Matrix (m.M11, m.M12, m.M21, m.M22, m.OffsetX, m.OffsetY);
+			Context.Transform (t);
+		}
+
+		public Matrix GetCTM ()
+		{
+			var t = Context.Matrix;
+			return new Matrix (t.Xx, t.Yx, t.Xy, t.Yy, t.X0, t.Y0);
+		}
+
+		public bool IsPointInFill (double x, double y)
+		{
+			return Context.InFill (x+GlobalXOffset, y+GlobalYOffset);
+		}
+
+		public bool IsPointInStroke (double x, double y)
+		{
+			return Context.InStroke (x+GlobalXOffset, y+GlobalYOffset);
+		}
 	}
 	
 	public class CairoContextBackendHandler: ContextBackendHandler
@@ -100,40 +271,32 @@ namespace Xwt.CairoBackend
 
 		public override double GetScaleFactor (object backend)
 		{
-			CairoContextBackend gc = (CairoContextBackend)backend;
-			return gc.ScaleFactor;
+			return (backend as CairoContextBackend).ScaleFactor;
 		}
 
 		public override void Save (object backend)
 		{
-			CairoContextBackend gc = (CairoContextBackend)backend;
-			gc.Save ();
+			(backend as CairoContextBackend).Save ();
 		}
 		
 		public override void Restore (object backend)
 		{
-			CairoContextBackend gc = (CairoContextBackend)backend;
-			gc.Restore ();
+			(backend as CairoContextBackend).Restore ();
 		}
 		
 		public override void SetGlobalAlpha (object backend, double alpha)
 		{
-			CairoContextBackend gc = (CairoContextBackend) backend;
-			gc.GlobalAlpha = alpha;
+			(backend as CairoContextBackend).GlobalAlpha = alpha;
 		}
-		
-		const double degrees = System.Math.PI / 180d;
 
 		public override void Arc (object backend, double xc, double yc, double radius, double angle1, double angle2)
 		{
-			CairoContextBackend gc = (CairoContextBackend)backend;
-			gc.Context.Arc (xc+gc.GlobalXOffset, yc+gc.GlobalYOffset, radius, angle1 * degrees, angle2 * degrees);
+			(backend as CairoContextBackend).Arc (xc, yc, radius, angle1, angle2);
 		}
 
 		public override void ArcNegative (object backend, double xc, double yc, double radius, double angle1, double angle2)
 		{
-			CairoContextBackend gc = (CairoContextBackend)backend;
-			gc.Context.ArcNegative (xc+gc.GlobalXOffset, yc+gc.GlobalYOffset, radius, angle1 * degrees, angle2 * degrees);
+			(backend as CairoContextBackend).ArcNegative (xc, yc, radius, angle1, angle2);
 		}
 
 		public override void Clip (object backend)
@@ -156,52 +319,27 @@ namespace Xwt.CairoBackend
 
 		public override void CurveTo (object backend, double x1, double y1, double x2, double y2, double x3, double y3)
 		{
-			CairoContextBackend gc = (CairoContextBackend) backend;
-			gc.Context.CurveTo (x1+gc.GlobalXOffset, y1+gc.GlobalYOffset, x2+gc.GlobalXOffset, y2+gc.GlobalYOffset, x3+gc.GlobalXOffset, y3+gc.GlobalYOffset);
+			(backend as CairoContextBackend).CurveTo (x1, y1, x2, y2, x3, y3);
 		}
 
 		public override void Fill (object backend)
 		{
-			var gtkc = (CairoContextBackend) backend;
-			Cairo.Context ctx = gtkc.Context;
-			var alpha = gtkc.GlobalAlpha * gtkc.PatternAlpha;
-
-			if (alpha == 1.0)
-				ctx.Fill ();
-			else {
-				ctx.Save ();
-				ctx.Clip ();
-				ctx.PaintWithAlpha (alpha);
-				ctx.Restore ();
-			}
+			(backend as CairoContextBackend).Fill ();
 		}
 
 		public override void FillPreserve (object backend)
 		{
-			var gtkc = (CairoContextBackend) backend;
-			Cairo.Context ctx = gtkc.Context;
-			var alpha = gtkc.GlobalAlpha * gtkc.PatternAlpha;
-
-			if (alpha == 1)
-				ctx.FillPreserve ();
-			else {
-				ctx.Save ();
-				ctx.ClipPreserve ();
-				ctx.PaintWithAlpha (alpha);
-				ctx.Restore ();
-			}
+			(backend as CairoContextBackend).FillPreserve ();
 		}
 
 		public override void LineTo (object backend, double x, double y)
 		{
-			CairoContextBackend gc = (CairoContextBackend) backend;
-			gc.Context.LineTo (x+gc.GlobalXOffset, y+gc.GlobalYOffset);
+			(backend as CairoContextBackend).LineTo (x, y);
 		}
 
 		public override void MoveTo (object backend, double x, double y)
 		{
-			CairoContextBackend gc = (CairoContextBackend) backend;
-			gc.Context.MoveTo (x+gc.GlobalXOffset, y+gc.GlobalYOffset);
+			(backend as CairoContextBackend).MoveTo (x, y);
 		}
 
 		public override void NewPath (object backend)
@@ -212,132 +350,67 @@ namespace Xwt.CairoBackend
 
 		public override void Rectangle (object backend, double x, double y, double width, double height)
 		{
-			CairoContextBackend gc = (CairoContextBackend) backend;
-			gc.Context.Rectangle (x+gc.GlobalXOffset, y+gc.GlobalYOffset, width, height);
+			(backend as CairoContextBackend).Rectangle (x, y, width, height);
 		}
 
 		public override void RelCurveTo (object backend, double dx1, double dy1, double dx2, double dy2, double dx3, double dy3)
 		{
-			Cairo.Context ctx = ((CairoContextBackend) backend).Context;
-			ctx.RelCurveTo (dx1, dy1, dx2, dy2, dx3, dy3);
+			(backend as CairoContextBackend).Context.RelCurveTo (dx1, dy1, dx2, dy2, dx3, dy3);
 		}
 
 		public override void RelLineTo (object backend, double dx, double dy)
 		{
-			Cairo.Context ctx = ((CairoContextBackend) backend).Context;
-			ctx.RelLineTo (dx, dy);
+			(backend as CairoContextBackend).Context.RelLineTo (dx, dy);
 		}
 
 		public override void RelMoveTo (object backend, double dx, double dy)
 		{
-			Cairo.Context ctx = ((CairoContextBackend) backend).Context;
-			ctx.RelMoveTo (dx, dy);
+			(backend as CairoContextBackend).Context.RelMoveTo (dx, dy);
 		}
 
 		public override void Stroke (object backend)
 		{
-			Cairo.Context ctx = ((CairoContextBackend) backend).Context;
-			ctx.Stroke ();
+			(backend as CairoContextBackend).Context.Stroke ();
 		}
 
 		public override void StrokePreserve (object backend)
 		{
-			Cairo.Context ctx = ((CairoContextBackend) backend).Context;
-			ctx.StrokePreserve ();
+			(backend as CairoContextBackend).Context.StrokePreserve ();
 		}
 
 		public override void SetColor (object backend, Xwt.Drawing.Color color)
 		{
-			var gtkContext = (CairoContextBackend) backend;
-			gtkContext.Context.SetSourceRGBA (color.Red, color.Green, color.Blue, color.Alpha * gtkContext.GlobalAlpha);
-			gtkContext.PatternAlpha = 1;
+			(backend as CairoContextBackend).SetColor (color);
 		}
 		
 		public override void SetLineWidth (object backend, double width)
 		{
-			Cairo.Context ctx = ((CairoContextBackend) backend).Context;
-			ctx.LineWidth = width;
+			(backend as CairoContextBackend).Context.LineWidth = width;
 		}
 		
 		public override void SetLineDash (object backend, double offset, params double[] pattern)
 		{
-			Cairo.Context ctx = ((CairoContextBackend) backend).Context;
-			ctx.SetDash (pattern, offset);
+			(backend as CairoContextBackend).Context.SetDash (pattern, offset);
 		}
 		
 		public override void SetPattern (object backend, object p)
 		{
-			var cb = (CairoContextBackend)backend;
-
-			Cairo.Context ctx = cb.Context;
-			/*if (p is ImagePatternBackend) {
-				cb.PatternAlpha = ((ImagePatternBackend)p).Image.Alpha;
-				p = ((ImagePatternBackend)p).GetPattern (ApplicationContext, ((CairoContextBackend)backend).ScaleFactor);
-			} else*/
-				cb.PatternAlpha = 1;
-
-			if (p != null)
-				ctx.SetSource ((Cairo.Pattern) p);
-			else
-				ctx.SetSource ((Cairo.Pattern) null);
+			(backend as CairoContextBackend).SetPattern (p);
 		}
 		
 		public override void DrawTextLayout (object backend, TextLayout layout, double x, double y)
 		{
-			var be = (Xwt.CairoBackend.CairoTextLayoutBackendHandler.PangoBackend)layout.GetBackend();
-			var pl = be.Layout;
-			CairoContextBackend ctx = (CairoContextBackend)backend;
-
-			ctx.Context.MoveTo (x+ctx.GlobalXOffset, y+ctx.GlobalYOffset);
-
-			if (layout.Height <= 0) {
-				Pango.CairoHelper.ShowLayout (ctx.Context, pl);
-			} else {
-				var lc = pl.LineCount;
-				var scale = Pango.Scale.PangoScale;
-				double h = 0;
-				for (int i=0; i<lc; i++) {
-					var line = pl.Lines [i];
-					var ext = new Pango.Rectangle ();
-					var extl = new Pango.Rectangle ();
-					line.GetExtents (ref ext, ref extl);
-					h += (extl.Height / scale);
-					if (h > layout.Height)
-						break;
-					ctx.Context.MoveTo (x, y + h);
-					Pango.CairoHelper.ShowLayoutLine (ctx.Context, line);
-				}
-			}
-
-			ctx.Context.MoveTo (x+ctx.GlobalXOffset, y+ctx.GlobalYOffset);
+			(backend as CairoContextBackend).DrawTextLayout (layout, x, y);
 		}
 
 		public override void DrawImage (object backend, ImageDescription img, double x, double y)
 		{
-			CairoContextBackend ctx = (CairoContextBackend)backend;
-
-			img.Alpha *= ctx.GlobalAlpha;/*
-			var pix = (Xwt.GtkBackend.GtkImage) img.Backend;
-
-			pix.Draw (ApplicationContext, ctx.Context, ctx.ScaleFactor, x, y, img);*/
+			(backend as CairoContextBackend).DrawImage (img, x, y);
 		}
-		
-		public override void DrawImage (object backend, ImageDescription img, Rectangle srcRect, Rectangle destRect)
+
+		public override void DrawImage (object backend, ImageDescription img, Xwt.Rectangle srcRect, Xwt.Rectangle destRect)
 		{
-			CairoContextBackend ctx = (CairoContextBackend)backend;
-			ctx.Context.Save ();
-			ctx.Context.NewPath();
-			ctx.Context.Rectangle (destRect.X, destRect.Y, destRect.Width, destRect.Height);
-			ctx.Context.Clip ();
-			ctx.Context.Translate (destRect.X-srcRect.X, destRect.Y-srcRect.Y);
-			double sx = destRect.Width / srcRect.Width;
-			double sy = destRect.Height / srcRect.Height;
-			ctx.Context.Scale (sx, sy);
-			img.Alpha *= ctx.GlobalAlpha;
-			/*
-			var pix = (Xwt.GtkBackend.GtkImage) img.Backend;
-			pix.Draw (ApplicationContext, ctx.Context, ctx.ScaleFactor, 0, 0, img);*/
-			ctx.Context.Restore ();
+			(backend as CairoContextBackend).DrawImage (img, srcRect, destRect);
 		}
 		
 		protected virtual Size GetImageSize (object img)
@@ -347,34 +420,27 @@ namespace Xwt.CairoBackend
 		
 		public override void Rotate (object backend, double angle)
 		{
-			CairoContextBackend gc = (CairoContextBackend)backend;
-			gc.Context.Rotate ((angle * System.Math.PI) / 180);
+			(backend as CairoContextBackend).Rotate (angle);
 		}
 		
 		public override void Scale (object backend, double scaleX, double scaleY)
 		{
-			CairoContextBackend gc = (CairoContextBackend)backend;
-			gc.Context.Scale (scaleX, scaleY);
+			(backend as CairoContextBackend).Scale (scaleX, scaleY);
 		}
 
 		public override void Translate (object backend, double tx, double ty)
 		{
-			CairoContextBackend gc = (CairoContextBackend)backend;
-			gc.Context.Translate (tx, ty);
+			(backend as CairoContextBackend).Translate (tx, ty);
 		}
 
 		public override void ModifyCTM (object backend, Matrix m)
 		{
-			CairoContextBackend gc = (CairoContextBackend)backend;
-			Cairo.Matrix t = new Cairo.Matrix (m.M11, m.M12, m.M21, m.M22, m.OffsetX, m.OffsetY);
-			gc.Context.Transform (t);
+			(backend as CairoContextBackend).ModifyCTM (m);
 		}
 
 		public override Matrix GetCTM (object backend)
 		{
-			Cairo.Matrix t = ((CairoContextBackend)backend).Context.Matrix;
-			Matrix ctm = new Matrix (t.Xx, t.Yx, t.Xy, t.Yy, t.X0, t.Y0);
-			return ctm;
+			return (backend as CairoContextBackend).GetCTM ();
 		}
 
 		public override object CreatePath ()
@@ -401,20 +467,17 @@ namespace Xwt.CairoBackend
 
 		public override bool IsPointInFill (object backend, double x, double y)
 		{
-			var gc = backend as CairoContextBackend;
-			return gc.Context.InFill (x+gc.GlobalXOffset, y+gc.GlobalYOffset);
+			return (backend as CairoContextBackend).IsPointInFill (x, y);
 		}
 
 		public override bool IsPointInStroke (object backend, double x, double y)
 		{
-			var gc = backend as CairoContextBackend;
-			return gc.Context.InStroke (x+gc.GlobalXOffset, y+gc.GlobalYOffset);
+			return (backend as CairoContextBackend).IsPointInStroke (x, y);
 		}
 
 		public override void Dispose (object backend)
 		{
-			var ctx = (CairoContextBackend) backend;
-			ctx.Dispose ();
+			(backend as CairoContextBackend).Dispose ();
 		}
 
 		#endregion
