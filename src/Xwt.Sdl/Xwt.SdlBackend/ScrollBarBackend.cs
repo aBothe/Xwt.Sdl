@@ -178,11 +178,11 @@ namespace Xwt.Sdl
 
 		const double barPadding = 2;
 
-		protected override void DrawInternally (CairoContextBackend c, Rectangle rect)
+		protected override void DrawInternally (CairoContextBackend c, Rectangle rect, double absX, double absY)
 		{
 			var ws = WidgetStyles.Instance;
 			// Background
-			base.DrawInternally (c, rect);
+			base.DrawInternally (c, rect, absX, absY);
 
 			// Bar
 			c.Rectangle (barRect);

@@ -44,13 +44,11 @@ namespace Xwt.Sdl
 
 		public new ICanvasEventSink EventSink {get{return base.EventSink as ICanvasEventSink; }}
 
-		protected override void DrawInternally (CairoContextBackend c,Rectangle dirtyRect)
+		protected override void DrawInternally (CairoContextBackend c,Rectangle dirtyRect, double absX, double absY)
 		{
-			base.DrawInternally (c,dirtyRect);
+			base.DrawInternally (c,dirtyRect, absX, absY);
 
 			// Draw actual content
-			double absX, absY;
-			GetAbsoluteLocation (out absX, out absY);
 			c.GlobalXOffset += absX;
 			c.GlobalYOffset += absY;
 

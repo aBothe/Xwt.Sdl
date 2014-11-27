@@ -97,7 +97,7 @@ namespace Xwt.Sdl
 				return ext;
 			}
 
-			protected override void DrawInternally (CairoContextBackend c, Rectangle rect)
+			protected override void DrawInternally (CairoContextBackend c, Rectangle rect, double absX, double absY)
 			{
 				bool isCurrent = IsCurrent;
 				var ws = WidgetStyles.Instance;
@@ -387,17 +387,16 @@ namespace Xwt.Sdl
 			}
 		}
 
-		protected override void DrawInternally (CairoContextBackend c, Rectangle dirtyRect)
+		protected override void DrawInternally (CairoContextBackend c, Rectangle dirtyRect, double absX, double absY)
 		{
-			base.DrawInternally (c, dirtyRect);
+			base.DrawInternally (c,dirtyRect, absX, absY);
 
 			var w = CurrentChildWidget;
-			var absLoc = AbsoluteLocation;
 
 			// Inactive tabs
 			for (int i = TabHeaders.Count-1; i >= 0; i--) {
 				if (i != currentTab)
-					TabHeaders [i].Draw (c, TabHeaders[i].Bounds.Offset(absLoc).Intersect(dirtyRect));
+					TabHeaders [i].Draw (c, TabHeaders[i].Bounds.Offset(absX, absY).Intersect(dirtyRect));
 			}
 
 			// Draw content area
@@ -405,7 +404,7 @@ namespace Xwt.Sdl
 				var ws = WidgetStyles.Instance;
 				var contentRect = 
 					CalculateChildArea ()
-					.Offset(absLoc)
+					.Offset(absX, absY)
 					.Inflate (ws.NotebookChildPadding, ws.NotebookChildPadding)
 					.Intersect(dirtyRect);
 
@@ -419,11 +418,11 @@ namespace Xwt.Sdl
 
 			// Draw current tab
 			if(currentTab >= 0 && currentTab < TabHeaders.Count)
-				TabHeaders[currentTab].Draw (c, TabHeaders[currentTab].Bounds.Offset(absLoc).Intersect(dirtyRect));
+				TabHeaders[currentTab].Draw (c, TabHeaders[currentTab].Bounds.Offset(absX, absY).Intersect(dirtyRect));
 
 			// Child
 			if(w != null)
-				w.Draw (c, w.Bounds.Offset (absLoc).Intersect(dirtyRect));
+				w.Draw (c, w.Bounds.Offset (absX, absY).Intersect(dirtyRect));
 		}
 	}
 }

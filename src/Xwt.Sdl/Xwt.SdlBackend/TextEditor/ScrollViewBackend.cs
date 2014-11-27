@@ -256,15 +256,14 @@ namespace Xwt.Sdl
 			Invalidate ();
 		}
 
-		protected override void DrawInternally (CairoContextBackend c, Rectangle dirtyRect)
+		protected override void DrawInternally (CairoContextBackend c, Rectangle dirtyRect, double absLocX, double absLocY)
 		{
-			base.DrawInternally (c, dirtyRect);
+			base.DrawInternally (c,dirtyRect, absLocX, absLocY);
 
 			// Draw child
 			if (child != null) {
-				var absLoc = AbsoluteLocation;
-				if( dirtyRect.X >= absLoc.X && dirtyRect.X <= absLoc.X + VisualChildWidth &&
-					dirtyRect.Y >= absLoc.Y && dirtyRect.Y <= absLoc.Y + VisualChildHeight)
+				if( dirtyRect.X >= absLocX && dirtyRect.X <= absLocX + VisualChildWidth &&
+					dirtyRect.Y >= absLocY && dirtyRect.Y <= absLocY + VisualChildHeight)
 				{
 					var visRect = VisibleRect;
 					/* Problem: Passing the dirtyRect to the draw method will not cause the widget to pay attention to being scrolled through or so.
@@ -277,7 +276,7 @@ namespace Xwt.Sdl
 					c.GlobalXOffset -= visRect.X;
 					c.GlobalYOffset -= visRect.Y;
 
-					child.Draw (c, visRect.Offset(absLoc.X, absLoc.Y).Intersect(dirtyRect.Offset(visRect.X, visRect.Y)));
+					child.Draw (c, visRect.Offset(absLocX, absLocY).Intersect(dirtyRect.Offset(visRect.X, visRect.Y)));
 
 					c.GlobalXOffset += visRect.X;
 					c.GlobalYOffset += visRect.Y;

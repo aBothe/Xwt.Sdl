@@ -62,11 +62,9 @@ namespace Xwt.Sdl
 		const double xPadding = 10;
 		const double cornerRadius = 3;
 
-		protected override void DrawInternally (CairoBackend.CairoContextBackend c,Rectangle dirtyRect)
+		protected override void DrawInternally (CairoBackend.CairoContextBackend c,Rectangle dirtyRect, double X, double Y)
 		{
 			var style = WidgetStyles.Instance;
-			double X, Y;
-			GetAbsoluteLocation (out X, out Y);
 
 			// Border
 			{

@@ -397,14 +397,17 @@ namespace Xwt.Sdl
 			viewPortProxyX = c.GlobalXOffset;
 			viewPortProxyY = c.GlobalYOffset;
 
+			double x, y;
+			GetAbsoluteLocation (out x, out y);
+
 			if (!alreadyIntersectedDirtyRect)
-				dirtyRect = AbsoluteBounds.Intersect (dirtyRect);
+				dirtyRect = new Rectangle(x,y, Width, Height).Intersect (dirtyRect);
 
 			if (!dirtyRect.IsEmpty) {
 				c.Save ();
 				c.Rectangle (dirtyRect);
 				c.Context.Clip ();
-				DrawInternally (c, dirtyRect);
+				DrawInternally (c, dirtyRect, x,y);
 				c.Restore ();
 			}
 		}
@@ -415,7 +418,7 @@ namespace Xwt.Sdl
 		/// <param name="c">Drawing context</param>
 		/// <param name="dirtyRect">The previously invalidated area that needs to be redrawn. 
 		/// Contains at least the upper left absolut widget coordinates.</param>
-		protected virtual void DrawInternally(CairoContextBackend c,Rectangle rect)
+		protected virtual void DrawInternally(CairoContextBackend c,Rectangle rect, double absX, double absY)
 		{
 			if (backgroundColor.HasValue) {
 				c.SetColor (backgroundColor.Value);

@@ -151,13 +151,10 @@ namespace Xwt.Sdl
 			return lay;
 		}
 
-		protected override void DrawInternally (CairoContextBackend c, Rectangle dirtyRect)
+		protected override void DrawInternally (CairoContextBackend c, Rectangle dirtyRect, double X, double Y)
 		{
-			base.DrawInternally (c, dirtyRect);
+			base.DrawInternally (c,dirtyRect, X, Y);
 			var st = WidgetStyles.Instance;
-
-			double X, Y;
-			GetAbsoluteLocation (out X, out Y);
 
 			using (var lay = CreateLayout(c.Context)) {
 				c.SetColor (TextColor);
