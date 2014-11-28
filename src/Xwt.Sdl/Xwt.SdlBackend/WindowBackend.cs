@@ -372,22 +372,22 @@ namespace Xwt.Sdl
 				sw.Restart ();
 
 			using (var drawingContext = new Cairo.Context (drawingSurface)) {
-				var ctxt = new CairoBackend.CairoContextBackend (1, drawingContext, drawingSurface);
+				using (var ctxt = new CairoBackend.CairoContextBackend (1, drawingContext, drawingSurface)) {
+					var childRect = child != null ? child.AbsoluteBounds : new Rectangle ();
+					if (clearBackground || child == null ||	invalidatedRegion.Contains (childRect)) {
+						drawingContext.SetSourceRGB (1, 1, 1);
+						drawingContext.Paint ();
+						clearBackground = false;
+					}
 
-				var childRect = child != null ? child.AbsoluteBounds : new Rectangle();
-				if (clearBackground || child == null ||	invalidatedRegion.Contains(childRect)) {
-					drawingContext.SetSourceRGB (1, 1, 1);
-					drawingContext.Paint ();
-					clearBackground = false;
+					if (menu != null)
+						menu.Draw (ctxt, Width);
+
+					if (child != null)
+						child.Draw (ctxt, childRect.Intersect (invalidatedRegion));
+
+					SDL.SDL_UpdateWindowSurface (window);
 				}
-
-				if (menu != null)
-					menu.Draw (ctxt, Width);
-
-				if (child != null)
-					child.Draw (ctxt, childRect.Intersect(invalidatedRegion));
-
-				SDL.SDL_UpdateWindowSurface (window);
 			}
 
 			if (System.Diagnostics.Debugger.IsAttached) {
