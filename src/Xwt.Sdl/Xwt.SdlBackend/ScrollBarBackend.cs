@@ -171,11 +171,14 @@ namespace Xwt.Sdl
 			}
 		}
 
-		internal override void OnBoundsChanged (double x, double y, double width, double height)
+		internal override bool OnBoundsChanged (double x, double y, double width, double height)
 		{
-			base.OnBoundsChanged (x, y, width, height);
+			if (!base.OnBoundsChanged (x, y, width, height))
+				return false;
+
 			UpdateBarRect ();
-			Invalidate ();
+			// Don't invalidate again because it's already been done in base.OnBoundsChanged
+			return true;
 		}
 
 		const double barPadding = 2;

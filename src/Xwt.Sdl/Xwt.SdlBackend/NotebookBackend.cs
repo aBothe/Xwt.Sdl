@@ -124,14 +124,17 @@ namespace Xwt.Sdl
 				}
 			}
 
-			internal override void OnBoundsChanged (double x, double y, double width, double height)
+			internal override bool OnBoundsChanged (double x, double y, double width, double height)
 			{
-				base.OnBoundsChanged (x, y, width, height);
+				if (!base.OnBoundsChanged (x, y, width, height))
+					return false;
+
 				var ll = HeadLabel.GetBackend () as LabelBackend;
 				var ws = WidgetStyles.Instance;
 				ll.OnBoundsChanged(
 					ws.NotebookTabHeaderPadding.Left, ws.NotebookTabHeaderPadding.Top, 
 					Math.Max(0.0, width - ws.NotebookTabHeaderPadding.Right), Math.Max(0.0, height - ws.NotebookTabHeaderPadding.Bottom));
+				return true;
 			}
 
 			#region Events
@@ -295,9 +298,10 @@ namespace Xwt.Sdl
 			return new Rectangle (x,y,Math.Max(0.0, w),Math.Max(0.0, h));
 		}
 
-		internal override void OnBoundsChanged (double x, double y, double width, double height)
+		internal override bool OnBoundsChanged (double x, double y, double width, double height)
 		{
-			base.OnBoundsChanged (x, y, width, height);
+			if (!base.OnBoundsChanged (x, y, width, height))
+				return false;
 
 			// Realign children
 			var chArea = CalculateChildArea();
@@ -311,6 +315,7 @@ namespace Xwt.Sdl
 				}
 
 			RealignTabHeaders ();
+			return true;
 		}
 
 		void RealignTabHeaders()

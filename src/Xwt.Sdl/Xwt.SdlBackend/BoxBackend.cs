@@ -68,7 +68,6 @@ namespace Xwt.Sdl
 				var w = widget [i] as WidgetBackend;
 				w.OnBoundsChanged (rect [i].X, rect [i].Y, rect [i].Width, rect [i].Height);
 			}
-			Invalidate ();
 		}
 
 		#endregion

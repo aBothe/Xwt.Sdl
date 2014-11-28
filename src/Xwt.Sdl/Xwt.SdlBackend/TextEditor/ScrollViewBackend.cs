@@ -93,9 +93,8 @@ namespace Xwt.Sdl
 		public void SetChildSize (Size size)
 		{
 			childHasCustomScrolling = false;
-			childSize = size;
-
-			RealignEverything ();
+			if(childSize != (childSize = size))
+				RealignEverything ();
 		}
 
 		public bool BorderVisible {
@@ -124,9 +123,7 @@ namespace Xwt.Sdl
 			}
 			set {
 				if (vScrollPolicy != (vScrollPolicy = value))
-					return;
-
-				RealignEverything();
+					RealignEverything();
 			}
 		}
 
@@ -136,9 +133,7 @@ namespace Xwt.Sdl
 			}
 			set {
 				if (hScrollPolicy != (hScrollPolicy = value))
-					return;
-
-				RealignEverything();
+					RealignEverything();
 			}
 		}
 
@@ -200,11 +195,13 @@ namespace Xwt.Sdl
 
 		#endregion
 
-		internal override void OnBoundsChanged (double x, double y, double width, double height)
+		internal override bool OnBoundsChanged (double x, double y, double width, double height)
 		{
-			base.OnBoundsChanged (x, y, width, height);
-
-			RealignEverything ();
+			if (base.OnBoundsChanged (x, y, width, height)) {
+				RealignEverything ();
+				return true;
+			}
+			return false;
 		}
 
 

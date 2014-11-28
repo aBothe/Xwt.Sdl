@@ -407,13 +407,13 @@ namespace Xwt.Sdl
 				focusedWidget.FireGainedFocus ();
 		}
 
-		void UpdateChildBounds()
+		bool UpdateChildBounds()
 		{
 			if (child == null)
-				return;
+				return false;
 
 			// The padding does NOT affect the menu position - only the child position!
-			child.OnBoundsChanged (padding.Left, 
+			return child.OnBoundsChanged (padding.Left, 
 				padding.Top + menuHeight, 
 				(double)Width-padding.Right, 
 				(double)Height - menuHeight - padding.Bottom);

@@ -174,9 +174,10 @@ namespace Xwt.Sdl
 			return new Size (x + xPadding, y + yPadding + cornerRadius/2);
 		}
 
-		internal override void OnBoundsChanged (double x, double y, double width, double height)
+		internal override bool OnBoundsChanged (double x, double y, double width, double height)
 		{
-			base.OnBoundsChanged (x, y, width, height);
+			if (!base.OnBoundsChanged (x, y, width, height))
+				return false;
 
 			if (label != null) {
 				var ll = (label.GetBackend () as LabelBackend);
@@ -196,6 +197,8 @@ namespace Xwt.Sdl
 					Math.Max(0.0, Math.Min(labelSize.Width, Width - imageWidth)),
 					Math.Max(0.0, Math.Min(labelSize.Height, Height - 2 * cornerRadius)));
 			}
+
+			return true;
 		}
 
 		internal override void FireMouseEnter ()

@@ -334,14 +334,21 @@ namespace Xwt.Sdl
 			return ea.Handled;
 		}
 
-		internal virtual void OnBoundsChanged(double x, double y, double width, double height)
+		/// <summary>
+		/// Returns true if some boundary changed, false if otherwise.
+		/// </summary>
+		internal virtual bool OnBoundsChanged(double x, double y, double width, double height)
 		{
+			var changed = this.x != x || this.y != y || this.width != width || this.height != height;
+
 			this.x = x;
 			this.y = y;
 			this.width = width;
 			this.height = height;
 
-			OnWidgetResized ();
+			if(changed)
+				OnWidgetResized ();
+			return changed;
 		}
 
 		internal virtual void SetRelativePosition(double x, double y, bool invalidate = true)
@@ -349,7 +356,7 @@ namespace Xwt.Sdl
 			this.x = x;
 			this.y = y;
 
-			if(invalidate)
+			if(invalidate && (this.x != x || this.y != y))
 				OnWidgetResized ();
 		}
 
