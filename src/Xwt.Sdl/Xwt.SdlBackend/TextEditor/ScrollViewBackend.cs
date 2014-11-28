@@ -44,6 +44,7 @@ namespace Xwt.Sdl
 			}
 		}
 		Size childSize;
+		bool childHasCustomScrolling;
 		static double scrollbarWidth {get{ return WidgetStyles.Instance.ScrollbarWidth; }}
 		readonly ScrollBarBackend VScrollbar, HScrollbar;
 		ScrollPolicy vScrollPolicy, hScrollPolicy;
@@ -81,18 +82,17 @@ namespace Xwt.Sdl
 
 		public void SetChild (IWidgetBackend c)
 		{
-			if (c == null)
-				return;
+			child = c as WidgetBackend;
 
-			this.child = c as WidgetBackend;
-			if(c != null)
+			if (child != null) {
 				child.Parent = this;
-
-			RealignEverything ();
+				childHasCustomScrolling = true;
+			}
 		}
 
 		public void SetChildSize (Size size)
 		{
+			childHasCustomScrolling = false;
 			childSize = size;
 
 			RealignEverything ();
@@ -152,6 +152,9 @@ namespace Xwt.Sdl
 
 		public override WidgetBackend GetChildAt (double x, double y)
 		{
+			if (childHasCustomScrolling)
+				return child;
+
 			bool verticallyAtScrollbar = y >= Height - scrollbarWidth;
 
 			if (x >= Width - scrollbarWidth)
@@ -208,6 +211,14 @@ namespace Xwt.Sdl
 
 		void RealignEverything()
 		{
+			if (childHasCustomScrolling) {
+				if (child != null)
+					child.OnBoundsChanged (0, 0, Width, Height);
+				VScrollbar.Visible = false;
+				HScrollbar.Visible = false;
+				return;
+			}
+
 			var scrollbarWidth = ScrollViewBackend.scrollbarWidth;
 			var needVSroll = Height > 0 && childSize.Height > (Height - scrollbarWidth);
 			var needHScroll = Width > 0 && childSize.Width > (Width - scrollbarWidth);
@@ -262,6 +273,11 @@ namespace Xwt.Sdl
 
 			// Draw child
 			if (child != null) {
+				if (childHasCustomScrolling) {
+					child.Draw (c, dirtyRect);
+					return;
+				}
+
 				if( dirtyRect.X >= absLocX && dirtyRect.X <= absLocX + VisualChildWidth &&
 					dirtyRect.Y >= absLocY && dirtyRect.Y <= absLocY + VisualChildHeight)
 				{
