@@ -174,13 +174,14 @@ namespace Xwt.Sdl
 		public override Size GetPreferredSize (Cairo.Context fontExtentContext, double maxWidth, double maxHeight)
 		{
 			var st = WidgetStyles.Instance;
-			using(var lay = CreateLayout(fontExtentContext)){
-				int w, h;
+			int w, h;
+			using (var lay = CreateLayout (fontExtentContext)) {
 				lay.GetPixelSize (out w, out h);
-				return new Size (
-					width = Math.Min(maxWidth, w+(havePadding ? st.LabelXPadding*2 : 0)), 
-					height = Math.Min(maxHeight, h+(havePadding ? st.LabelYPadding*2 : 0)));
 			}
+
+			return new Size (
+				width = Math.Min(maxWidth, w+(havePadding ? st.LabelXPadding*2 : 0)), 
+				height = Math.Min(maxHeight, h+(havePadding ? st.LabelYPadding*2 : 0)));
 		}
 			
 		public void SetFormattedText (FormattedText text)

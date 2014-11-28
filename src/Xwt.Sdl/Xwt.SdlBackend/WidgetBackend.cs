@@ -31,7 +31,7 @@ using Xwt.CairoBackend;
 
 namespace Xwt.Sdl
 {
-	public abstract class WidgetBackend : IWidgetBackend
+	public abstract class WidgetBackend : IWidgetBackend, IDisposable
 	{
 		#region Properties
 		static int gid;
@@ -498,21 +498,22 @@ namespace Xwt.Sdl
 
 		public Size GetPreferredSize (SizeConstraint widthConstraint, SizeConstraint heightConstraint)
 		{
+			double xmax = widthConstraint.IsConstrained ? widthConstraint.AvailableSize : double.MaxValue;
+			double ymax = heightConstraint.IsConstrained ? heightConstraint.AvailableSize : double.MaxValue;
+
+			Size sz;
 			using (var surf = new Cairo.ImageSurface (Cairo.Format.A1, 0, 0))
-			using (var c = new Cairo.Context (surf)) {
-				double	xmax = widthConstraint.IsConstrained ? widthConstraint.AvailableSize : double.MaxValue,
-						ymax = heightConstraint.IsConstrained ? heightConstraint.AvailableSize : double.MaxValue;
-				var sz = GetPreferredSize (c, xmax,ymax);
+			using (var c = new Cairo.Context (surf))
+				sz = GetPreferredSize (c, xmax,ymax);
 
-				if (frontend != null) {
-					if (frontend.ExpandHorizontal)
-						sz.Width = Math.Min(xmax, Parent.Width);
-					if (frontend.ExpandVertical)
-						sz.Height = Math.Min(ymax, Parent.Height);
-				}
-
-				return sz;
+			if (frontend != null) {
+				if (frontend.ExpandHorizontal)
+					sz.Width = Math.Min(xmax, Parent.Width);
+				if (frontend.ExpandVertical)
+					sz.Height = Math.Min(ymax, Parent.Height);
 			}
+
+			return sz;
 		}
 
 		public virtual Size GetPreferredSize(Cairo.Context fontExtentContext,double maxWidth, double maxHeight) { return Size.Zero; }

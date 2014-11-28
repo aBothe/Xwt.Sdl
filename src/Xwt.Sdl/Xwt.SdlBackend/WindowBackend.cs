@@ -31,7 +31,7 @@ using System.Collections.Generic;
 
 namespace Xwt.Sdl
 {
-	public class WindowBackend : IWindowBackend
+	public class WindowBackend : IWindowBackend, IDisposable
 	{
 		#region Properties
 		internal static Dictionary<uint, WeakReference> windowCache = new Dictionary<uint, WeakReference>();
