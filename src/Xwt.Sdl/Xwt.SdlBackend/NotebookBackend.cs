@@ -248,6 +248,9 @@ namespace Xwt.Sdl
 
 		public override WidgetBackend GetChildAt (double x, double y)
 		{
+			x -= viewPortProxyX;
+			y -= viewPortProxyY;
+
 			var w = CurrentChildWidget;
 			if (w != null && w.Bounds.Contains (x, y))
 				return w;

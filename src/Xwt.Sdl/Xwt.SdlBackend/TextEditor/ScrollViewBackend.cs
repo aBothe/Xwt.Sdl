@@ -37,10 +37,11 @@ namespace Xwt.Sdl
 			get {
 				if(child != null)
 					yield return child;
-				if (VScrollbar.Visible)
+
+				if (!childHasCustomScrolling) {
 					yield return VScrollbar;
-				if (HScrollbar.Visible)
 					yield return HScrollbar;
+				}
 			}
 		}
 		Size childSize;
@@ -150,6 +151,9 @@ namespace Xwt.Sdl
 			if (childHasCustomScrolling)
 				return child;
 
+			x -= viewPortProxyX;
+			y -= viewPortProxyY;
+
 			bool verticallyAtScrollbar = y >= Height - scrollbarWidth;
 
 			if (x >= Width - scrollbarWidth)
@@ -159,14 +163,13 @@ namespace Xwt.Sdl
 				return HScrollbar;
 
 			if (child == null || 
+				x <= 0 || y <= 0 ||
 				x > childSize.Width || 
 				y > childSize.Height)
 				return null;
 
-			// Offset x,y by scroll positions
-			var visRect = VisibleRect;
-			x -= visRect.X;
-			y -= visRect.Y;
+			x += viewPortProxyX;
+			y += viewPortProxyY;
 
 			var w = child;
 			while (true) {

@@ -364,16 +364,21 @@ namespace Xwt.Sdl
 
 		/// <summary>
 		/// Important for redirecting window events to the topmost widget.
+		/// Note: When overloading, mind setting off x/y by viewPortProxyX/viewPortProxyY !!
 		/// </summary>
 		/// <returns>The <see cref="Xwt.Sdl.WidgetBackend"/>.</returns>
 		/// <param name="x">The x coordinate, relative to the widget's x location.</param>
 		/// <param name="y">The y coordinate, relative to the widget's y location</param>
 		public virtual WidgetBackend GetChildAt(double x, double y)
 		{
+			x -= viewPortProxyX;
+			y -= viewPortProxyY;
+
 			var children = Children;
 			if(children != null)
 				foreach (var ch in children)
-					if (x >= ch.X && y >= ch.Y && x <= ch.X + ch.Width && y <= ch.Y + ch.Height)
+					if (ch.Visible &&
+						x >= ch.X && y >= ch.Y && x <= ch.X + ch.Width && y <= ch.Y + ch.Height)
 						return ch;
 			return null;
 		}
