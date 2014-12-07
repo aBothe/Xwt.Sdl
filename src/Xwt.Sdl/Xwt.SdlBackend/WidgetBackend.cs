@@ -388,20 +388,26 @@ namespace Xwt.Sdl
 		/// </summary>
 		public void Invalidate()
 		{
-			var pw = ParentWindow;
-			if(pw != null)
-				pw.Invalidate (AbsoluteBounds.Offset(viewPortProxyX, viewPortProxyY));
+			Invalidate (new Rectangle(0,0, Width, Height));
 		}
 
 		public void Invalidate(Rectangle rect, bool isAbsolute = false)
 		{
-			double x=0, y=0;
-			if(!isAbsolute)
+			if (!isAbsolute) {
+				double x, y;
 				GetAbsoluteLocation (out x, out y);
+				rect.X += x;
+				rect.Y += y;
+			}
+
+			// TODO: Treat viewPortProxy-Values to shrink the invalidated region to a rectangle that 
+			// is maximally as large as the parent/-window's visible drawing region.
+			// Still, Invalidate() guarantees nothing in terms of exclusively drawing a certain widget's subregion 
+			// (because other widgets may simply supersede previously given regions) - so it's probably not worth implementing this. 
 
 			var pw = ParentWindow;
 			if(pw != null)
-				pw.Invalidate (isAbsolute ? rect.Offset(viewPortProxyX, viewPortProxyY) : rect.Offset(x+viewPortProxyX,y+viewPortProxyY));
+				pw.Invalidate (rect);
 		}
 
 		public void Draw(CairoContextBackend c, Rectangle dirtyRect, bool alreadyIntersectedDirtyRect = true)
