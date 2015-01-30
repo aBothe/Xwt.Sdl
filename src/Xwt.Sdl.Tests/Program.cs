@@ -184,7 +184,7 @@ namespace Xwt.Sdl.Tests
 			butt.Font = butt.Font.WithWeight (FontWeight.Bold);
 			butt.Label = "B";
 			butt.Cursor = CursorType.Hand;
-			butt.Image = Image.FromFile ("./ts.png");
+			butt.Image = Image.FromFile ("ts.png");
 			butt.Clicked+=(sender, e) => {
 				(sender as Button).WidthRequest=40; 
 				labelT.Text = "######################";
