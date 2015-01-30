@@ -282,6 +282,7 @@ namespace Xwt.Sdl
 				case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_SHOWN:
 					SDL.SDL_GetWindowSize (window, out Width, out Height);
 					UpdateViewPort ();
+					UpdateChildBounds ();
 					Invalidate ();
 					eventSink.OnShown ();
 					break;
