@@ -36,6 +36,12 @@ namespace Xwt.Sdl
 
 		#region IListViewBackend implementation
 
+		public int CurrentEventRow {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
 		public void SetSource (IListDataSource source, IBackend sourceBackend)
 		{
 			throw new NotImplementedException ();
