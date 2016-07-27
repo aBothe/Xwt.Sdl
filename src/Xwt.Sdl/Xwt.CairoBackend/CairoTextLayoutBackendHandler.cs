@@ -207,6 +207,16 @@ namespace Xwt.CairoBackend
 			var tl = (IDisposable) backend;
 			tl.Dispose ();
 		}
+
+		public override double GetBaseline (object backend)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override double GetMeanline (object backend)
+		{
+			throw new NotImplementedException ();
+		}
 	}
 }
 

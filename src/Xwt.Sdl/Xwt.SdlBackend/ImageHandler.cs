@@ -66,10 +66,6 @@ namespace Xwt.Sdl
 		{
 			throw new NotImplementedException ();
 		}
-		public override object ConvertToBitmap (object handle, double width, double height, double scaleFactor, ImageFormat format)
-		{
-			throw new NotImplementedException ();
-		}
 		public override bool IsBitmap (object handle)
 		{
 			throw new NotImplementedException ();
@@ -108,6 +104,11 @@ namespace Xwt.Sdl
 		{
 			var col = (handle as System.Drawing.Bitmap).GetPixel (x, y);
 			return new Xwt.Drawing.Color ((double)col.R/255.0, (double)col.G, (double)col.B/255.0, (double)col.A/255.0);
+		}
+
+		public override object ConvertToBitmap (ImageDescription idesc, double scaleFactor, ImageFormat format)
+		{
+			throw new NotImplementedException ();
 		}
 		#endregion
 	}

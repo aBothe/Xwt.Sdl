@@ -656,6 +656,16 @@ namespace Xwt.Sdl
 			}
 		}
 
+		public string Name {
+			get {
+				throw new NotImplementedException ();
+			}
+
+			set {
+				throw new NotImplementedException ();
+			}
+		}
+
 		#endregion
 
 		#region IBackend implementation

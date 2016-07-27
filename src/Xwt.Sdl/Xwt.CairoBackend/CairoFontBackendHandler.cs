@@ -157,6 +157,16 @@ namespace Xwt.CairoBackend
 			FontDescription fd = (FontDescription) handle;
 			return (FontStretch)(int)fd.Stretch;
 		}
+
+		public override IEnumerable<KeyValuePair<string, object>> GetAvailableFamilyFaces (string family)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override bool RegisterFontFromFile (string fontPath)
+		{
+			throw new NotImplementedException ();
+		}
 	}
 }
 

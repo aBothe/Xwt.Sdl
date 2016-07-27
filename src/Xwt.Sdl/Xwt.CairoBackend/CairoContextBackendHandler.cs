@@ -485,6 +485,11 @@ namespace Xwt.CairoBackend
 			(backend as CairoContextBackend).Dispose ();
 		}
 
+		public override void SetStyles (object backend, StyleSet styles)
+		{
+			throw new NotImplementedException ();
+		}
+
 		#endregion
 	}
 }

@@ -141,6 +141,12 @@ namespace Xwt.Sdl
 				throw new NotImplementedException ();
 			}
 		}
+
+		public bool HasCompletions {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
 		#endregion
 
 		public override Size GetPreferredSize (Cairo.Context fontExtentContext, double maxWidth, double maxHeight)
@@ -214,7 +220,15 @@ namespace Xwt.Sdl
 
 		}
 
+		public void SetCompletions (string [] completions)
+		{
+			throw new NotImplementedException ();
+		}
 
+		public void SetCompletionMatchFunc (Func<string, string, bool> matchFunc)
+		{
+			throw new NotImplementedException ();
+		}
 	}
 }
 

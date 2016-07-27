@@ -238,6 +238,11 @@ namespace Xwt.Sdl
 			return base.RenderWidget (w);
 		}
 
+		public override object GetNativeWindow (IWindowFrameBackend backend)
+		{
+			throw new NotImplementedException ();
+		}
+
 		public override ToolkitFeatures SupportedFeatures {
 			get {
 				return ToolkitFeatures.WidgetOpacity;

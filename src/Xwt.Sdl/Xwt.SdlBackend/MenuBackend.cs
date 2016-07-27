@@ -37,6 +37,16 @@ namespace Xwt.Sdl
 
 		public readonly double Height;
 
+		public object Font {
+			get {
+				throw new NotImplementedException ();
+			}
+
+			set {
+				throw new NotImplementedException ();
+			}
+		}
+
 		public void Draw(CairoBackend.CairoContextBackend c,int width)
 		{
 			c.Context.SetSourceRGB (1, 0, 0);

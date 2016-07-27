@@ -622,6 +622,28 @@ namespace Xwt.Sdl
 			}
 		}
 
+		public string Name {
+			get {
+				throw new NotImplementedException ();
+			}
+
+			set {
+				throw new NotImplementedException ();
+			}
+		}
+
+		public object Window {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
+		public IntPtr NativeHandle {
+			get {
+				throw new NotImplementedException ();
+			}
+		}
+
 		#endregion
 
 		#region IBackend implementation

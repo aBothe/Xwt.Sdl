@@ -105,6 +105,16 @@ namespace Xwt.Sdl
 			}
 		}
 
+		public int FocusedRow {
+			get {
+				throw new NotImplementedException ();
+			}
+
+			set {
+				throw new NotImplementedException ();
+			}
+		}
+
 		#endregion
 
 		#region ITableViewBackend implementation
@@ -171,6 +181,16 @@ namespace Xwt.Sdl
 		}
 
 		public void UpdateColumn (ListViewColumn col, object handle, ListViewColumnChange change)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void StartEditingCell (int row, CellView cell)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public Rectangle GetRowBounds (int row, bool includeMargin)
 		{
 			throw new NotImplementedException ();
 		}

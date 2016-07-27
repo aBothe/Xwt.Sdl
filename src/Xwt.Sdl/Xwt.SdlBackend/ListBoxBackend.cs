@@ -95,6 +95,16 @@ namespace Xwt.Sdl
 			throw new NotImplementedException ();
 		}
 
+		public int GetRowAtPosition (Point p)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public Rectangle GetRowBounds (int row, bool includeMargin)
+		{
+			throw new NotImplementedException ();
+		}
+
 		public ScrollPolicy VerticalScrollPolicy {
 			get {
 				throw new NotImplementedException ();
@@ -113,7 +123,15 @@ namespace Xwt.Sdl
 			}
 		}
 
+		public int FocusedRow {
+			get {
+				throw new NotImplementedException ();
+			}
 
+			set {
+				throw new NotImplementedException ();
+			}
+		}
 	}
 }
 
