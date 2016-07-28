@@ -220,7 +220,7 @@ namespace Xwt.Sdl
 
 		public bool MouseWheel(int x, int y, ScrollDirection dir)
 		{
-			if (!Sensitive || val >= upperVal || val <= lowerVal)
+			if (!Sensitive || val > upperVal || val < lowerVal)
 				return false;
 
 			switch (dir) {
