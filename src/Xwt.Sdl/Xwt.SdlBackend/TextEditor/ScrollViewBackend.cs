@@ -50,8 +50,8 @@ namespace Xwt.Sdl
 		readonly ScrollBarBackend VScrollbar, HScrollbar;
 		ScrollPolicy vScrollPolicy, hScrollPolicy;
 		bool showBorder = false;
-		double VisualChildWidth { get{ return Math.Min(Width, childSize.Width) - (VScrollbar.Visible ? scrollbarWidth : 0); } }
-		double VisualChildHeight { get{ return Math.Min(Height, childSize.Height) - (HScrollbar.Visible ? scrollbarWidth : 0); } }
+		double VisualChildWidth { get{ return Math.Min(Width- (VScrollbar.Visible ? scrollbarWidth : 0), childSize.Width); } }
+		double VisualChildHeight { get{ return Math.Min(Height - (HScrollbar.Visible ? scrollbarWidth : 0), childSize.Height); } }
 
 		public Rectangle VisibleRect
 		{
