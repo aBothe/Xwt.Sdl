@@ -259,6 +259,9 @@ namespace Xwt.Sdl
 				if (tab.Bounds.Contains (x, y))
 					return tab;
 
+			if (CalculateChildArea ().Contains (x, y))
+				return w;
+
 			return null;
 		}
 
