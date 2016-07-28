@@ -226,11 +226,15 @@ namespace Xwt.Sdl
 			var scrollbarWidth = ScrollViewBackend.scrollbarWidth;
 			var needVSroll = Height > 0 && childSize.Height > (Height - scrollbarWidth);
 			var needHScroll = Width > 0 && childSize.Width > (Width - scrollbarWidth);
+			const double normalizedMaximum = 100.0;
 
 			// Set the scrollbars' pagesizes.
 			// Important: Persist the current scroll values ranging from 0 to 100, except a new child has been set.
-			VScrollbar.SetRange (0, 100, needVSroll ? 100.0/(childSize.Height/Height) : 100.0, 1, 1, VScrollbar.Value);
-			HScrollbar.SetRange (0, 100, needHScroll ? 100.0/(childSize.Width/Width) : 100.0, 1, 1, HScrollbar.Value);
+			var vPageSize = needVSroll ? normalizedMaximum / (childSize.Height / Height) : normalizedMaximum;
+			var hPageSize = needHScroll ? normalizedMaximum / (childSize.Width / Width) : normalizedMaximum;
+
+			VScrollbar.SetRange (0, normalizedMaximum + vPageSize, vPageSize, 1, 1, VScrollbar.Value);
+			HScrollbar.SetRange (0, normalizedMaximum + hPageSize, hPageSize, 1, 1, HScrollbar.Value);
 
 			// Show/hide scrollbars
 			switch (VerticalScrollPolicy) {

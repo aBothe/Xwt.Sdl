@@ -56,7 +56,7 @@ namespace Xwt.Sdl
 
 		public double UpperValue {
 			get {
-				return upperVal;
+				return upperVal + PageSize;
 			}
 		}
 
@@ -107,9 +107,9 @@ namespace Xwt.Sdl
 
 		public void SetRange (double lowerValue, double upperValue, double pageSize, double pageIncrement, double stepIncrement, double value)
 		{
-			this.lowerVal = lowerValue;
-			this.upperVal = upperValue;
-			this.pageSize = pageSize;
+			this.lowerVal = Math.Max(lowerValue, 0.0);
+			this.pageSize = Math.Max(pageSize, 0.0);
+			this.upperVal = Math.Max(upperValue, this.pageSize) - this.pageSize;
 			this.pageIncrement = pageIncrement;
 			this.stepIncrement = stepIncrement;
 			Value = value; // implies UpdateBarRect,Invalidate()
