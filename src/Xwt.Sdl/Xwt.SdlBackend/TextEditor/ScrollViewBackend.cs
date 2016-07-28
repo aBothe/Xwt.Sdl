@@ -226,14 +226,15 @@ namespace Xwt.Sdl
 			var needVSroll = Height > 0 && childSize.Height > Height;
 			var needHScroll = Width > 0 && childSize.Width > Width;
 			const double normalizedMaximum = 100.0;
+			double pageIncrement = normalizedMaximum / WidgetStyles.Instance.ScrollViewStepIncrementPercent;
 
 			// Set the scrollbars' pagesizes.
 			// Important: Persist the current scroll values ranging from 0 to 100, except a new child has been set.
 			var vPageSize = needVSroll ? normalizedMaximum / (childSize.Height / Height) : normalizedMaximum;
 			var hPageSize = needHScroll ? normalizedMaximum / (childSize.Width / Width) : normalizedMaximum;
 
-			VScrollbar.SetRange (0, normalizedMaximum + vPageSize, vPageSize, 1, 1, VScrollbar.Value);
-			HScrollbar.SetRange (0, normalizedMaximum + hPageSize, hPageSize, 1, 1, HScrollbar.Value);
+			VScrollbar.SetRange (0, normalizedMaximum + vPageSize, vPageSize, pageIncrement, pageIncrement, VScrollbar.Value);
+			HScrollbar.SetRange (0, normalizedMaximum + hPageSize, hPageSize, pageIncrement, pageIncrement, HScrollbar.Value);
 
 			// Show/hide scrollbars
 			switch (VerticalScrollPolicy) {

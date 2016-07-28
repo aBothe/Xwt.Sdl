@@ -88,6 +88,10 @@ namespace Xwt.Sdl
 		public Color ScrollbarHoveredColor = new Color(0.75,0.75,0.75);
 		public Color ScrollbarColor = new Color(0.65,0.65,0.65);
 		#endregion
+
+		#region ScrollView
+		public double ScrollViewStepIncrementPercent = 7.0;
+		#endregion
 	}
 }
 
