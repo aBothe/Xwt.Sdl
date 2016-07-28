@@ -223,9 +223,8 @@ namespace Xwt.Sdl
 			if (child != null)
 				child.OnBoundsChanged (0, 0, childSize.Width, childSize.Height);
 
-			var scrollbarWidth = ScrollViewBackend.scrollbarWidth;
-			var needVSroll = Height > 0 && childSize.Height > (Height - scrollbarWidth);
-			var needHScroll = Width > 0 && childSize.Width > (Width - scrollbarWidth);
+			var needVSroll = Height > 0 && childSize.Height > Height;
+			var needHScroll = Width > 0 && childSize.Width > Width;
 			const double normalizedMaximum = 100.0;
 
 			// Set the scrollbars' pagesizes.
