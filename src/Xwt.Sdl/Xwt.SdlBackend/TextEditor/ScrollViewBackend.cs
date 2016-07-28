@@ -313,6 +313,21 @@ namespace Xwt.Sdl
 			if (HScrollbar.Visible)
 				HScrollbar.Draw (c, dirtyRect, false);
 		}
+
+		internal override bool FireMouseWheel (uint timestamp, int x, int y, ScrollDirection dir)
+		{
+			if (!base.FireMouseWheel (timestamp, x, y, dir)) {
+				switch (dir) {
+				case ScrollDirection.Down:
+				case ScrollDirection.Up:
+					return VScrollbar.FireMouseWheel (timestamp, x, y, dir);
+				case ScrollDirection.Left:
+				case ScrollDirection.Right:
+					return HScrollbar.FireMouseWheel (timestamp, x, y, dir);
+				}
+			}
+			return true;
+		}
 	}
 }
 
