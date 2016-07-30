@@ -165,6 +165,8 @@ namespace Xwt.Sdl.Tests
 			tabs.Add (butt, "Tabz 2");
 			//mw.Size = new Size (100, 150);
 
+			var icon1 = Image.FromFile ("ts.png");
+			mw.Icon = icon1;
 
 			//mw.MainMenu = new Menu ();
 			var c = new MyCanvas ();
@@ -184,7 +186,7 @@ namespace Xwt.Sdl.Tests
 			butt.Font = butt.Font.WithWeight (FontWeight.Bold);
 			butt.Label = "B";
 			butt.Cursor = CursorType.Hand;
-			butt.Image = Image.FromFile ("ts.png");
+			butt.Image = icon1;
 			butt.Clicked+=(sender, e) => {
 				(sender as Button).WidthRequest=40; 
 				labelT.Text = "######################";

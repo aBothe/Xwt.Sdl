@@ -515,7 +515,14 @@ namespace Xwt.Sdl
 
 		public void SetIcon (ImageDescription image)
 		{
-			throw new NotImplementedException ();
+			var img = (image.Backend as ImageBackend).Bitmap;
+			BitmapData bitmap = img.LockBits (new System.Drawing.Rectangle (0, 0, img.Width, img.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+			IntPtr surfaceHandle = SDL.SDL_CreateRGBSurfaceFrom (bitmap.Scan0, bitmap.Width, bitmap.Height, 32, bitmap.Stride, 0x00ff0000, 0x0000ff00, 0x0000ff, 0xff000000);
+
+			SDL.SDL_SetWindowIcon (window, surfaceHandle);
+
+			SDL.SDL_FreePalette (surfaceHandle);
+			img.UnlockBits (bitmap);
 		}
 
 		public void Present ()

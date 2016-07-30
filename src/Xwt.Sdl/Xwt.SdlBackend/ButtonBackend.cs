@@ -133,8 +133,8 @@ namespace Xwt.Sdl
 
 			// Image
 			if (!image.IsNull) {
-				var imgBck = image.Backend as System.Drawing.Bitmap;
-				var data = imgBck.LockBits (new System.Drawing.Rectangle (0, 0, imgBck.Width, imgBck.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+				var imgBck = (image.Backend as ImageBackend).Bitmap;
+				var data = imgBck.LockBits (new System.Drawing.Rectangle (0, 0, imgBck.Width, imgBck.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
 				var imgSurf = new Cairo.ImageSurface (data.Scan0, Cairo.Format.Argb32, data.Width, data.Height, data.Stride);
 				var imageWidth = (double)imgSurf.Width;
 

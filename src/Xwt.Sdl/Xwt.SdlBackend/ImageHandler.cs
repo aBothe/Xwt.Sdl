@@ -35,11 +35,11 @@ namespace Xwt.Sdl
 		#region implemented abstract members of ImageBackendHandler
 		public override object LoadFromStream (Stream stream)
 		{
-			return new System.Drawing.Bitmap (stream);
+			return new ImageBackend(new System.Drawing.Bitmap (stream));
 		}
 		public override void Dispose (object backend)
 		{
-			(backend as System.Drawing.Bitmap).Dispose ();
+			(backend as ImageBackend).Bitmap.Dispose ();
 		}
 
 		public override void SaveToStream (object backend, Stream stream, ImageFileType fileType)
@@ -76,12 +76,12 @@ namespace Xwt.Sdl
 		}
 		public override Size GetSize (object handle)
 		{
-			var img = handle as System.Drawing.Image;
+			var img = (handle as ImageBackend).Bitmap;
 			return new Size (img.Width, img.Height);
 		}
 		public override object CopyBitmap (object handle)
 		{
-			return (handle as System.Drawing.Bitmap).Clone ();
+			return (handle as ImageBackend).Bitmap.Clone ();
 		}
 		public override void CopyBitmapArea (object srcHandle, int srcX, int srcY, int width, int height, object destHandle, int destX, int destY)
 		{
@@ -93,7 +93,7 @@ namespace Xwt.Sdl
 		}
 		public override void SetBitmapPixel (object handle, int x, int y, Xwt.Drawing.Color color)
 		{
-			(handle as System.Drawing.Bitmap).SetPixel (x, y, 
+			(handle as ImageBackend).Bitmap.SetPixel (x, y,
 				System.Drawing.Color.FromArgb(
 					(int)(color.Alpha*255.0),
 					(int)(color.Red*255.0),
@@ -102,7 +102,7 @@ namespace Xwt.Sdl
 		}
 		public override Xwt.Drawing.Color GetBitmapPixel (object handle, int x, int y)
 		{
-			var col = (handle as System.Drawing.Bitmap).GetPixel (x, y);
+			var col = (handle as ImageBackend).Bitmap.GetPixel (x, y);
 			return new Xwt.Drawing.Color ((double)col.R/255.0, (double)col.G, (double)col.B/255.0, (double)col.A/255.0);
 		}
 
