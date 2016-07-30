@@ -28,6 +28,7 @@ using System.Runtime.InteropServices;
 using Xwt.Backends;
 using SDL2;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 
 namespace Xwt.Sdl
 {
@@ -630,13 +631,8 @@ namespace Xwt.Sdl
 		}
 
 		public string Name {
-			get {
-				throw new NotImplementedException ();
-			}
-
-			set {
-				throw new NotImplementedException ();
-			}
+			get;
+			set;
 		}
 
 		public object Window {
@@ -647,7 +643,7 @@ namespace Xwt.Sdl
 
 		public IntPtr NativeHandle {
 			get {
-				throw new NotImplementedException ();
+				return window;
 			}
 		}
 
