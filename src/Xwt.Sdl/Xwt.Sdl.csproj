@@ -32,15 +32,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="SDL2#">
-      <HintPath>..\..\ext\SDL2#.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Cairo" />
     <Reference Include="System.Drawing" />
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="SDL2-CS">
+      <HintPath>..\..\ext\SDL2-CS.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -82,16 +82,14 @@
     <Folder Include="Xwt.SdlBackend\TextEditor\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\ext\SDL2#.dll.config">
-      <Link>SDL2#.dll.config</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Gettext-ScanForTranslations>False</Gettext-ScanForTranslations>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\ext\xwt\Xwt\Xwt.csproj">
       <Project>{92494904-35FA-4DC9-BDE9-3A3E87AC49D3}</Project>
       <Name>Xwt</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\ext\SDL2-CS.dll.config">
+      <Link>SDL2-CS.dll.config</Link>
+    </None>
   </ItemGroup>
 </Project>
