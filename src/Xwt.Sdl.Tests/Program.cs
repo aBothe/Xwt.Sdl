@@ -173,10 +173,12 @@ namespace Xwt.Sdl.Tests
 
 			Menu menu = new Menu ();
 			MenuItem fileMenu = new MenuItem ("&File");
+			Menu fileSubMenu = fileMenu.SubMenu = new Menu ();
+
 			MenuItem exitButton = new MenuItem ("A&ction 1");
 			exitButton.Image = icon1;
 			exitButton.Clicked += (sender, e) => scroll.Value += 15;
-			fileMenu.SubMenu.Items.Add (exitButton);
+			fileSubMenu.Items.Add (exitButton);
 			menu.Items.Add (fileMenu);
 			mw.MainMenu = menu;
 
