@@ -57,6 +57,9 @@ namespace Xwt.Sdl.Tests
 
 		protected override void OnDraw (Context ctx, Rectangle dirtyRect)
 		{
+			ctx.Rectangle (dirtyRect);
+			ctx.SetColor (Colors.White);
+			ctx.Fill ();
 			var b = Bounds;
 			ctx.SetColor (Colors.Black);
 
@@ -147,7 +150,7 @@ namespace Xwt.Sdl.Tests
 			tabs.Add (scrollSurrounding, "Other canvas");
 
 			var scroll = new VScrollbar ();
-			scroll.PageSize = 50;
+			scroll.PageSize = 20;
 			scroll.LowerValue = 0;
 			scroll.UpperValue = 100;
 			scroll.PageIncrement = 10;
@@ -168,14 +171,22 @@ namespace Xwt.Sdl.Tests
 			var icon1 = Image.FromFile ("ts.png");
 			mw.Icon = icon1;
 
-			//mw.MainMenu = new Menu ();
+			Menu menu = new Menu ();
+			MenuItem fileMenu = new MenuItem ("&File");
+			MenuItem exitButton = new MenuItem ("A&ction 1");
+			exitButton.Image = icon1;
+			exitButton.Clicked += (sender, e) => scroll.Value += 15;
+			fileMenu.SubMenu.Items.Add (exitButton);
+			menu.Items.Add (fileMenu);
+			mw.MainMenu = menu;
+
 			var c = new MyCanvas ();
 			c.ExpandHorizontal = true;
 			c.ExpandVertical = true;
 			tabs.Add (c, "Tab 1 #######################");
 
 			var box = new VBox ();
-			box.WidthRequest = 150;
+			box.WidthRequest = 200;
 			box.HeightRequest = 200;
 			//box.BackgroundColor = Colors.GreenYellow;
 			c.AddChild (box);

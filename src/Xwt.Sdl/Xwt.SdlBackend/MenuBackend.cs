@@ -24,30 +24,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Collections.Generic;
 using Xwt.Backends;
 
 namespace Xwt.Sdl
 {
-	public class MenuBackend : IMenuBackend
+	public class MenuBackend : WidgetBackend, IMenuBackend
 	{
+		List<MenuItemBackend> items = new List<MenuItemBackend> ();
+
+
 		public MenuBackend ()
 		{
-			Height = 25.0;
+			Height = WidgetStyles.Instance.MenuBarHeight;
 		}
 
-		public readonly double Height;
-
-		public object Font {
-			get {
-				throw new NotImplementedException ();
-			}
-
-			set {
-				throw new NotImplementedException ();
-			}
-		}
-
-		public void Draw(CairoBackend.CairoContextBackend c,int width)
+		public void DrawAsMenuBar(CairoBackend.CairoContextBackend c,int width)
 		{
 			c.Context.SetSourceRGB (1, 0, 0);
 			c.Rectangle (0, 0, (double)width, (double)Height);
@@ -58,12 +50,15 @@ namespace Xwt.Sdl
 
 		public void InsertItem (int index, IMenuItemBackend menuItem)
 		{
-			throw new NotImplementedException ();
+			if (index >= items.Count)
+				items.Add ((MenuItemBackend)menuItem);
+			else
+				items.Insert (index, (MenuItemBackend)menuItem);
 		}
 
 		public void RemoveItem (IMenuItemBackend menuItem)
 		{
-			throw new NotImplementedException ();
+			items.Remove (menuItem as MenuItemBackend);
 		}
 
 		public void Popup ()
@@ -74,25 +69,6 @@ namespace Xwt.Sdl
 		public void Popup (IWidgetBackend widget, double x, double y)
 		{
 			throw new NotImplementedException ();
-		}
-
-		#endregion
-
-		#region IBackend implementation
-
-		public void InitializeBackend (object frontend, ApplicationContext context)
-		{
-
-		}
-
-		public void EnableEvent (object eventId)
-		{
-
-		}
-
-		public void DisableEvent (object eventId)
-		{
-
 		}
 
 		#endregion

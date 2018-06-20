@@ -73,6 +73,8 @@
     <Compile Include="Xwt.SdlBackend\TextEditor\ScrollViewBackend.cs" />
     <Compile Include="Xwt.SdlBackend\ScrollBarBackend.cs" />
     <Compile Include="Xwt.SdlBackend\IInWindowDrag.cs" />
+    <Compile Include="Xwt.SdlBackend\MenuItemBackend.cs" />
+    <Compile Include="Xwt.SdlBackend\ImageBackend.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

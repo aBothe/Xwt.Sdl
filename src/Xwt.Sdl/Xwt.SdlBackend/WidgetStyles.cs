@@ -92,6 +92,13 @@ namespace Xwt.Sdl
 		#region ScrollView
 		public double ScrollViewStepIncrementPercent = 7.0;
 		#endregion
+
+		#region Menu
+		public int MenuBarHeight = 25;
+		public int MenuItemHeight = 25;
+		public Color MenuBorder = Colors.DarkGray;
+		public Color MenuSeparatorColor = Colors.LightGray;
+		#endregion
 	}
 }
 

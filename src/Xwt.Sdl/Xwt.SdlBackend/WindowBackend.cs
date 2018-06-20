@@ -93,7 +93,7 @@ namespace Xwt.Sdl
 
 			if (drawingSurface != null)
 				drawingSurface.Dispose ();
-
+			
 			drawingSurface = new Cairo.ImageSurface (windowSurface.pixels, Cairo.Format.RGB24, windowSurface.w, windowSurface.h, windowSurface.pitch);
 		}
 
@@ -101,7 +101,7 @@ namespace Xwt.Sdl
 		{
 			if (menu != null) {
 				if (y <= menuHeight) // Normalize y value
-					return null; // .. or return a widget wrapper
+					return menu; // .. or return a widget wrapper
 			}
 
 			if (child == null || 
@@ -215,16 +215,6 @@ namespace Xwt.Sdl
 						return;
 
 					int x = ev.motion.x, y = ev.motion.y;
-
-					if (menu != null && y <= menuHeight) {
-						if (hoveredWidget != null) {
-							hoveredWidget.FireMouseLeave ();
-							hoveredWidget = null;
-						}
-
-						//TODO: Menu implementation
-						return;
-					}
 
 					if (CurrentDragOperation != null)
 						CurrentDragOperation.MouseMove (x, y);
@@ -383,7 +373,7 @@ namespace Xwt.Sdl
 					}
 
 					if (menu != null)
-						menu.Draw (ctxt, Width);
+						menu.DrawAsMenuBar (ctxt, Width);
 
 					if (child != null)
 						child.Draw (ctxt, childRect.Intersect (invalidatedRegion));

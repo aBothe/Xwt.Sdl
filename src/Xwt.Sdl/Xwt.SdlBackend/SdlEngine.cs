@@ -65,8 +65,8 @@ namespace Xwt.Sdl
 			RegisterBackend<GradientBackendHandler, CairoBackend.CairoGradientBackendHandler> ();
 			RegisterBackend<FontBackendHandler, CairoBackend.CairoFontBackendHandler> ();
 			RegisterBackend<IMenuBackend, MenuBackend> ();
-			/*RegisterBackend<IMenuItemBackend, MenuItemBackend> ();
-			RegisterBackend<ICheckBoxMenuItemBackend, CheckBoxMenuItemBackend> ();
+			RegisterBackend<IMenuItemBackend, MenuItemBackend> ();
+			/*RegisterBackend<ICheckBoxMenuItemBackend, CheckBoxMenuItemBackend> ();
 			RegisterBackend<IRadioButtonMenuItemBackend, RadioButtonMenuItemBackend> ();
 			RegisterBackend<ISeparatorMenuItemBackend, SeparatorMenuItemBackend> ();*/
 			RegisterBackend<IScrollViewBackend, ScrollViewBackend> ();
