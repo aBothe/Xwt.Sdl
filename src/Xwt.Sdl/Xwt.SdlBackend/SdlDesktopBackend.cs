@@ -47,7 +47,7 @@ namespace Xwt.Sdl
 			return new Point ((double)(mx+wx), (double)(my+wy));
 		}
 
-		class Screen
+		public class Screen
 		{
 			public int id;
 			public Rectangle Bounds;

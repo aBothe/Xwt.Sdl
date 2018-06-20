@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
-using System.Runtime.InteropServices;
+using Xwt.Drawing;
 using Xwt.Backends;
 using SDL2;
 using System.Collections.Generic;
@@ -72,6 +72,7 @@ namespace Xwt.Sdl
 		bool focused;
 		public bool HasFocus {get{return focused;}}
 		bool sensitive = true;
+		Color backgroundColor = new Color(1.0, 1.0, 1.0);
 
 		/// <summary>
 		/// Used for scrolling etc.
@@ -521,6 +522,17 @@ namespace Xwt.Sdl
 			SDL.SDL_ShowWindow (window);
 		}
 
+		public Color BackgroundColor {
+			get {
+				return backgroundColor;
+			}
+			set {
+				if (backgroundColor != (backgroundColor = value)) {
+					Invalidate ();
+				}
+			}
+		}
+
 		public Rectangle Bounds {
 			get {
 				int x, y, w, h;
@@ -588,10 +600,12 @@ namespace Xwt.Sdl
 
 		public double Opacity {
 			get {
-				throw new NotImplementedException ();
+				float opacity;
+				SDL.SDL_GetWindowOpacity (window, out opacity);
+				return (double)opacity;
 			}
 			set {
-				throw new NotImplementedException ();
+				SDL.SDL_SetWindowOpacity (window, (float)value);
 			}
 		}
 
@@ -607,7 +621,13 @@ namespace Xwt.Sdl
 
 		public object Screen {
 			get {
-				throw new NotImplementedException ();
+				int displayIndex = SDL.SDL_GetWindowDisplayIndex (window);
+				SDL.SDL_Rect bounds;
+				SDL.SDL_GetDisplayBounds (displayIndex, out bounds);
+				return new SdlDesktopBackend.Screen {
+					id = displayIndex,
+					Bounds = new Rectangle ((double)bounds.x, (double)bounds.y, (double)bounds.w, (double)bounds.h)
+				};
 			}
 		}
 

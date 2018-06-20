@@ -25,7 +25,6 @@
 // THE SOFTWARE.
 using System;
 using Xwt.Backends;
-using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
 using Xwt.CairoBackend;
 

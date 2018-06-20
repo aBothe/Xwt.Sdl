@@ -37,6 +37,17 @@ namespace Xwt.Sdl
 		protected new ILabelEventSink EventSink {get{ return base.EventSink as ILabelEventSink; }}
 		public bool havePadding = true;
 
+		bool selectable;
+		public bool Selectable {
+			get {
+				return selectable;
+			}
+			set {
+				selectable = value;
+				Invalidate ();
+			}
+		}
+
 		string text;
 		public string Text {
 			get {

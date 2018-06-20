@@ -164,7 +164,12 @@ namespace Xwt.CairoBackend
 				tl.Layout.Ellipsize = Pango.EllipsizeMode.End;
 			if (textTrimming == TextTrimming.Word)
 				tl.Layout.Ellipsize = Pango.EllipsizeMode.None;
+		}
 
+		public override void SetAlignment (object backend, Alignment alignment)
+		{
+			var tl = (PangoBackend)backend;
+			tl.Layout.Alignment = (Pango.Alignment)(int)alignment;
 		}
 
 		public override Size GetSize (object backend)
@@ -217,6 +222,6 @@ namespace Xwt.CairoBackend
 		{
 			throw new NotImplementedException ();
 		}
-	}
+    }
 }
 

@@ -386,13 +386,17 @@ namespace Xwt.Sdl
 		/// <summary>
 		/// Queues redrawing the widget.
 		/// </summary>
-		public void Invalidate()
+		public void Invalidate ()
 		{
-			Invalidate (new Rectangle(0,0, Width, Height));
+			Invalidate (new Rectangle (0, 0, Width, Height));
 		}
 
 		public void Invalidate(Rectangle rect, bool isAbsolute = false)
 		{
+			if (rect.IsEmpty) {
+				return;
+			}
+
 			if (!isAbsolute) {
 				double x, y;
 				GetAbsoluteLocation (out x, out y);
@@ -466,10 +470,29 @@ namespace Xwt.Sdl
 				customFont.Dispose ();*/
 		}
 
+		public Point ConvertToParentCoordinates (Point widgetCoordinates)
+		{
+			return RelativeLocation.Offset (viewPortProxyX, viewPortProxyY).Offset (widgetCoordinates);
+		}
+
+		public Point ConvertToWindowCoordinates (Point widgetCoordinates)
+		{
+			return AbsoluteLocation.Offset (viewPortProxyX, viewPortProxyY).Offset (widgetCoordinates);
+		}
+
 		public Point ConvertToScreenCoordinates (Point widgetCoordinates)
 		{
-			//TODO: Add the client-windowframe offsets and the window coordinates
-			return AbsoluteLocation.Offset(viewPortProxyX, viewPortProxyY).Offset (widgetCoordinates);
+			Point c = ConvertToWindowCoordinates (widgetCoordinates);
+
+			int wtop, wleft, wbottom, wright;
+			IntPtr nativeHandle = ParentWindow.NativeHandle;
+			if (SDL2.SDL.SDL_GetWindowBordersSize (nativeHandle, out wtop, out wleft, out wbottom, out wright) == 0) {
+				c = c.Offset (wtop, wleft);
+			}
+
+			int wx, wy;
+			SDL2.SDL.SDL_GetWindowPosition (nativeHandle, out wx, out wy);
+			return c.Offset (wx, wy);
 		}
 
 		public void SetMinSize (double width, double height)

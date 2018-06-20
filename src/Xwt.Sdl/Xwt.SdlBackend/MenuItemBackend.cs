@@ -5,7 +5,6 @@ namespace Xwt.Sdl
 {
 	public class MenuItemBackend : IMenuItemBackend
 	{
-
 		string label;
 		bool sensitive;
 		bool mnemonic;
@@ -44,6 +43,8 @@ namespace Xwt.Sdl
 			}
 		}
 
+		public string TooltipText { get; set; }
+
 		public bool Visible {
 			get {
 				throw new NotImplementedException ();
@@ -56,7 +57,6 @@ namespace Xwt.Sdl
 
 		public void Initialize (IMenuItemEventSink eventSink)
 		{
-			
 		}
 
 		public void SetImage (ImageDescription image)
@@ -66,22 +66,23 @@ namespace Xwt.Sdl
 
 		public void SetSubmenu (IMenuBackend menu)
 		{
-			
+
+		}
+
+		void Invalidate ()
+		{
 		}
 
 		public void InitializeBackend (object frontend, ApplicationContext context)
 		{
-			throw new NotImplementedException ();
 		}
 
 		public void EnableEvent (object eventId)
 		{
-			throw new NotImplementedException ();
 		}
 
 		public void DisableEvent (object eventId)
 		{
-			throw new NotImplementedException ();
 		}
 	}
 }

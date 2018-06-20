@@ -79,6 +79,7 @@ namespace Xwt.Sdl
 			var img = (handle as ImageBackend).Bitmap;
 			return new Size (img.Width, img.Height);
 		}
+
 		public override object CopyBitmap (object handle)
 		{
 			return (handle as ImageBackend).Bitmap.Clone ();
@@ -109,6 +110,12 @@ namespace Xwt.Sdl
 		public override object ConvertToBitmap (ImageDescription idesc, double scaleFactor, ImageFormat format)
 		{
 			throw new NotImplementedException ();
+		}
+
+		public override Size GetSize (string file)
+		{
+			System.Drawing.SizeF sizeF = System.Drawing.Image.FromFile (file).PhysicalDimension;
+			return new Size (sizeF.Width, sizeF.Height);
 		}
 		#endregion
 	}

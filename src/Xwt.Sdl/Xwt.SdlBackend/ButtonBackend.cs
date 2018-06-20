@@ -25,8 +25,7 @@
 // THE SOFTWARE.
 using System;
 using Xwt.Backends;
-using SDL2;
-using Xwt.CairoBackend;
+using Xwt.Drawing;
 
 namespace Xwt.Sdl
 {
@@ -36,12 +35,19 @@ namespace Xwt.Sdl
 		ButtonStyle style;
 		ButtonType type;
 		Label label;
-		public Size LabelSize
-		{
-			get{
-				return label != null ? label.Size : new Size();
+		Color? labelColor;
+		bool isDefault;
+
+		public Size LabelSize => label != null ? label.Size : new Size ();
+
+		public Color LabelColor {
+			get => labelColor != null ? labelColor.Value : Colors.Black;
+			set {
+				labelColor = value;
+				Invalidate ();
 			}
 		}
+		public bool IsDefault { get => isDefault; set { isDefault = value; Invalidate (); } }
 
 		bool mnemonic;
 		ImageDescription image;
@@ -158,7 +164,11 @@ namespace Xwt.Sdl
 			if (label != null) {
 				var labelBack = label.GetBackend () as LabelBackend;
 
-				labelBack.textCol = Sensitive ? style.ButtonLabelColor : style.ButtonInsensitiveLabelColor;
+				if (labelColor != null) {
+					labelBack.textCol = labelColor.Value;
+				} else {
+					labelBack.textCol = Sensitive ? style.ButtonLabelColor : style.ButtonInsensitiveLabelColor;
+				}
 				labelBack.Draw (c, dirtyRect);
 			}
 		}

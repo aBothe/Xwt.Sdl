@@ -28,7 +28,6 @@ using SDL2;
 using Xwt.Backends;
 using System.Threading;
 using System.Collections.Generic;
-using OpenTK.Graphics.OpenGL;
 
 namespace Xwt.Sdl
 {
@@ -40,7 +39,6 @@ namespace Xwt.Sdl
 
 		public override void InitializeApplication ()
 		{
-			GL.LoadAll ();
 			if (SDL.SDL_Init (SDL.SDL_INIT_VIDEO) < 0)
 				throw new SdlException ();
 		}
@@ -120,11 +118,11 @@ namespace Xwt.Sdl
 					runbeforeEventLoop.Pop ().Invoke ();
 				pendingEvents.Reset ();
 				while (SDL.SDL_PollEvent (out ev) != 0) {
+					HandleEvent (ev);
 					if (ev.type == SDL.SDL_EventType.SDL_QUIT) {
 						run = false;
 						return;
 					}
-					HandleEvent (ev);
 				}
 				pendingEvents.Set ();
 
